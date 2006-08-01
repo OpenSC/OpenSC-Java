@@ -3,6 +3,8 @@
 	<classpathentry output="java/bin" kind="src" path="java/src"/>
 	<classpathentry output="test/bin" kind="src" path="test/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenSC_libs"/>
+	<classpathentry kind="lib" path="java/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="java/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="test/lib/junit.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
