@@ -1,0 +1,20 @@
+#
+# $Id: TODO 1932 2006-07-28 12:03:05Z wglas $
+#
+# Author: Wolfgang Glas / ev-i Informationstechnologie GmbH
+#
+
+ - Expose specialized key classes, which implemente the respective
+   interfaces:
+
+     PKCS11RSAPrivateKey, PKCS11DSAPrivateKey
+     PKCS11RSAPublicKey, PKCS11DSAPublicKey
+
+     (more key classes may follow, if someone implements symmetric
+      ciphers or elliptic cureve algorithms...)
+
+ - Make Ecryption work by acquiring a signature on the provider from
+   SUN or bouncycastle.org
+ 
+ - Implement key pair generation and storing of certificates, which
+   involve presenting a SO pin to the card.

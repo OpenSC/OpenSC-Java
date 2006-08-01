@@ -1,0 +1,314 @@
+/* jniP11, a JCE cryptographic povider in top of PKCS#11 API
+ *
+ * Copyright (C) 2006 by ev-i Informationstechnologie GmbH www.ev-i.at
+ *
+ * Many code-snippets imported from libp11, which is
+ *
+ * Copyright (C) 2005 Olaf Kirch <okir@lst.de>
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+ */
+#include <org_opensc_pkcs11_wrap_PKCS11Object.h>
+
+#include <jniP11private.h>
+#include <stdlib.h>
+
+#define ENUM_HANDLES_BLOCK_SZ 32
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Object
+ * Method:    enumObjectsNative
+ * Signature: (JJJI)[J
+ */
+JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_enumObjectsNative)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jint p11_cls)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return 0;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  if (!slot) return 0;
+
+  CK_OBJECT_CLASS search_class = p11_cls;
+  CK_ATTRIBUTE search_attrs[] = {
+    {CKA_CLASS, &search_class, sizeof(search_class)}
+  };
+
+  CK_ULONG obj_ids[ENUM_HANDLES_BLOCK_SZ];
+
+  size_t ret_obj_ids_sz = ENUM_HANDLES_BLOCK_SZ;
+  int nobjs = 0;
+  jlong *ret_obj_ids=(jlong*)malloc(ret_obj_ids_sz * sizeof(jlong));
+
+  if (!ret_obj_ids)
+    {
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Out of memory during object enumeration for slot number %d.",
+                         (int)slot->id);
+      goto failed;
+    }
+
+  int rv = mod->method->C_FindObjectsInit(hsession,search_attrs,1);
+
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_FindObjectsInit failed for slot number %d.",
+                          (int)slot->id);
+      goto failed;
+    }
+
+  CK_ULONG count = 0;
+  int i;
+
+  rv = mod->method->C_FindObjects(hsession,obj_ids, ENUM_HANDLES_BLOCK_SZ, &count);
+
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_FindObjects failed for slot number %d.",
+                          (int)slot->id);
+      goto failed;
+    }
+
+  for (i=0; i<count ;++i)
+    {
+      ret_obj_ids[nobjs] = obj_ids[i];
+      ++nobjs;
+    }
+
+  while (count == ENUM_HANDLES_BLOCK_SZ)
+    {
+      ret_obj_ids_sz += ENUM_HANDLES_BLOCK_SZ;
+
+      jlong *new_obj_ids=(jlong*)realloc(ret_obj_ids,ret_obj_ids_sz * sizeof(jlong));
+     
+      if (!new_obj_ids)
+        {
+          jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                             "Out of memory during object enumeration for slot number %d.",
+                             (int)slot->id);
+          goto failed;
+        }
+
+      ret_obj_ids=new_obj_ids;
+
+      rv = mod->method->C_FindObjects(hsession,obj_ids,ENUM_HANDLES_BLOCK_SZ, &count);
+      
+      if (rv  != CKR_OK)
+        {
+          jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                              "C_FindObjects failed for slot number %d.",
+                              (int)slot->id);
+          goto failed;
+        }
+
+      for (i=0; i<count ;++i)
+        {
+          ret_obj_ids[nobjs] = obj_ids[i];
+          ++nobjs;
+        }
+    }
+
+  rv = mod->method->C_FindObjectsFinal(hsession);
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_FindObjectsFinal failed for slot number %d.",
+                          (int)slot->id);
+      goto failed;
+    }
+
+  // OK, akc it into JAVA's realm.
+  jlongArray ret = (*env)->NewLongArray(env,nobjs);
+  (*env)->SetLongArrayRegion(env,ret,0,nobjs,ret_obj_ids);
+
+  free(ret_obj_ids);
+  return ret;
+
+ failed:
+  free(ret_obj_ids);
+  return 0;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Object
+ * Method:    getAttributeNative
+ * Signature: (JJJI)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getAttributeNative)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return 0;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  if (!slot) return 0;
+
+  CK_ATTRIBUTE templ;
+
+  int rv;
+
+  templ.type = att;
+  templ.pValue = NULL;
+  templ.ulValueLen = 0;
+      
+  rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
+  
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_GetAttributeValue failed for attribute %u.",
+                          (unsigned)att);
+      return 0;
+    }
+
+  templ.pValue = alloca(templ.ulValueLen);
+
+  rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
+  
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_GetAttributeValue failed for attribute %u.",
+                          (unsigned)att);
+      return 0;
+    }
+  
+  jbyteArray ret = (*env)->NewByteArray(env,templ.ulValueLen);
+  (*env)->SetByteArrayRegion(env,ret,0,templ.ulValueLen,(jbyte*)templ.pValue);
+  
+  return ret;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Object
+ * Method:    getMechanismsNative
+ * Signature: (JJJJ)[Lorg/opensc/pkcs11/wrap/PKCS11Mechanism;
+ */
+jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getAllowedMechanismsNative)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return 0;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  if (!slot) return 0;
+
+  CK_ATTRIBUTE templ;
+
+  int rv;
+
+  templ.type = CKA_ALLOWED_MECHANISMS;
+  templ.pValue = NULL;
+  templ.ulValueLen = 0;
+      
+  rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
+  
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_GetAttributeValue failed for attribute CKA_ALLOWED_MECHANISMS.");
+      return 0;
+    }
+
+  templ.pValue = alloca(templ.ulValueLen);
+
+  rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
+  
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_GetAttributeValue failed for attribute CKA_ALLOWED_MECHANISMS.");
+      return 0;
+    }
+
+  CK_MECHANISM_TYPE_PTR mechanisms = (CK_MECHANISM_TYPE_PTR)templ.pValue;
+  CK_ULONG n_mechanisms = templ.ulValueLen/sizeof(CK_MECHANISM_TYPE);
+
+  return pkcs11_slot_make_jmechanisms(env,mod,slot,mechanisms,n_mechanisms);
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Object
+ * Method:    getULongAttributeNative
+ * Signature: (JJJJI)I
+ */
+jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAttributeNative)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return 0;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  if (!slot) return 0;
+
+  CK_ATTRIBUTE templ;
+  CK_ULONG ret;
+
+  int rv;
+
+  templ.type = att;
+  templ.pValue = &ret;
+  templ.ulValueLen = sizeof(CK_ULONG);
+      
+  rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
+  
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_GetAttributeValue failed for attribute %u.",
+                          (unsigned)att);
+      return 0;
+    }
+
+  return ret;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Object
+ * Method:    getBooleanAttributeNative
+ * Signature: (JJJJI)Z
+ */
+jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBooleanAttributeNative)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return 0;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  if (!slot) return 0;
+
+  CK_ATTRIBUTE templ;
+  CK_BBOOL ret;
+
+  int rv;
+
+  templ.type = att;
+  templ.pValue = &ret;
+  templ.ulValueLen = sizeof(CK_BBOOL);
+      
+  rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
+  
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_GetAttributeValue failed for attribute %u.",
+                          (unsigned)att);
+      return 0;
+    }
+
+  return ret;
+}

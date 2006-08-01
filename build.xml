@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+
+<!--
+
+ $Id: build.xml 344 2006-07-21 12:34:55Z lech $
+
+ Author: Wolfgang Glas/ev-i
+
+ Ant build file for the PKCS#11 provider
+
+-->
+
+<project name="opensc-PKCS11" basedir="." default="usage">
+
+	<property name="name" value="opensc-PKCS11"/>
+	<property name="version" value="0.1"/>
+
+	<property environment="env"/>
+
+	<condition property="c.build.dir" value="jni/build/unix/release">
+		<os family="unix" />
+	</condition>
+	<condition property="c.uild.dir" value="jni/build/mingw/release">
+		<os family="windows" />
+	</condition>
+
+	<condition property="jni.lib" value="lib${name}-${version}.so">
+		<os family="unix" />
+	</condition>
+	<condition property="jni.lib" value="${name}-${version}.dll">
+		<os family="windows" />
+	</condition>
+	
+	<property name="src.dir" value="java/src"/>            <!-- *.java -->
+	<property name="build.dir" value="java/bin"/>          <!-- *.class -->
+	<property name="lib.dir" value="java/lib"/>          <!-- external *.jar -->
+	<property name="dist.dir" value="dist"/>
+	<property name="javadoc.dir" value="doc"/>
+
+	<property name="test.src.dir" value="test/src"/><!-- *.java -->
+	<property name="test.build.dir" value="test/bin"/><!-- *.class -->
+	<property name="test.lib.dir" value="test/lib"/>      <!-- external *.jar -->
+	
+	<property name="jarfile" value="${name}.jar" />
+
+        <filelist id="third-party-jars" dir="${lib.dir}">
+			<file name="commons-logging.jar"/>
+			<file name="log4j.jar"/>
+	</filelist>
+        <filelist id="test-jars" dir="${test.lib.dir}">
+			<file name="junit.jar"/>
+        </filelist>
+
+	<path id="master-classpath">
+           <filelist refid="third-party-jars"/>
+	</path>
+
+	<path id="test-classpath">
+           <filelist refid="third-party-jars"/>
+           <filelist refid="test-jars"/>
+	   <pathelement location="${build.dir}"/>
+	</path>
+
+	<path id="runtest-classpath">
+           <filelist refid="third-party-jars"/>
+           <filelist refid="test-jars"/>
+	   <pathelement location="${build.dir}"/>
+	   <pathelement location="${test.build.dir}"/>
+	</path>
+
+
+	<!-- target Usage -->
+	<target name="usage" description="print usage" >
+
+		<echo message=""/>
+		<echo message="opensc-PKCS11 build file"/>
+		<echo message="---------------"/>
+		<echo message=""/>
+		<echo message="Available targets include:"/>
+		<echo message=""/>
+		<echo message="clean               --> Clean temporary output dirs"/>
+		<echo message="build               --> Compile main Java sources"/>
+		<echo message="jnibuild            --> Build JNI plugin"/>
+		<echo message="buildtest           --> Compile test Java sources"/>
+		<echo message="runtest             --> Run Java tests"/>
+		<echo message="javadoc             --> (re)Creates the javadoc in doc/javadoc"/>
+		<echo message="jarfile             --> Patches config files and creates .jar file"/>
+		<echo message="jnidist             --> install JNI plugin in dist-dir"/>
+		<echo message="all                 --> Everything for rebuilding"/>
+		<echo message=""/>
+		<echo message=""/>
+
+	</target>
+
+
+	<!-- target Clean -->
+	<target name="clean" description="Clean output dirs (build, dist)">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${test.build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${javadoc.dir}"/>
+	    <exec dir="${c.build.dir}" executable="make">
+                 <arg line="distclean"/>
+            </exec>
+	</target>
+
+        <!-- target jnibuild -->
+	<target name="jnibuild" description="Compile C source tree into shared library.">
+
+	    <exec dir="${c.build.dir}" executable="perl">
+                <arg line="../../../src/scripts/config.pl"/>
+            </exec>
+	    <exec dir="${c.build.dir}" executable="make"/>
+
+	</target>
+
+        <!-- target jnidist -->
+        <target name="jnidist" depends="jnibuild" description="Copy C shared library to the dist directory.">
+	    <mkdir dir="${dist.dir}"/>
+            <copy todir="${dist.dir}">
+               <fileset dir="${c.build.dir}/jniP11">
+                   <include name="${jni.lib}"/>
+               </fileset>
+            </copy>   
+        </target>
+
+         <!-- target srcdist -->
+        <target name="srcdist" description="zip source files for use in the exported eclipse project.">
+	    <mkdir dir="${dist.dir}"/>
+            <zip zipfile="${dist.dir}/opensc-PKCS11-src.zip">
+               <fileset dir="${src.dir}">
+                   <include name="**/*.java"/>
+               </fileset>
+            </zip>   
+        </target>
+
+         <!-- target distzip -->
+        <target name="distzip" depends="jarfile,jnidist,srcdist" description="zip an exported eclipse project.">
+           <copy file="conf/eclipse/classpath.tmpl" tofile="${dist.dir}/.classpath"/>
+           <copy file="conf/eclipse/project.tmpl" tofile="${dist.dir}/.project"/>
+ 
+            <zip zipfile="${dist.dir}/opensc-PKCS11-${os.name}-${os.arch}-${version}.zip">
+               <fileset dir="${dist.dir}">
+                   <include name="${jni.lib}"/>
+                   <include name="opensc-PKCS11.jar"/>
+                   <include name="opensc-PKCS11-src.zip"/>
+                   <include name=".classpath"/>
+                   <include name=".project"/>
+               </fileset>
+            </zip>   
+        </target>
+
+        <!-- target build -->
+	<target name="build" description="Compile main source tree java files into class files">
+
+		<mkdir dir="${build.dir}"/>
+
+		<javac destdir="${build.dir}" debug="true"
+				deprecation="false" optimize="false" failonerror="true" encoding="UTF-8" >
+			<src path="${src.dir}"/>
+			<classpath refid="master-classpath"/>
+		</javac>
+
+	</target>
+
+
+	<!-- target jarfile -->
+	<target name="jarfile" depends="build" description="Compile main source
+tree java files into jar archive">
+
+		<copy todir="${build.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${dist.dir}"/>
+
+		<jar jarfile="${dist.dir}/${jarfile}" compress="true" basedir="${build.dir}"/>
+
+	</target>
+	
+    <!-- target all -->
+    <target name="all" depends="clean,distzip" description="Clean,distzip"/>
+
+        <!-- target buildtest -->
+	<target name="buildtest" depends="build" description="Compile test source tree java files into class files">
+
+		<mkdir dir="${test.build.dir}"/>
+
+		<javac destdir="${test.build.dir}" debug="true"
+				deprecation="false" optimize="false" failonerror="true" encoding="UTF-8" >
+			<src path="${test.src.dir}"/>
+			<classpath refid="test-classpath"/>
+		</javac>
+
+	</target>
+
+       <!-- target runtestclass -->
+	<target name="runtestclass" depends="buildtest,jnibuild" description="run a single test">
+	
+		<java classname="junit.textui.TestRunner" fork="true">
+  	    	    <arg value="-classNames"/>
+	    	    <arg value="${testClass}"/>
+                    <jvmarg value="-Djava.library.path=${c.build.dir}/jniP11"/>
+		    <classpath refid="runtest-classpath"/>
+		</java>
+
+        </target>
+
+       <!-- target runtest -->
+	<target name="runtest" depends="buildtest" description="Compile test source tree java files into class files">
+	  <antcall target="runtestclass">
+           <param name="testClass" value="org.opensc.pkcs11.TestProvider"/>
+          </antcall>
+
+        </target>
+
+
+	<!-- target javadoc -->
+	<target name="javadoc" depends="build" >
+		<delete dir="${javadoc.dir}"/>
+		<mkdir dir="${javadoc.dir}"/>
+		<javadoc destdir="${javadoc.dir}">
+		  <fileset dir="${src.dir}" defaultexcludes="yes" />
+			<!-- when your offline activate this -->
+			<!--
+			<link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/" packagelistloc="doc/javadoc-packagelists/jdk" />
+			-->
+			<!-- when you can access the web, use this -->
+			<link offline="false" href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+			<classpath refid="test-classpath"/>
+		</javadoc>
+	</target>
+	
+</project>

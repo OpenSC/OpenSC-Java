@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry output="java/bin" kind="src" path="java/src"/>
+	<classpathentry output="test/bin" kind="src" path="test/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenSC_libs"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
