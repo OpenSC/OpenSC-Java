@@ -1,0 +1,33 @@
+#
+# $Id: README 1932 2006-07-28 12:03:05Z wglas $
+#
+# Author: Wolfgang Glas / ev-i Informationstechnologie GmbH
+#
+
+This is the PKCS#11 provider of the opensc project.
+
+It is still in an embryonic state, but it is possible to issue
+RSA/SHA1 signatures using a fully initialized card with a private
+key and at least on certificate.
+
+Before building, please populate the library subdiretories with
+some well-known JAVA libraries (or put a symbolic link there...)
+as outlined below:
+
+java/lib
+|-- commons-logging.jar
+`-- log4j.jar
+test/lib/
+`-- junit.jar
+
+In order to build the beast, try
+
+ ant all
+
+in the root directory. Please note, that when running
+the project you must supply the command line argument
+
+-Djava.library.path=<opensc-java-root>/dist
+
+to the java virtual machine in order to locate the jni
+plugin jniP11-0.1

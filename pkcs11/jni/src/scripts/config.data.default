@@ -1,0 +1,50 @@
+#
+# $Id: config.data.default,v 1.4 2006/01/11 16:38:31 wglas Exp $
+#
+# Default makefile variable settings.
+#
+ac prefix=/usr/local
+ac LIBSUBDIR=
+ac DESTDIR=
+ac EXEC=
+ac DEFS=-DHAVE_CONFIG_H
+ac LIBS=
+ac CC=gcc
+ac CFLAGS=-g -O2 -Wall
+ac LDFLAGS=
+ac NCLDFLAGS=
+ac CPPFLAGS=
+ac EXEEXT=
+ac OBJEXT=o
+ac CPP=gcc -E
+ac CXX=g++
+ac CXXFLAGS=-g -O2 -Wall
+ac RANLIB=ranlib
+ac STRIP=strip
+ac AR=ar
+ac ARFLAGS=cq
+ac RC=
+ac LIBPFX=lib
+ac LIBEXT=a
+ac LIBDYN=so
+ac LIBDYNPFX=lib
+ac DYN_LDFLAGS=-shared
+ac DYN_CFLAGS=-fPIC
+ac SSL_LDFLAGS=
+ac SSL_LIBS=-lcrypto -lssl
+ac SSL_CFLAGS=
+ac JNI_CFLAGS=-I/usr/lib/java/include -I/usr/lib/java/include/linux
+#ac JNI_CFLAGS=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+ac JNI_LDFLAGS=
+ac JNI_LIBS=
+ac OPENSC_CFLAGS=
+ac OPENSC_LDFLAGS=
+ac OPENSC_LIBS=-lopensc
+ac PKCS11_CFLAGS=
+ac PKCS11_LDFLAGS=
+ac PKCS11_LIBS=-lltdl
+ac RESOLV_LIBS=
+test { $LIBSUBDIR eq "" && $ARCHNAME =~ /^x86_64-/ } then {ac LIBSUBDIR=lib64}
+test { $LIBSUBDIR eq ""} then {ac LIBSUBDIR=lib}
+test { $RESOLV_LIBS eq "" && $ARCHNAME =~ /^x86_64-/ } then {ac RESOLV_LIBS=/usr/lib64/libresolv.a}
+test { $RESOLV_LIBS eq "" } then {ac RESOLV_LIBS=/usr/lib/libresolv.a}
