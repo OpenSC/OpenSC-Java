@@ -2,7 +2,7 @@
 
 <!--
 
- $Id: build.xml 344 2006-07-21 12:34:55Z lech $
+ $Id$
 
  Author: Wolfgang Glas/ev-i
 
@@ -42,6 +42,10 @@
 	<property name="test.lib.dir" value="test/lib"/>      <!-- external *.jar -->
 	
 	<property name="jarfile" value="${name}.jar" />
+
+        <property name="log4j.version" value="1.2.13" />
+        <property name="commons-logging.version" value="1.1" />
+        <property name="junit.version" value="4.1" />
 
         <filelist id="third-party-jars" dir="${lib.dir}">
 			<file name="commons-logging.jar"/>
@@ -104,6 +108,89 @@
                  <arg line="distclean"/>
             </exec>
 	</target>
+
+	<!-- target distclean -->
+	<target name="distclean" depends="clean" description="clean and delete all downloaded files.">
+            <delete file="test/lib/junit${junit.version}.zip"/>
+            <delete file="test/lib/junit.jar"/>
+            <delete file="test/lib/junit.jar.MD5"/>
+
+            <delete file="java/lib/logging-log4j-${log4j.version}.tar.gz"/>
+            <delete file="java/lib/log4j.jar"/>
+            <delete file="java/lib/log4j.jar.MD5"/>
+
+            <delete file="java/lib/commons-logging-${commons-logging.version}.tar.gz"/>
+            <delete file="java/lib/commons-logging.jar"/>
+            <delete file="java/lib/commons-logging.jar.MD5"/>
+        </target>
+
+        <!-- condition junit.up.to.date -->
+          <condition property="junit.up.to.date">
+             <and>
+                <available file="test/lib/junit.jar"/>
+                <checksum file="test/lib/junit.jar"/>
+             </and>
+          </condition>
+
+        <!-- target fetch-junit -->
+	<target name="fetch-junit" unless="junit.up.to.date" description="Fetch external junit.jar.">
+         <get
+src="http://switch.dl.sourceforge.net/sourceforge/junit/junit${junit.version}.zip"
+  dest="test/lib/junit${junit.version}.zip" />
+
+         <unzip src="test/lib/junit${junit.version}.zip"  dest="test/lib" />
+         <move file="test/lib/junit${junit.version}/junit-${junit.version}.jar"
+               tofile="test/lib/junit.jar"/>
+         <delete dir="test/lib/junit${junit.version}"/>
+         <checksum file="test/lib/junit.jar"/>
+        </target>
+
+
+        <!-- condition log4j.up.to.date -->
+          <condition property="log4j.up.to.date">
+             <and>
+                <available file="java/lib/log4j.jar"/>
+                <checksum file="java/lib/log4j.jar"/>
+             </and>
+          </condition>
+
+        <!-- target fetch-log4j -->
+	<target name="fetch-log4j" unless="log4j.up.to.date" description="Fetch external log4j.jar.">
+         <get
+src="http://apache.4any.org/logging/log4j/${log4j.version}/logging-log4j-${log4j.version}.tar.gz"
+  dest="java/lib/logging-log4j-${log4j.version}.tar.gz" />
+
+         <untar src="java/lib/logging-log4j-${log4j.version}.tar.gz"  dest="java/lib" compression="gzip"/>
+         <move file="java/lib/logging-log4j-${log4j.version}/dist/lib/log4j-${log4j.version}.jar"
+               tofile="java/lib/log4j.jar"/>
+         <delete dir="java/lib/logging-log4j-${log4j.version}"/>
+         <checksum file="java/lib/log4j.jar"/>
+        </target>
+
+        <!-- condition commons-logging.up.to.date -->
+          <condition property="commons-logging.up.to.date">
+             <and>
+                <available file="java/lib/commons-logging.jar"/>
+                <checksum file="java/lib/commons-logging.jar"/>
+             </and>
+          </condition>
+
+        <!-- target fetch-commons-logging -->
+	<target name="fetch-commons-logging" unless="commons-logging.up.to.date" description="Fetch external commons-logging.jar.">
+         <get
+src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${commons-logging.version}.tar.gz"
+  dest="java/lib/commons-logging-${commons-logging.version}.tar.gz" />
+
+         <untar src="java/lib/commons-logging-${commons-logging.version}.tar.gz"  dest="java/lib" compression="gzip"/>
+         <move file="java/lib/commons-logging-${commons-logging.version}/commons-logging-${commons-logging.version}.jar"
+               tofile="java/lib/commons-logging.jar"/>
+         <delete dir="java/lib/commons-logging-${commons-logging.version}"/>
+         <checksum file="java/lib/commons-logging.jar"/>
+        </target>
+
+        <!-- target fetchjars -->
+	<target name="fetchjars" depends="fetch-commons-logging,fetch-log4j,fetch-junit" description="Fetch external jar files.">
+        </target>
 
         <!-- target jnibuild -->
 	<target name="jnibuild" description="Compile C source tree into shared library.">
@@ -182,7 +269,7 @@ tree java files into jar archive">
 	</target>
 	
     <!-- target all -->
-    <target name="all" depends="clean,distzip" description="Clean,distzip"/>
+    <target name="all" depends="clean,fetchjars,distzip" description="Clean,distzip"/>
 
         <!-- target buildtest -->
 	<target name="buildtest" depends="build" description="Compile test source tree java files into class files">

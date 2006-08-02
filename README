@@ -1,5 +1,5 @@
 #
-# $Id: README 1932 2006-07-28 12:03:05Z wglas $
+# $Id$
 #
 # Author: Wolfgang Glas / ev-i Informationstechnologie GmbH
 #
@@ -10,24 +10,47 @@ It is still in an embryonic state, but it is possible to issue
 RSA/SHA1 signatures using a fully initialized card with a private
 key and at least on certificate.
 
-Before building, please populate the library subdiretories with
-some well-known JAVA libraries (or put a symbolic link there...)
-as outlined below:
-
-java/lib
-|-- commons-logging.jar
-`-- log4j.jar
-test/lib/
-`-- junit.jar
+Installation
+------------
 
 In order to build the beast, try
 
  ant all
 
-in the root directory. Please note, that when running
+in the root directory. This script will automagically
+fetches some popular java libraries via http, if called for the
+first time.
+
+Please note, that when running main methods or JUnit tests
 the project you must supply the command line argument
 
 -Djava.library.path=<opensc-java-root>/dist
 
 to the java virtual machine in order to locate the jni
-plugin jniP11-0.1
+plugin libopensc-PKCS1-0.1.so resp. opensc-PKCS1-0.1.dll
+
+Eclipse integration
+-------------------
+
+If you like to use the PKCS11 provider inside an eclipse
+project, you should import the file
+  
+  dist/opensc-PKCS11-<os>-<arch>-0.1.zip
+
+as a new eclipse project by using the
+
+  File->Import->Import existing project into workspace->
+    archive file
+
+facility of eclipse. Afterwards, you should select the new
+project opensc-PKCS11 as a referenced project insode your
+own JAVA project.
+
+Developping opensc-PKCS11
+-------------------------
+
+opensc-PKCS11 comes with the necessary project files for
+using the SVN-tree as an eclipse project.
+
+The file conf/eclipse/TestProvider.launch contain a complete
+'Run...' configuration for the JUnit test case.
