@@ -103,6 +103,62 @@ JNIEXPORT jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_
 JNIEXPORT jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMechanismsNative)
   (JNIEnv *, jobject, jlong, jlong);
 
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenLabelNative
+ * Signature: (JJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenLabelNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenManufacturerNative
+ * Signature: (JJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenManufacturerNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenModelNative
+ * Signature: (JJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenModelNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenSerialNumberNative
+ * Signature: (JJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenSerialNumberNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenMinPinLenNative
+ * Signature: (JJ)I
+ */
+JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPinLenNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenMaxPinLenNative
+ * Signature: (JJ)I
+ */
+JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPinLenNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    hasTokenProtectedAuthPathNative
+ * Signature: (JJ)Z
+ */
+JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_hasTokenProtectedAuthPathNative)
+  (JNIEnv *, jobject, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

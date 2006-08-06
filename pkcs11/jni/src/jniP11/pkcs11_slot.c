@@ -66,7 +66,32 @@ pkcs11_slot_t *new_pkcs11_slot(JNIEnv *env,  pkcs11_module_t *mod, CK_SLOT_ID id
           (int)slot->ck_slot_info.firmwareVersion.minor );
 #endif
 
- return slot;
+  if (slot->ck_slot_info.flags & CKF_TOKEN_PRESENT)
+    {
+      rv = mod->method->C_GetTokenInfo(id,&slot->ck_token_info);
+      if (rv != CKR_OK)
+        {
+          jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                              "C_GetTokenInfo for PKCS11 slot %d failed.",(int)id);
+          goto failed;
+        }
+
+#ifdef DEBUG_PKCS11_SLOT
+      fprintf(stderr,"token.label= %.32s.\n",slot->ck_token_info.label);
+      fprintf(stderr,"token.manufacturer= %.32s.\n",slot->ck_token_info.manufacturerID);
+      fprintf(stderr,"token.model= %.16s.\n",slot->ck_token_info.model);
+      fprintf(stderr,"token.serialNumber= %.16s.\n",slot->ck_token_info.serialNumber);
+      fprintf(stderr,"token.flags= %x.\n",(unsigned)slot->ck_token_info.flags);
+      fprintf(stderr,"token.ulMaxSessionCount= %u.\n",
+              (unsigned)slot->ck_token_info.ulMaxSessionCount);
+      fprintf(stderr,"token.ulMaxPinLen= %u.\n",
+              (unsigned)slot->ck_token_info.ulMaxPinLen);
+      fprintf(stderr,"token.ulMinPinLen= %u.\n",
+              (unsigned)slot->ck_token_info.ulMinPinLen);
+#endif
+    }
+    
+  return slot;
 
 failed:
   free(slot);

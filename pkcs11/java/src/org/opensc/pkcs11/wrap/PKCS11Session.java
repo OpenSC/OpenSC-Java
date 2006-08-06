@@ -104,6 +104,13 @@ public class PKCS11Session extends DestroyableHolder
 	
 	/**
 	 * Presents the user PIN to the token. Should only be called after open().
+	 * 
+	 * @param pin The user pin. This paremeter may be <code>null</code>, if the
+	 *            token has a protected authentication path.
+	 *            
+	 * @throws PKCS11Exception Upon errors of the underlying PKCS#11 engine.
+	 *            
+	 * @see PKCS11Slot#hasTokenProtectedAuthPath()
 	 */
 	public void loginUser(char[] pin) throws PKCS11Exception
 	{
@@ -117,6 +124,13 @@ public class PKCS11Session extends DestroyableHolder
 	
 	/**
 	 * Presents the security officer PIN to the token. Should only be called after open().
+	 * 
+	 * @param pin The SO pin. This paremeter may be <code>null</code>, if the
+	 *            token has a protected authentication path.
+	 *            
+	 * @throws PKCS11Exception Upon errors of the underlying PKCS#11 engine.
+	 *            
+	 * @see PKCS11Slot#hasTokenProtectedAuthPath()
 	 */
 	public void loginSO(char[] pin) throws PKCS11Exception
 	{

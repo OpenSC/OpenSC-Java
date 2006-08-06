@@ -37,6 +37,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.security.auth.callback.CallbackHandler;
 
 import junit.framework.TestCase;
 
@@ -98,7 +99,7 @@ public class TestProvider extends TestCase
 		PKCS11LoadStoreParameter params  = new PKCS11LoadStoreParameter();
 		
 		params.setWaitForSlot(true);
-		params.setProtectionParameter(new PasswordProtection(null));
+		params.setProtectionParameter(new KeyStore.CallbackHandlerProtection(new PINEntry()));
 		
 		ks.load(params);
 		
@@ -141,7 +142,7 @@ public class TestProvider extends TestCase
 		PKCS11LoadStoreParameter params  = new PKCS11LoadStoreParameter();
 		
 		params.setWaitForSlot(true);
-		params.setProtectionParameter(new PasswordProtection(null));
+		params.setProtectionParameter(new KeyStore.CallbackHandlerProtection(new PINEntry()));
 		
 		ks.load(params);
 		
@@ -164,6 +165,7 @@ public class TestProvider extends TestCase
 				{
 					Key key = ks.getKey(alias,null);
 					
+					System.out.println("certificate="+certificate);
 					System.out.println("key.class="+key.getClass());
 					
 					assertTrue(provider.getService("Signature","SHA1withRSA").supportsParameter(key));
@@ -175,11 +177,22 @@ public class TestProvider extends TestCase
 					//
 					Signature sig = Signature.getInstance("SHA1withRSA" /*,provider*/);
 					sig.initSign((PrivateKey)key);
+					System.out.println("sig.provider="+sig.getProvider().getName());
+					
 					sig.update(testData);
 					byte[] signature = sig.sign();
 					
+					System.out.print("sig=");
+					
+					for (byte b:signature)
+					{
+						System.out.print(String.format("%02x",((int)b)&0xff));
+					}
+					System.out.println(".");
+					
 					Signature vfy = Signature.getInstance("SHA1withRSA");
 					vfy.initVerify(certificate);
+					System.out.println("vfy.provider="+vfy.getProvider().getName());
 					vfy.update(testData);
 					assertEquals(vfy.verify(signature),true);
 				}
@@ -194,7 +207,7 @@ public class TestProvider extends TestCase
 		PKCS11LoadStoreParameter params  = new PKCS11LoadStoreParameter();
 		
 		params.setWaitForSlot(true);
-		params.setProtectionParameter(new PasswordProtection(null));
+		params.setProtectionParameter(new KeyStore.CallbackHandlerProtection(new PINEntry()));
 		
 		ks.load(params);
 		
@@ -236,6 +249,8 @@ public class TestProvider extends TestCase
 	public void testWrapper() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException, PKCS11Exception
 	{
 		List<PKCS11Slot> slots = PKCS11Slot.enumerateSlots(provider);
+		
+		char [] pin = null;
 		
 		for (Iterator<PKCS11Slot> iter = slots.iterator(); iter.hasNext();)
 		{
@@ -290,7 +305,12 @@ public class TestProvider extends TestCase
 					System.out.println("pubkey.data.length = "+data.length);
 				}
 				
-				session.loginUser(null);
+				if (slot.hasTokenProtectedAuthPath())
+					pin = null;
+				else
+					pin = PINEntry.getPIN("Enter PIN for slot "+slot.getId());
+					
+				session.loginUser(pin);
 				
 				List<PKCS11PrivateKey> privkeys = PKCS11PrivateKey.getPrivateKeys(session);
 				

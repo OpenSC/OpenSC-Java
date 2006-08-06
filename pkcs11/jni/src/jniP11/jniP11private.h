@@ -49,6 +49,7 @@ struct pkcs11_slot_st
   int _magic;
   CK_SLOT_ID id;
   CK_SLOT_INFO ck_slot_info;
+  CK_TOKEN_INFO ck_token_info;
 };
 
 /* functions in pkcs11_error.c */

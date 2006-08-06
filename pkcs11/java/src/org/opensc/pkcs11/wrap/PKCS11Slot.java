@@ -253,6 +253,138 @@ public class PKCS11Slot extends DestroyableHolder
 		return getMechanismsNative(pvh,handle);
 	}
 	
+	private native byte[] getTokenLabelNative(long pvh, long handle) throws PKCS11Exception;
+	
+	/**
+	 * @return The label of the token.
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()                         
+	 */
+	public String getTokenLabel() throws PKCS11Exception
+	{
+		try
+		{
+			return new String(getTokenLabelNative(pvh,handle),"UTF-8");
+		} catch (UnsupportedEncodingException e)
+		{
+			return null;
+		}
+	}
+	
+	private native byte[] getTokenManufacturerNative(long pvh, long handle) throws PKCS11Exception;
+	
+	/**
+	 * @return The manufacturer of the token.
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()                         
+	 */
+	public String getTokenManufacturer() throws PKCS11Exception
+	{
+		try
+		{
+			return new String(getTokenManufacturerNative(pvh,handle),"UTF-8");
+		} catch (UnsupportedEncodingException e)
+		{
+			return null;
+		}
+	}
+	
+	private native byte[] getTokenModelNative(long pvh, long handle) throws PKCS11Exception;
+	
+	/**
+	 * @return The model of the token.
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()                         
+	 */
+	public String getTokenModel() throws PKCS11Exception
+	{
+		try
+		{
+			return new String(getTokenModelNative(pvh,handle),"UTF-8");
+		} catch (UnsupportedEncodingException e)
+		{
+			return null;
+		}
+	}
+		
+	private native byte[] getTokenSerialNumberNative(long pvh, long handle) throws PKCS11Exception;
+	
+	/**
+	 * @return The serial number of the token.
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()                         
+	 */
+	public String getTokenSerialNumber() throws PKCS11Exception
+	{
+		try
+		{
+			return new String(getTokenSerialNumberNative(pvh,handle),"UTF-8");
+		} catch (UnsupportedEncodingException e)
+		{
+			return null;
+		}
+	}
+			
+	private native int getTokenMinPinLenNative(long pvh, long handle) throws PKCS11Exception;
+
+	/**
+	 * @return The minimal PIN length of the token.
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()                         
+	 */
+	public int getTokenMinPinLen() throws PKCS11Exception
+	{
+		
+		return getTokenMinPinLenNative(pvh,handle);
+	}
+			
+	private native int getTokenMaxPinLenNative(long pvh, long handle) throws PKCS11Exception;
+
+	/**
+	 * @return The maximal PIN length of the token.
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()                         
+	 */
+	public int getTokenMaxPinLen() throws PKCS11Exception
+	{
+		
+		return getTokenMaxPinLenNative(pvh,handle);
+	}
+			
+	private native boolean hasTokenProtectedAuthPathNative(long pvh, long handle) throws PKCS11Exception;
+
+	/**
+	 * Checks, if the token has an protected authentication path via a PINpad
+	 * or another hardware authentication method.
+	 * 
+	 * @return Whether the token has a protected authentication path.
+	 *         If <code>true</code>, PIN parameters passed to the login
+	 *         functions of an associated session may be null.
+	 *         
+	 * @throws PKCS11Exception When no token is in the slot or another
+	 *                         error of the underlying PKCS#11 engine occurrs.
+	 *                         
+	 * @see PKCS11Slot#isTokenPresent()       
+	 * @see PKCS11Session#loginUser(char[])
+	 * @see PKCS11Session#loginSO(char[])               
+	 */
+	public boolean hasTokenProtectedAuthPath() throws PKCS11Exception
+	{
+		return hasTokenProtectedAuthPathNative(pvh,handle);
+	}
+			
 	/**
 	 * @return Returns the id of this slot.
 	 */
