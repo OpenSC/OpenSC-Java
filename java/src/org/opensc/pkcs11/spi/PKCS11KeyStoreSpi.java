@@ -558,13 +558,20 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				}
 				else if (so_pp instanceof CallbackHandlerProtection)
 				{
-					CallbackHandler cbh =
-						((CallbackHandlerProtection)so_pp).getCallbackHandler();
+					char [] pin = null;
+					// do authenticate with the protected auth method of the token,
+					// if this is possible, otherwise use the callback to authenticate.
+					if (!this.slot.hasTokenProtectedAuthPath())
+					{
+						CallbackHandler cbh =
+							((CallbackHandlerProtection)so_pp).getCallbackHandler();
 					
-					PasswordCallback pcb = new PasswordCallback("Please enter the SO pin:",false);
-					cbh.handle(new Callback[] { pcb });
+						PasswordCallback pcb = new PasswordCallback("Please enter the SO pin:",false);
+						cbh.handle(new Callback[] { pcb });
+						pin = pcb.getPassword();
+					}
 					
-					session.loginSO(pcb.getPassword());
+					session.loginSO(pin);
 				}
 			}
 
@@ -575,13 +582,21 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			}
 			else if (pp instanceof CallbackHandlerProtection)
 			{
-				CallbackHandler cbh =
-					((CallbackHandlerProtection)pp).getCallbackHandler();
+				char [] pin = null;
+				// do authenticate with the protected auth method of the token,
+				// if this is possible, otherwise use the callback to authenticate. 
+				if (!this.slot.hasTokenProtectedAuthPath())
+				{
+					CallbackHandler cbh =
+						((CallbackHandlerProtection)pp).getCallbackHandler();
 				
-				PasswordCallback pcb = new PasswordCallback("Please enter the user pin:",false);
-				cbh.handle(new Callback[] { pcb });
+					PasswordCallback pcb = new PasswordCallback("Please enter the user pin:",false);
+					cbh.handle(new Callback[] { pcb });
+					
+					pin = pcb.getPassword();
+				}
 				
-				this.session.loginUser(pcb.getPassword());
+				this.session.loginUser(pin);
 			}
 
 			// OK, the session is up and running, now get the certificates
@@ -597,12 +612,6 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			for (PKCS11PrivateKey privKey : privKeys)
 			{
 				privKeysById.put(privKey.getId(),new PKCS11KSEntry(privKey));
-				
-				/*
-				String name = String.format("ID_%02X",privKey.getId());
-				
-				this.entries.put(name,new PKCS11KSEntry(privKey));
-				*/
 			}
 			
 			List<PKCS11Certificate> certificates =

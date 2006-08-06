@@ -313,3 +313,201 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMe
 
   return pkcs11_slot_make_jmechanisms(env,mod,slot,mechanisms,n_mechanisms);
 }
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenlabelNative
+ * Signature: (JJ)[B
+ */
+jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenlabelNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+
+  int l = sizeof(slot->ck_token_info.label)/sizeof(CK_UTF8CHAR);
+
+  while (l > 0 && slot->ck_token_info.label[l-1] == ' ')
+    --l;
+
+  jbyteArray ret = (*env)->NewByteArray(env,l);
+  (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.label);
+
+  return ret;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenManufacturerNative
+ * Signature: (JJ)[B
+ */
+jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenManufacturerNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+
+  int l = sizeof(slot->ck_token_info.manufacturerID)/sizeof(CK_UTF8CHAR);
+
+  while (l > 0 && slot->ck_token_info.manufacturerID[l-1] == ' ')
+    --l;
+
+  jbyteArray ret = (*env)->NewByteArray(env,l);
+  (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.manufacturerID);
+
+  return ret;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenModelNative
+ * Signature: (JJ)[B
+ */
+jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenModelNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+
+  int l = sizeof(slot->ck_token_info.model)/sizeof(CK_UTF8CHAR);
+
+  while (l > 0 && slot->ck_token_info.model[l-1] == ' ')
+    --l;
+
+  jbyteArray ret = (*env)->NewByteArray(env,l);
+  (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.model);
+
+  return ret;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenSerialNumberNative
+ * Signature: (JJ)[B
+ */
+jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenSerialNumberNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+
+  int l = sizeof(slot->ck_token_info.serialNumber)/sizeof(CK_UTF8CHAR);
+
+  while (l > 0 && slot->ck_token_info.serialNumber[l-1] == ' ')
+    --l;
+
+  jbyteArray ret = (*env)->NewByteArray(env,l);
+  (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.serialNumber);
+
+  return ret;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenMinPinLenNative
+ * Signature: (JJ)I
+ */
+jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPinLenNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+ 
+  if (slot->ck_token_info.ulMinPinLen > 0x7fffffff ||
+      slot->ck_token_info.ulMinPinLen > slot->ck_token_info.ulMaxPinLen )
+    jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                       "Invalid value %u for ulMinPinLen of token in slot %d.",
+                       (unsigned)slot->ck_token_info.ulMinPinLen,(int)slot->id);
+
+  return slot->ck_token_info.ulMinPinLen;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    getTokenMaxPinLenNative
+ * Signature: (JJ)I
+ */
+jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPinLenNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+
+  if (slot->ck_token_info.ulMaxPinLen > 0x7fffffff ||
+      slot->ck_token_info.ulMinPinLen > slot->ck_token_info.ulMaxPinLen )
+    jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                       "Invalid value %u for ulMaxPinLen of token in slot %d.",
+                       (unsigned)slot->ck_token_info.ulMaxPinLen,(int)slot->id);
+
+  return slot->ck_token_info.ulMaxPinLen;
+}
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
+ * Method:    hasTokenProtectedAuthPathNative
+ * Signature: (JJ)Z
+ */
+jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_hasTokenProtectedAuthPathNative)
+  (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
+{
+ pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return JNI_FALSE;
+
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  if (!slot) return JNI_FALSE;
+
+  if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
+    jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_TOKEN_NOT_PRESENT,
+                        "No token present in slot %d.",
+                        (int)slot->id);
+
+  return (slot->ck_token_info.flags & CKF_PROTECTED_AUTHENTICATION_PATH) != 0;
+}
