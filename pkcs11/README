@@ -43,7 +43,7 @@ as a new eclipse project by using the
     archive file
 
 facility of eclipse. Afterwards, you should select the new
-project opensc-PKCS11 as a referenced project insode your
+project opensc-PKCS11 as a referenced project inside your
 own JAVA project.
 
 Developping opensc-PKCS11
