@@ -23,7 +23,7 @@
  * 
  ***********************************************************/
 
-package org.opensc.pkcs11;
+package org.opensc.test.pkcs11;
 
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;

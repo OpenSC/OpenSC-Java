@@ -62,13 +62,13 @@
 	<path id="test-classpath">
            <filelist refid="third-party-jars"/>
            <filelist refid="test-jars"/>
-	   <pathelement location="${build.dir}"/>
+	   <pathelement location="${dist.dir}/${jarfile}"/>
 	</path>
 
 	<path id="runtest-classpath">
            <filelist refid="third-party-jars"/>
            <filelist refid="test-jars"/>
-	   <pathelement location="${build.dir}"/>
+	   <pathelement location="${dist.dir}/${jarfile}"/>
 	   <pathelement location="${test.build.dir}"/>
 	</path>
 
@@ -223,7 +223,7 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
         </target>
 
          <!-- target distzip -->
-        <target name="distzip" depends="jarfile,jnidist,srcdist" description="zip an exported eclipse project.">
+        <target name="distzip" depends="signedjarfile,jnidist,srcdist" description="zip an exported eclipse project.">
            <copy file="conf/eclipse/classpath.tmpl" tofile="${dist.dir}/.classpath"/>
            <copy file="conf/eclipse/project.tmpl" tofile="${dist.dir}/.project"/>
  
@@ -251,7 +251,6 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
 
 	</target>
 
-
 	<!-- target jarfile -->
 	<target name="jarfile" depends="build" description="Compile main source
 tree java files into jar archive">
@@ -268,11 +267,33 @@ tree java files into jar archive">
 
 	</target>
 	
-    <!-- target all -->
+    <!-- condition opensc-pkcs11.keystore.available -->
+      <condition property="opensc-pkcs11.keystore.available">
+         <and>
+            <available file="conf/keystore/opensc-pkcs11.keystore"/>
+            <available file="conf/keystore/opensc-pkcs11.txt"/>
+         </and>
+      </condition>
+
+	<!-- target signedjarfile -->
+	<target name="signedjarfile" depends="jarfile" if="opensc-pkcs11.keystore.available"
+		description="Sign the generated jar file.">
+		<property file="conf/keystore/opensc-pkcs11.txt"/>
+		
+		<exec executable="jarsigner" failonerror="true">
+			<arg line="-keystore conf/keystore/opensc-pkcs11.keystore"/>
+			<arg line="-storepass ${keystore_passwd}"/>
+			<arg line="${dist.dir}/${jarfile}"/>
+			<arg line="${signing_alias}"/>
+		</exec>
+		
+	</target>
+		
+		<!-- target all -->
     <target name="all" depends="clean,fetchjars,distzip" description="Clean,distzip"/>
 
         <!-- target buildtest -->
-	<target name="buildtest" depends="build" description="Compile test source tree java files into class files">
+	<target name="buildtest" depends="signedjarfile" description="Compile test source tree java files into class files">
 
 		<mkdir dir="${test.build.dir}"/>
 
@@ -297,9 +318,9 @@ tree java files into jar archive">
         </target>
 
        <!-- target runtest -->
-	<target name="runtest" depends="buildtest" description="Compile test source tree java files into class files">
+	<target name="runtest" depends="buildtest,jnibuild" description="Compile test source tree java files into class files">
 	  <antcall target="runtestclass">
-           <param name="testClass" value="org.opensc.pkcs11.TestProvider"/>
+           <param name="testClass" value="org.opensc.test.pkcs11.TestProvider"/>
           </antcall>
 
         </target>

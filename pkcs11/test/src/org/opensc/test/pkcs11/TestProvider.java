@@ -9,7 +9,7 @@
  * 
  ***********************************************************/
 
-package org.opensc.pkcs11;
+package org.opensc.test.pkcs11;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -39,6 +39,8 @@ import javax.crypto.NoSuchPaddingException;
 
 import junit.framework.TestCase;
 
+import org.opensc.pkcs11.PKCS11LoadStoreParameter;
+import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.pkcs11.wrap.PKCS11Certificate;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11Mechanism;
