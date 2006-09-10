@@ -29,6 +29,7 @@ import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.SignatureSpi;
 
@@ -78,7 +79,9 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	{
 		int pkcs11_alg;
 		
-		if (algorithm.equals("MD5withRSA")) 
+		if (algorithm.equals("NONEwithRSA")) 
+			pkcs11_alg = PKCS11Mechanism.CKM_RSA_PKCS;
+		else if (algorithm.equals("MD5withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_MD5_RSA_PKCS;
 		else if (algorithm.equals("SHA1withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_SHA1_RSA_PKCS;
@@ -133,6 +136,15 @@ public class PKCS11SignatureSpi extends SignatureSpi
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.security.SignatureSpi#engineInitSign(java.security.PrivateKey, java.security.SecureRandom)
+	 */
+	@Override
+	protected void engineInitSign(PrivateKey privKey, SecureRandom random) throws InvalidKeyException
+	{
+		this.engineInitSign(privKey);
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.security.SignatureSpi#engineInitSign(java.security.PrivateKey)
 	 */

@@ -66,6 +66,7 @@ public class PKCS11CipherSpi extends CipherSpi
 	PKCS11SessionChild worker;
 	PrivateKey privateKey;
 	PublicKey publicKey;
+	int mode;
 	long count;
 
 	/**
@@ -81,6 +82,7 @@ public class PKCS11CipherSpi extends CipherSpi
 		super();
 		this.provider = provider;
 		this.algorithm = algorithm;
+		this.mode = 0;
 		this.count = 0;
 	}
 
@@ -196,25 +198,33 @@ public class PKCS11CipherSpi extends CipherSpi
 	{
 		if (opmode == Cipher.ENCRYPT_MODE)
 		{
-			if (! (key instanceof PublicKey))
-				throw new InvalidKeyException("PKCS11 signature engine expects a public key for encryption mode.");
-			
-			PublicKey pubKey = (PublicKey)key;
-			
-			if (! (pubKey instanceof PKCS11SessionChild))
+			if (! (key instanceof PKCS11SessionChild))
 				throw new InvalidKeyException("PKCS11 signature engine expects a valid PKCS11 object.");
-			
-			if (!algorithm.startsWith(pubKey.getAlgorithm()))
+
+			if (!algorithm.startsWith(key.getAlgorithm()))
 				throw new InvalidKeyException("PKCS11 key algorithm ["+
-						pubKey.getAlgorithm()+
+						key.getAlgorithm()+
 						"] is incompatible with signature algorithm ["+
 						algorithm+"].");
 			
 			int pkcs11_alg = getPKCS11MechanismType();
 			
-			this.worker = (PKCS11SessionChild)pubKey;
-			this.publicKey = pubKey;
-			this.privateKey = null;
+			this.worker = (PKCS11SessionChild)key;
+			
+			if (key instanceof PublicKey)
+			{
+				this.publicKey = (PublicKey)key;
+				this.privateKey = null;
+			}
+			else if (key instanceof PrivateKey)
+			{
+				this.publicKey = null;
+				this.privateKey = (PrivateKey)key;
+			}
+			else
+				throw new InvalidKeyException("PKCS11 signature engine expects a public or private key for encryption mode.");
+	
+			this.mode = opmode;
 			
 			try
 			{
@@ -229,26 +239,33 @@ public class PKCS11CipherSpi extends CipherSpi
 		}
 		else if (opmode == Cipher.DECRYPT_MODE)
 		{
-			if (! (key instanceof PrivateKey))
-				throw new InvalidKeyException("PKCS11 signature engine expects a private key for decryption mode.");
-			
-			PrivateKey privKey = (PrivateKey)key;
-			
-			if (! (privKey instanceof PKCS11SessionChild))
+			if (! (key instanceof PKCS11SessionChild))
 				throw new InvalidKeyException("PKCS11 signature engine expects a valid PKCS11 object.");
 			
-			if (!algorithm.startsWith(privKey.getAlgorithm()))
+			if (!algorithm.startsWith(key.getAlgorithm()))
 				throw new InvalidKeyException("PKCS11 key algorithm ["+
-						privKey.getAlgorithm()+
+						key.getAlgorithm()+
 						"] is incompatible with signature algorithm ["+
 						algorithm+"].");
 			
 			int pkcs11_alg = getPKCS11MechanismType();
 			
-			this.worker = (PKCS11SessionChild)privKey;
-			this.publicKey = null;
-			this.privateKey = privKey;
+			this.worker = (PKCS11SessionChild)key;
+			if (key instanceof PublicKey)
+			{
+				this.publicKey = (PublicKey)key;
+				this.privateKey = null;
+			}
+			else if (key instanceof PrivateKey)
+			{
+				this.publicKey = null;
+				this.privateKey = (PrivateKey)key;
+			}
+			else
+				throw new InvalidKeyException("PKCS11 signature engine expects a public or private key for decryption mode.");
 			
+			this.mode = opmode;
+
 			try
 			{
 				initDecryptNative(worker.getPvh(),
@@ -260,6 +277,8 @@ public class PKCS11CipherSpi extends CipherSpi
 				throw new InvalidKeyException("PKCS11 exception initializing decryption:",e);
 			}			
 		}
+		else
+			throw new InvalidKeyException("Invalid operation mode ["+opmode+"] in PKCS11CipherSpi.engineInit().");
 		
 		this.count = 0;
 	}
@@ -299,7 +318,7 @@ public class PKCS11CipherSpi extends CipherSpi
 		{
 			this.count += len;
 			
-			if (this.privateKey != null)
+			if (this.mode == Cipher.DECRYPT_MODE)
 				return updateDecryptNative(this.worker.getPvh(),this.worker.getSlotHandle(),
 						this.worker.getSessionHandle(),this.worker.getHandle(),data,off,len);
 			else
@@ -330,7 +349,7 @@ public class PKCS11CipherSpi extends CipherSpi
 		{
 			this.count += len;
 			
-			if (this.privateKey != null)
+			if (this.mode == Cipher.DECRYPT_MODE)
 				return updateDecryptNativeOff(this.worker.getPvh(),this.worker.getSlotHandle(),
 						this.worker.getSessionHandle(),this.worker.getHandle(),
 						input,off,len,output,output_off);
@@ -363,7 +382,7 @@ public class PKCS11CipherSpi extends CipherSpi
 		
 		try
 		{
-			if (this.privateKey != null)
+			if (this.mode == Cipher.DECRYPT_MODE)
 				if (this.count == 0)
 					ret = doDecryptNative(this.worker.getPvh(),this.worker.getSlotHandle(),
 							this.worker.getSessionHandle(),this.worker.getHandle(),input,off,len);
@@ -409,7 +428,7 @@ public class PKCS11CipherSpi extends CipherSpi
 		
 		try
 		{
-			if (this.privateKey != null)
+			if (this.mode == Cipher.DECRYPT_MODE)
 				if (this.count == 0)
 					ret = doDecryptNativeOff(this.worker.getPvh(),this.worker.getSlotHandle(),
 							this.worker.getSessionHandle(),this.worker.getHandle(),
