@@ -13,8 +13,5 @@
      (more key classes may follow, if someone implements symmetric
       ciphers or elliptic cureve algorithms...)
 
- - Make Ecryption work by acquiring a signature on the provider from
-   SUN or bouncycastle.org
- 
  - Implement key pair generation and storing of certificates, which
    involve presenting a SO pin to the card.
