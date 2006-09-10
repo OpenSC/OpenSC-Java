@@ -10,10 +10,10 @@ all: Makefile bin
 install: Makefile bin-install
 
 bin:
-	make bin-recursive
+	$(MAKE) bin-recursive
 
 bin-install:
-	make bin-install-recursive
+	$(MAKE) bin-install-recursive
 
 Makefile: $(srcdir)/Makefile.in
 	echo "Updating out-of-date Makefiles..."

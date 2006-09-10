@@ -64,7 +64,7 @@ Makefile: $(srcdir)/Makefile.in
 	../reconfigure.sh
 
 build-dep:
-	make dep=yes build
+	$(MAKE) dep=yes build
 
 build: $(LIBRARY)
 
