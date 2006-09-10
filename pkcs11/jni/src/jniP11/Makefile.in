@@ -85,7 +85,7 @@ Makefile: $(srcdir)/Makefile.in
 	../reconfigure.sh
 
 build-dep:
-	make dep=yes build
+	$(MAKE) dep=yes build
 
 build: $(LIBRARY)
 
@@ -99,7 +99,7 @@ distclean:: clean
 foo:
 
 ../jnix/$(LIBPFX)jnix.$(LIBEXT): foo
-	make -C ../jnix $(LIBPFX)jnix.$(LIBEXT)
+	$(MAKE) -C ../jnix $(LIBPFX)jnix.$(LIBEXT)
 
 $(LIBRARY): $(BASELIBRARIES) $(JNIOBJECTS)
 	rm -f $@

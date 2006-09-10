@@ -27,9 +27,18 @@
 	<condition property="c.build.dir" value="jni/build/unix/release">
 		<os family="unix" />
 	</condition>
-	<condition property="c.uild.dir" value="jni/build/mingw/release">
+	<condition property="c.build.dir" value="jni/build/mingw/release">
 		<os family="windows" />
 	</condition>
+
+	<condition property="osname" value="${os.name}">
+		<os family="unix" />
+	</condition>
+	<condition property="osname" value="Windows">
+		<os family="windows" />
+	</condition>
+
+	<property name="make.exe" value="make"/>
 
 	<condition property="jni.lib" value="lib${name}-${version}.so">
 		<os family="unix" />
@@ -42,6 +51,7 @@
 	<property name="build.dir" value="java/bin"/>          <!-- *.class -->
 	<property name="lib.dir" value="java/lib"/>          <!-- external *.jar -->
 	<property name="dist.dir" value="dist"/>
+	<property name="dist.tmp.dir" value="dist/tmp"/>
 	<property name="javadoc.dir" value="doc"/>
 
 	<property name="test.src.dir" value="test/src"/><!-- *.java -->
@@ -69,13 +79,13 @@
 	<path id="test-classpath">
            <filelist refid="third-party-jars"/>
            <filelist refid="test-jars"/>
-	   <pathelement location="${dist.dir}/${jarfile}"/>
+	   <pathelement location="${dist.tmp.dir}/${jarfile}"/>
 	</path>
 
 	<path id="runtest-classpath">
            <filelist refid="third-party-jars"/>
            <filelist refid="test-jars"/>
-	   <pathelement location="${dist.dir}/${jarfile}"/>
+	   <pathelement location="${dist.tmp.dir}/${jarfile}"/>
 	   <pathelement location="${test.build.dir}"/>
 	</path>
 
@@ -109,9 +119,9 @@
 
 		<delete dir="${build.dir}"/>
 		<delete dir="${test.build.dir}"/>
-		<delete dir="${dist.dir}"/>
+		<delete dir="${dist.tmp.dir}"/>
 		<delete dir="${javadoc.dir}"/>
-	    <exec dir="${c.build.dir}" executable="make">
+	    <exec dir="${c.build.dir}" executable="${make.exe}">
                  <arg line="distclean"/>
             </exec>
 	</target>
@@ -205,14 +215,14 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
 	    <exec dir="${c.build.dir}" executable="perl">
                 <arg line="../../../src/scripts/config.pl"/>
             </exec>
-	    <exec dir="${c.build.dir}" executable="make"/>
+	    <exec dir="${c.build.dir}" executable="${make.exe}"/>
 
 	</target>
 
         <!-- target jnidist -->
         <target name="jnidist" depends="jnibuild" description="Copy C shared library to the dist directory.">
-	    <mkdir dir="${dist.dir}"/>
-            <copy todir="${dist.dir}">
+	    <mkdir dir="${dist.tmp.dir}"/>
+            <copy todir="${dist.tmp.dir}">
                <fileset dir="${c.build.dir}/jniP11">
                    <include name="${jni.lib}"/>
                </fileset>
@@ -221,8 +231,8 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
 
          <!-- target srcdist -->
         <target name="srcdist" description="zip source files for use in the exported eclipse project.">
-	    <mkdir dir="${dist.dir}"/>
-            <zip zipfile="${dist.dir}/opensc-PKCS11-src.zip">
+	    <mkdir dir="${dist.tmp.dir}"/>
+            <zip zipfile="${dist.tmp.dir}/opensc-PKCS11-src.zip">
                <fileset dir="${src.dir}">
                    <include name="**/*.java"/>
                </fileset>
@@ -231,11 +241,11 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
 
          <!-- target distzip -->
         <target name="distzip" depends="signedjarfile,jnidist,srcdist" description="zip an exported eclipse project.">
-           <copy file="conf/eclipse/classpath.tmpl" tofile="${dist.dir}/.classpath"/>
-           <copy file="conf/eclipse/project.tmpl" tofile="${dist.dir}/.project"/>
+           <copy file="conf/eclipse/classpath.tmpl" tofile="${dist.tmp.dir}/.classpath"/>
+           <copy file="conf/eclipse/project.tmpl" tofile="${dist.tmp.dir}/.project"/>
  
-            <zip zipfile="${dist.dir}/opensc-PKCS11-${os.name}-${os.arch}-${version}.${patchlevel}.zip">
-               <fileset dir="${dist.dir}">
+            <zip zipfile="${dist.dir}/opensc-PKCS11-${osname}-${os.arch}-${version}.${patchlevel}.zip">
+               <fileset dir="${dist.tmp.dir}">
                    <include name="${jni.lib}"/>
                    <include name="opensc-PKCS11.jar"/>
                    <include name="opensc-PKCS11-src.zip"/>
@@ -268,9 +278,9 @@ tree java files into jar archive">
 			</fileset>
 		</copy>
 
-		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.tmp.dir}"/>
 
-		<jar jarfile="${dist.dir}/${jarfile}" compress="true" basedir="${build.dir}">
+		<jar jarfile="${dist.tmp.dir}/${jarfile}" compress="true" basedir="${build.dir}">
 			<manifest>
 			    <attribute name="Built-By" value="${user.name}"/>
 				  <attribute name="Extension-Name" value="org.opensc.pkcs11"/>
@@ -301,7 +311,7 @@ tree java files into jar archive">
 		<exec executable="jarsigner" failonerror="true">
 			<arg line="-keystore conf/keystore/${filename}"/>
 			<arg line="-storepass ${keystore_passwd}"/>
-			<arg line="${dist.dir}/${jarfile}"/>
+			<arg line="${dist.tmp.dir}/${jarfile}"/>
 			<arg line="${signing_alias}"/>
 		</exec>
 		
