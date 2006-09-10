@@ -13,7 +13,14 @@
 <project name="opensc-PKCS11" basedir="." default="usage">
 
 	<property name="name" value="opensc-PKCS11"/>
+	<!-- This value should correspond to the value of the version
+		 in src/org/opensc/pkcs11/PKCS11Provider.java
+		 and jni/src/jniP11/Makefile.in
+      --> 
 	<property name="version" value="0.1"/>
+	<!-- The patchlevel is increased for each release, when the jni Interface
+	     remains binary compatible, i.e. no new native function is added. -->
+	<property name="patchlevel" value="0"/>
 
 	<property environment="env"/>
 
@@ -227,7 +234,7 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
            <copy file="conf/eclipse/classpath.tmpl" tofile="${dist.dir}/.classpath"/>
            <copy file="conf/eclipse/project.tmpl" tofile="${dist.dir}/.project"/>
  
-            <zip zipfile="${dist.dir}/opensc-PKCS11-${os.name}-${os.arch}-${version}.zip">
+            <zip zipfile="${dist.dir}/opensc-PKCS11-${os.name}-${os.arch}-${version}.${patchlevel}.zip">
                <fileset dir="${dist.dir}">
                    <include name="${jni.lib}"/>
                    <include name="opensc-PKCS11.jar"/>
@@ -263,8 +270,19 @@ tree java files into jar archive">
 
 		<mkdir dir="${dist.dir}"/>
 
-		<jar jarfile="${dist.dir}/${jarfile}" compress="true" basedir="${build.dir}"/>
-
+		<jar jarfile="${dist.dir}/${jarfile}" compress="true" basedir="${build.dir}">
+			<manifest>
+			    <attribute name="Built-By" value="${user.name}"/>
+				  <attribute name="Extension-Name" value="org.opensc.pkcs11"/>
+				  <attribute name="Specification-Title" value="OpenSC PKCS#11 JCE provider"/>
+			      <attribute name="Specification-Version" value="${version}"/>
+			      <attribute name="Specification-Vendor" value="opensc-project.org"/>
+			      <attribute name="Implementation-Title" value="OpenSC PKCS#11 JCE provider"/>
+			      <attribute name="Implementation-Version" value="${version}.${patchlevel}"/> 
+				  <attribute name="Implementation-Vendor" value="opensc-project.org"/>
+				  <attribute name="Implementation-Vendor-Id" value="org.opensc-project"/>
+			  </manifest>
+		</jar>
 	</target>
 	
     <!-- condition opensc-pkcs11.keystore.available -->
