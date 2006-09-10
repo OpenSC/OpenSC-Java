@@ -56,7 +56,10 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	private static final long serialVersionUID = -2568219416560640437L;
 
+	/* This value has to correspond to the value of version in build.xml */
 	private static final double version = 0.1;
+	/* This value has to correspond to the value of patchlevel in build.xml */
+	private static final double patchlevel = 0;
 	
 	static {
 		System.loadLibrary("opensc-PKCS11-"+version); 
@@ -178,7 +181,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	public PKCS11Provider(String filename) throws IOException
 	{
-		super("OpenSC-PKCS11", version, "OpenSC PKCS11 provider.");
+		super("OpenSC-PKCS11", version+0.001*patchlevel, "OpenSC PKCS11 provider.");
 		this.pkcs11ModuleHandle = 0;
 		initialize(filename);
 	}
@@ -195,7 +198,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	public PKCS11Provider(String filename, String suffix) throws IOException
 	{
-		super("OpenSC-PKCS11-"+suffix, version, "OpenSC PKCS11 provider.");
+		super("OpenSC-PKCS11-"+suffix, version+0.001*patchlevel, "OpenSC PKCS11 provider.");
 		this.pkcs11ModuleHandle = 0;
 		initialize(filename);
 	}
