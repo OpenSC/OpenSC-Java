@@ -287,19 +287,19 @@ tree java files into jar archive">
 	
     <!-- condition opensc-pkcs11.keystore.available -->
       <condition property="opensc-pkcs11.keystore.available">
-         <and>
-            <available file="conf/keystore/opensc-pkcs11.keystore"/>
-            <available file="conf/keystore/opensc-pkcs11.txt"/>
-         </and>
+         <available file="conf/keystore/opensc-pkcs11.txt"/>
       </condition>
 
 	<!-- target signedjarfile -->
 	<target name="signedjarfile" depends="jarfile" if="opensc-pkcs11.keystore.available"
 		description="Sign the generated jar file.">
-		<property file="conf/keystore/opensc-pkcs11.txt"/>
 		
+		<!-- Import the keystore_passwd, filename and signing_alias
+		     properties from opensc-pkcs11.txt -->
+		<property file="conf/keystore/opensc-pkcs11.txt"/>
+
 		<exec executable="jarsigner" failonerror="true">
-			<arg line="-keystore conf/keystore/opensc-pkcs11.keystore"/>
+			<arg line="-keystore conf/keystore/${filename}"/>
 			<arg line="-storepass ${keystore_passwd}"/>
 			<arg line="${dist.dir}/${jarfile}"/>
 			<arg line="${signing_alias}"/>

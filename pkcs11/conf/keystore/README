@@ -1,0 +1,16 @@
+#
+# $Id$
+#
+OpenCS PKCS#11 provider keystore.
+
+If you like to deliver a binary packge of the OpenSC PKCS#11 provider
+you must get hold of the keystore, which provides the code signing
+certificate for the OpenSC project.
+
+Most likely, you should have gained SVN write access to the OpenSC
+repositories by contactin the opensc-devel mailing lists and by
+actively contributing code to the OpenSC project.
+
+If you have SVN write access, you might ask Andreas Jellinghaus for
+providing you the follwing two files, which comprise the OpenSC
+keystore: opensc-pkcs11.keystore, opensc-pks11.txt
