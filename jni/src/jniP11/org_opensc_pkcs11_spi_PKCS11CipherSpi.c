@@ -50,7 +50,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
   if (rv  != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
-                          "C_EnryptInit failed for slot %d.",
+                          "C_EncryptInit failed for slot %d.",
                           (int)slot->id);
       return;
     }

@@ -156,6 +156,8 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 		putService(new PKCS11Service
         		(this, "KeyStore", "PKCS11", "org.opensc.pkcs11.spi.PKCS11KeyStoreSpi"));
 		putService(new PKCS11SignatureService
+        		(this, "Signature", "NONEwithRSA", "org.opensc.pkcs11.spi.PKCS11SignatureSpi"));
+		putService(new PKCS11SignatureService
         		(this, "Signature", "MD5withRSA", "org.opensc.pkcs11.spi.PKCS11SignatureSpi"));
 		putService(new PKCS11SignatureService
         		(this, "Signature", "SHA1withRSA", "org.opensc.pkcs11.spi.PKCS11SignatureSpi"));
