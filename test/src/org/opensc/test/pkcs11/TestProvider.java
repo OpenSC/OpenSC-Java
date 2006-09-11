@@ -315,8 +315,11 @@ public class TestProvider extends TestCase
 				if (slot.hasTokenProtectedAuthPath())
 					pin = null;
 				else
-					pin = PINEntry.getPIN("Enter PIN for slot "+slot.getId());
-					
+				{
+					PINEntry pe = new PINEntry();
+					pin = pe.getPIN("Enter PIN for slot "+slot.getId());
+				}
+				
 				session.loginUser(pin);
 				
 				List<PKCS11PrivateKey> privkeys = PKCS11PrivateKey.getPrivateKeys(session);

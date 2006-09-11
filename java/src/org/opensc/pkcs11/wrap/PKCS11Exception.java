@@ -41,135 +41,135 @@ public class PKCS11Exception extends IOException
 
 	private int errorCode;
 
-	static final int CKR_OK = 0x00000000;
-	static final int CKR_CANCEL = 0x00000001;
-	static final int CKR_HOST_MEMORY = 0x00000002;
-	static final int CKR_SLOT_ID_INVALID = 0x00000003;
+	public static final int CKR_OK = 0x00000000;
+	public static final int CKR_CANCEL = 0x00000001;
+	public static final int CKR_HOST_MEMORY = 0x00000002;
+	public static final int CKR_SLOT_ID_INVALID = 0x00000003;
 
 	/* CKR_GENERAL_ERROR and CKR_FUNCTION_FAILED are new for v2.0 */
-	static final int CKR_GENERAL_ERROR = 0x00000005;
-	static final int CKR_FUNCTION_FAILED = 0x00000006;
+	public static final int CKR_GENERAL_ERROR = 0x00000005;
+	public static final int CKR_FUNCTION_FAILED = 0x00000006;
 
 	/*
 	 * CKR_ARGUMENTS_BAD, CKR_NO_EVENT, CKR_NEED_TO_CREATE_THREADS, and
 	 * CKR_CANT_LOCK are new for v2.01
 	 */
-	static final int CKR_ARGUMENTS_BAD = 0x00000007;
-	static final int CKR_NO_EVENT = 0x00000008;
-	static final int CKR_NEED_TO_CREATE_THREADS = 0x00000009;
-	static final int CKR_CANT_LOCK = 0x0000000A;
-	static final int CKR_ATTRIBUTE_READ_ONLY = 0x00000010;
-	static final int CKR_ATTRIBUTE_SENSITIVE = 0x00000011;
-	static final int CKR_ATTRIBUTE_TYPE_INVALID = 0x00000012;
-	static final int CKR_ATTRIBUTE_VALUE_INVALID = 0x00000013;
-	static final int CKR_DATA_INVALID = 0x00000020;
-	static final int CKR_DATA_LEN_RANGE = 0x00000021;
-	static final int CKR_DEVICE_ERROR = 0x00000030;
-	static final int CKR_DEVICE_MEMORY = 0x00000031;
-	static final int CKR_DEVICE_REMOVED = 0x00000032;
-	static final int CKR_ENCRYPTED_DATA_INVALID = 0x00000040;
-	static final int CKR_ENCRYPTED_DATA_LEN_RANGE = 0x00000041;
-	static final int CKR_FUNCTION_CANCELED = 0x00000050;
-	static final int CKR_FUNCTION_NOT_PARALLEL = 0x00000051;
+	public static final int CKR_ARGUMENTS_BAD = 0x00000007;
+	public static final int CKR_NO_EVENT = 0x00000008;
+	public static final int CKR_NEED_TO_CREATE_THREADS = 0x00000009;
+	public static final int CKR_CANT_LOCK = 0x0000000A;
+	public static final int CKR_ATTRIBUTE_READ_ONLY = 0x00000010;
+	public static final int CKR_ATTRIBUTE_SENSITIVE = 0x00000011;
+	public static final int CKR_ATTRIBUTE_TYPE_INVALID = 0x00000012;
+	public static final int CKR_ATTRIBUTE_VALUE_INVALID = 0x00000013;
+	public static final int CKR_DATA_INVALID = 0x00000020;
+	public static final int CKR_DATA_LEN_RANGE = 0x00000021;
+	public static final int CKR_DEVICE_ERROR = 0x00000030;
+	public static final int CKR_DEVICE_MEMORY = 0x00000031;
+	public static final int CKR_DEVICE_REMOVED = 0x00000032;
+	public static final int CKR_ENCRYPTED_DATA_INVALID = 0x00000040;
+	public static final int CKR_ENCRYPTED_DATA_LEN_RANGE = 0x00000041;
+	public static final int CKR_FUNCTION_CANCELED = 0x00000050;
+	public static final int CKR_FUNCTION_NOT_PARALLEL = 0x00000051;
 
 	/* CKR_FUNCTION_NOT_SUPPORTED is new for v2.0 */
-	static final int CKR_FUNCTION_NOT_SUPPORTED = 0x00000054;
-	static final int CKR_KEY_HANDLE_INVALID = 0x00000060;
+	public static final int CKR_FUNCTION_NOT_SUPPORTED = 0x00000054;
+	public static final int CKR_KEY_HANDLE_INVALID = 0x00000060;
 
 	/* CKR_KEY_SENSITIVE was removed for v2.0 */
-	static final int CKR_KEY_SIZE_RANGE = 0x00000062;
-	static final int CKR_KEY_TYPE_INCONSISTENT = 0x00000063;
+	public static final int CKR_KEY_SIZE_RANGE = 0x00000062;
+	public static final int CKR_KEY_TYPE_INCONSISTENT = 0x00000063;
 
 	/*
 	 * CKR_KEY_NOT_NEEDED, CKR_KEY_CHANGED, CKR_KEY_NEEDED,
 	 * CKR_KEY_INDIGESTIBLE, CKR_KEY_FUNCTION_NOT_PERMITTED,
 	 * CKR_KEY_NOT_WRAPPABLE, and CKR_KEY_UNEXTRACTABLE are new for v2.0
 	 */
-	static final int CKR_KEY_NOT_NEEDED = 0x00000064;
-	static final int CKR_KEY_CHANGED = 0x00000065;
-	static final int CKR_KEY_NEEDED = 0x00000066;
-	static final int CKR_KEY_INDIGESTIBLE = 0x00000067;
-	static final int CKR_KEY_FUNCTION_NOT_PERMITTED = 0x00000068;
-	static final int CKR_KEY_NOT_WRAPPABLE = 0x00000069;
-	static final int CKR_KEY_UNEXTRACTABLE = 0x0000006A;
-	static final int CKR_MECHANISM_INVALID = 0x00000070;
-	static final int CKR_MECHANISM_PARAM_INVALID = 0x00000071;
+	public static final int CKR_KEY_NOT_NEEDED = 0x00000064;
+	public static final int CKR_KEY_CHANGED = 0x00000065;
+	public static final int CKR_KEY_NEEDED = 0x00000066;
+	public static final int CKR_KEY_INDIGESTIBLE = 0x00000067;
+	public static final int CKR_KEY_FUNCTION_NOT_PERMITTED = 0x00000068;
+	public static final int CKR_KEY_NOT_WRAPPABLE = 0x00000069;
+	public static final int CKR_KEY_UNEXTRACTABLE = 0x0000006A;
+	public static final int CKR_MECHANISM_INVALID = 0x00000070;
+	public static final int CKR_MECHANISM_PARAM_INVALID = 0x00000071;
 
 	/*
 	 * CKR_OBJECT_CLASS_INCONSISTENT and CKR_OBJECT_CLASS_INVALID were removed
 	 * for v2.0
 	 */
-	static final int CKR_OBJECT_HANDLE_INVALID = 0x00000082;
-	static final int CKR_OPERATION_ACTIVE = 0x00000090;
-	static final int CKR_OPERATION_NOT_INITIALIZED = 0x00000091;
-	static final int CKR_PIN_INCORRECT = 0x000000A0;
-	static final int CKR_PIN_INVALID = 0x000000A1;
-	static final int CKR_PIN_LEN_RANGE = 0x000000A2;
+	public static final int CKR_OBJECT_HANDLE_INVALID = 0x00000082;
+	public static final int CKR_OPERATION_ACTIVE = 0x00000090;
+	public static final int CKR_OPERATION_NOT_INITIALIZED = 0x00000091;
+	public static final int CKR_PIN_INCORRECT = 0x000000A0;
+	public static final int CKR_PIN_INVALID = 0x000000A1;
+	public static final int CKR_PIN_LEN_RANGE = 0x000000A2;
 
 	/* CKR_PIN_EXPIRED and CKR_PIN_LOCKED are new for v2.0 */
-	static final int CKR_PIN_EXPIRED = 0x000000A3;
-	static final int CKR_PIN_LOCKED = 0x000000A4;
-	static final int CKR_SESSION_CLOSED = 0x000000B0;
-	static final int CKR_SESSION_COUNT = 0x000000B1;
-	static final int CKR_SESSION_HANDLE_INVALID = 0x000000B3;
-	static final int CKR_SESSION_PARALLEL_NOT_SUPPORTED = 0x000000B4;
-	static final int CKR_SESSION_READ_ONLY = 0x000000B5;
-	static final int CKR_SESSION_EXISTS = 0x000000B6;
+	public static final int CKR_PIN_EXPIRED = 0x000000A3;
+	public static final int CKR_PIN_LOCKED = 0x000000A4;
+	public static final int CKR_SESSION_CLOSED = 0x000000B0;
+	public static final int CKR_SESSION_COUNT = 0x000000B1;
+	public static final int CKR_SESSION_HANDLE_INVALID = 0x000000B3;
+	public static final int CKR_SESSION_PARALLEL_NOT_SUPPORTED = 0x000000B4;
+	public static final int CKR_SESSION_READ_ONLY = 0x000000B5;
+	public static final int CKR_SESSION_EXISTS = 0x000000B6;
 
 	/*
 	 * CKR_SESSION_READ_ONLY_EXISTS and CKR_SESSION_READ_WRITE_SO_EXISTS are new
 	 * for v2.0
 	 */
-	static final int CKR_SESSION_READ_ONLY_EXISTS = 0x000000B7;
-	static final int CKR_SESSION_READ_WRITE_SO_EXISTS = 0x000000B8;
-	static final int CKR_SIGNATURE_INVALID = 0x000000C0;
-	static final int CKR_SIGNATURE_LEN_RANGE = 0x000000C1;
-	static final int CKR_TEMPLATE_INCOMPLETE = 0x000000D0;
-	static final int CKR_TEMPLATE_INCONSISTENT = 0x000000D1;
-	static final int CKR_TOKEN_NOT_PRESENT = 0x000000E0;
-	static final int CKR_TOKEN_NOT_RECOGNIZED = 0x000000E1;
-	static final int CKR_TOKEN_WRITE_PROTECTED = 0x000000E2;
-	static final int CKR_UNWRAPPING_KEY_HANDLE_INVALID = 0x000000F0;
-	static final int CKR_UNWRAPPING_KEY_SIZE_RANGE = 0x000000F1;
-	static final int CKR_UNWRAPPING_KEY_TYPE_INCONSISTENT = 0x000000F2;
-	static final int CKR_USER_ALREADY_LOGGED_IN = 0x00000100;
-	static final int CKR_USER_NOT_LOGGED_IN = 0x00000101;
-	static final int CKR_USER_PIN_NOT_INITIALIZED = 0x00000102;
-	static final int CKR_USER_TYPE_INVALID = 0x00000103;
+	public static final int CKR_SESSION_READ_ONLY_EXISTS = 0x000000B7;
+	public static final int CKR_SESSION_READ_WRITE_SO_EXISTS = 0x000000B8;
+	public static final int CKR_SIGNATURE_INVALID = 0x000000C0;
+	public static final int CKR_SIGNATURE_LEN_RANGE = 0x000000C1;
+	public static final int CKR_TEMPLATE_INCOMPLETE = 0x000000D0;
+	public static final int CKR_TEMPLATE_INCONSISTENT = 0x000000D1;
+	public static final int CKR_TOKEN_NOT_PRESENT = 0x000000E0;
+	public static final int CKR_TOKEN_NOT_RECOGNIZED = 0x000000E1;
+	public static final int CKR_TOKEN_WRITE_PROTECTED = 0x000000E2;
+	public static final int CKR_UNWRAPPING_KEY_HANDLE_INVALID = 0x000000F0;
+	public static final int CKR_UNWRAPPING_KEY_SIZE_RANGE = 0x000000F1;
+	public static final int CKR_UNWRAPPING_KEY_TYPE_INCONSISTENT = 0x000000F2;
+	public static final int CKR_USER_ALREADY_LOGGED_IN = 0x00000100;
+	public static final int CKR_USER_NOT_LOGGED_IN = 0x00000101;
+	public static final int CKR_USER_PIN_NOT_INITIALIZED = 0x00000102;
+	public static final int CKR_USER_TYPE_INVALID = 0x00000103;
 
 	/*
 	 * CKR_USER_ANOTHER_ALREADY_LOGGED_IN and CKR_USER_TOO_MANY_TYPES are new to
 	 * v2.01
 	 */
-	static final int CKR_USER_ANOTHER_ALREADY_LOGGED_IN = 0x00000104;
-	static final int CKR_USER_TOO_MANY_TYPES = 0x00000105;
-	static final int CKR_WRAPPED_KEY_INVALID = 0x00000110;
-	static final int CKR_WRAPPED_KEY_LEN_RANGE = 0x00000112;
-	static final int CKR_WRAPPING_KEY_HANDLE_INVALID = 0x00000113;
-	static final int CKR_WRAPPING_KEY_SIZE_RANGE = 0x00000114;
-	static final int CKR_WRAPPING_KEY_TYPE_INCONSISTENT = 0x00000115;
-	static final int CKR_RANDOM_SEED_NOT_SUPPORTED = 0x00000120;
+	public static final int CKR_USER_ANOTHER_ALREADY_LOGGED_IN = 0x00000104;
+	public static final int CKR_USER_TOO_MANY_TYPES = 0x00000105;
+	public static final int CKR_WRAPPED_KEY_INVALID = 0x00000110;
+	public static final int CKR_WRAPPED_KEY_LEN_RANGE = 0x00000112;
+	public static final int CKR_WRAPPING_KEY_HANDLE_INVALID = 0x00000113;
+	public static final int CKR_WRAPPING_KEY_SIZE_RANGE = 0x00000114;
+	public static final int CKR_WRAPPING_KEY_TYPE_INCONSISTENT = 0x00000115;
+	public static final int CKR_RANDOM_SEED_NOT_SUPPORTED = 0x00000120;
 
 	/* These are new to v2.0 */
-	static final int CKR_RANDOM_NO_RNG = 0x00000121;
+	public static final int CKR_RANDOM_NO_RNG = 0x00000121;
 
 	/* These are new to v2.11 */
-	static final int CKR_DOMAIN_PARAMS_INVALID = 0x00000130;
+	public static final int CKR_DOMAIN_PARAMS_INVALID = 0x00000130;
 
 	/* These are new to v2.0 */
-	static final int CKR_BUFFER_TOO_SMALL = 0x00000150;
-	static final int CKR_SAVED_STATE_INVALID = 0x00000160;
-	static final int CKR_INFORMATION_SENSITIVE = 0x00000170;
-	static final int CKR_STATE_UNSAVEABLE = 0x00000180;
+	public static final int CKR_BUFFER_TOO_SMALL = 0x00000150;
+	public static final int CKR_SAVED_STATE_INVALID = 0x00000160;
+	public static final int CKR_INFORMATION_SENSITIVE = 0x00000170;
+	public static final int CKR_STATE_UNSAVEABLE = 0x00000180;
 
 	/* These are new to v2.01 */
-	static final int CKR_CRYPTOKI_NOT_INITIALIZED = 0x00000190;
-	static final int CKR_CRYPTOKI_ALREADY_INITIALIZED = 0x00000191;
-	static final int CKR_MUTEX_BAD = 0x000001A0;
-	static final int CKR_MUTEX_NOT_LOCKED = 0x000001A1;
+	public static final int CKR_CRYPTOKI_NOT_INITIALIZED = 0x00000190;
+	public static final int CKR_CRYPTOKI_ALREADY_INITIALIZED = 0x00000191;
+	public static final int CKR_MUTEX_BAD = 0x000001A0;
+	public static final int CKR_MUTEX_NOT_LOCKED = 0x000001A1;
 
 	/* This is new to v2.20 */
-	static final int CKR_FUNCTION_REJECTED = 0x00000200;
+	public static final int CKR_FUNCTION_REJECTED = 0x00000200;
 
 	static public String getErrorCodeName(int errorCode)
 	{
