@@ -70,7 +70,14 @@ public class TestProvider extends TestCase
 	public void setUp() throws IOException
 	{	
 		// Add provider "SunPKCS11-OpenSC"
-		provider = new PKCS11Provider("/usr/lib/opensc-pkcs11.so");
+		String pkcs11_path;
+		
+		if (System.getProperty("os.name").contains("Windows"))
+			pkcs11_path = System.getenv("ProgramFiles")+"\\Smart Card Bundle\\opensc-pkcs11.dll";
+		else
+			pkcs11_path = "/usr/lib/opensc-pkcs11.so";
+			
+		provider = new PKCS11Provider(pkcs11_path);
 		Security.addProvider(provider);
 				
 		Provider providers[] = Security.getProviders();
