@@ -43,6 +43,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.opensc.pkcs11.PKCS11EventCallback;
+
 /**
  * A class ,that allows to enter PINs on the command line.
  * 
@@ -50,18 +52,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  */
 public class PINEntry implements CallbackHandler
 {
-
-	/**
-	 * Contructs a PINEntry instance. 
-	 */
-	public PINEntry()
-	{
-		super();
-	}
-
+	private Label label;
+	private Label prompt;
+	private PINListener listener;
+	private TextField textField;
+	
 	static private class PINListener implements KeyListener, WindowListener
 	{
 		private boolean accepted = false;
+		private boolean interacted = false;
 		private Frame frame;
 		
 		PINListener(Frame frame)
@@ -74,6 +73,7 @@ public class PINEntry implements CallbackHandler
 			this.frame.setVisible(false);
 			this.frame.dispose();
 			this.accepted = true;
+			this.interacted = true;
 			this.notify();	
 		}
 		
@@ -82,6 +82,7 @@ public class PINEntry implements CallbackHandler
 			this.frame.setVisible(false);
 			this.frame.dispose();
 			this.accepted = false;
+			this.interacted = true;
 			this.notify();	
 		}
 		
@@ -108,7 +109,8 @@ public class PINEntry implements CallbackHandler
 		{
 			try
 			{
-				this.wait();
+				if (!this.interacted)
+					this.wait();
 			} catch (InterruptedException e)
 			{
 				e.printStackTrace();
@@ -141,28 +143,30 @@ public class PINEntry implements CallbackHandler
 	}
 	
 	/**
-	 * Get a PIN from the user using a simple AWT window.
-	 * 
-	 * @param prompt The prompt shoen to the user.
-	 * @return The entered PIN, if the user pressed the return key.
-	 * @throws IOException If the user presses escape or closes the window.
+	 * Contructs a PINEntry instance. 
 	 */
-	static public char [] getPIN (String prompt) throws IOException
+	public PINEntry()
 	{
+		super();
 		Frame frame = new Frame("PIN entry");
 		
-		frame.setLayout(new GridLayout(1,2));
+		frame.setLayout(new GridLayout(2,2));
 		
-		Label label = new Label(prompt);
-		frame.add(label);
+		frame.add(new Label("Event:"));
 		
-		PINListener listener = new PINListener(frame);
+		this.label = new Label("NO_EVENT");
+		frame.add(this.label);
+		
+		this.prompt = new Label();
+		frame.add(this.prompt);
+		
+		this.listener = new PINListener(frame);
 
-		TextField textField = new TextField();
-		textField.setEchoChar('*');
-		textField.addKeyListener(listener);
-		frame.add(textField);
-		frame.addWindowListener(listener);
+		this.textField = new TextField();
+		this.textField.setEchoChar('*');
+		this.textField.addKeyListener(this.listener);
+		frame.add(this.textField);
+		frame.addWindowListener(this.listener);
 		
 		frame.pack();
 		frame.setVisible(true);
@@ -172,13 +176,24 @@ public class PINEntry implements CallbackHandler
 		Point p = new Point((r.width-frame.getWidth())/2,(r.height-frame.getHeight())/2);
 		
 		frame.setLocation(p);
+	}
+
+	/**
+	 * Get a PIN from the user using a simple AWT window.
+	 * 
+	 * @param prompt The prompt shown to the user.
+	 * @return The entered PIN, if the user pressed the return key.
+	 * @throws IOException If the user presses escape or closes the window.
+	 */
+	public char [] getPIN (String prompt) throws IOException
+	{
+		this.prompt.setText(prompt);
 		
 		if (!listener.waitForUser())
 			throw new IOException("The Password dialog has been interrupted by the user.");
 		
 		String pw = textField.getText();
-		char pin[] = new char[pw.length()];
-		pw.getChars(0,pw.length(),pin,0);
+		char pin[] = pw.toCharArray();
 		return pin;
 	}
 	
@@ -190,14 +205,23 @@ public class PINEntry implements CallbackHandler
 	{
 		for (Callback callback : callbacks)
 		{
-			if (!(callback instanceof PasswordCallback))
-				throw new UnsupportedCallbackException(callback,"Only PasswordCallback is supported.");
+			if (callback instanceof PasswordCallback)
+			{
+				PasswordCallback pwCb = (PasswordCallback)callback;
+				
+				char pin[] = this.getPIN(pwCb.getPrompt());
+				
+				pwCb.setPassword(pin);
+			}
+			else if (callback instanceof PKCS11EventCallback)
+			{
+				PKCS11EventCallback evCb = (PKCS11EventCallback)callback;
+				
+				this.label.setText(evCb.toString());
+			}
+			else
+				throw new UnsupportedCallbackException(callback,"Only PasswordCallback or PKCS11EventCallback is supported.");
 			
-			PasswordCallback pwCb = (PasswordCallback)callback;
-			
-			char pin[] = getPIN(pwCb.getPrompt());
-			
-			pwCb.setPassword(pin);
 		}
 	}
 

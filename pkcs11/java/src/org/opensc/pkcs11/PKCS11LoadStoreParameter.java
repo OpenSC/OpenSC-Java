@@ -55,7 +55,13 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 
 	/**
 	 * @param protectionParameter The security officer protection parameter to
-	 *                            be used. 
+	 *                            be used. A SO protection parameter is used,
+	 *                            when the token is opened in read/write mode.
+	 *                            
+	 * @see java.security.KeyStore.PasswordProtection
+	 * @see java.security.KeyStore.CallbackHandlerProtection
+	 * @see javax.security.auth.callback.PasswordCallback
+	 * @see PKCS11EventCallback
 	 */
 	public void setSOProtectionParameter(ProtectionParameter protectionParameter)
 	{
@@ -64,9 +70,14 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 
 	/**
 	 * @param protectionParameter The protectionParameter for the normal user to set
-	 *                            A protetion parameter for a normal user
+	 *                            A protection parameter for a normal user
 	 *                            is needed for signing as well as for listing 
 	 *                            private keys on the token.
+	 *                            
+	 * @see java.security.KeyStore.PasswordProtection
+	 * @see java.security.KeyStore.CallbackHandlerProtection
+	 * @see javax.security.auth.callback.PasswordCallback
+	 * @see PKCS11EventCallback
 	 */
 	public void setProtectionParameter(ProtectionParameter protectionParameter)
 	{

@@ -63,6 +63,7 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opensc.pkcs11.PKCS11EventCallback;
 import org.opensc.pkcs11.PKCS11LoadStoreParameter;
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.pkcs11.wrap.PKCS11Certificate;
@@ -452,6 +453,71 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		engineLoad(param);
 	}
 
+	private static void changeEvent(int ev, CallbackHandler eventHandler, PKCS11EventCallback cb) throws IOException
+	{
+		cb.setEvent(ev);
+		if (eventHandler==null) return;
+		
+		try
+		{
+			eventHandler.handle(new Callback[]{cb});
+		} catch (UnsupportedCallbackException e)
+		{
+			log.warn("PKCSEventCallback not supported by CallbackHandler ["+eventHandler.getClass()+"]",e);
+		}
+	}
+	
+	private static void eventFailed(CallbackHandler eventHandler, PKCS11EventCallback cb, Exception e) throws IOException
+	{
+		int fe;
+		
+		switch (cb.getEvent())
+		{
+		default:
+			fe = PKCS11EventCallback.INITIALIZATION_FAILED;
+			break;
+			
+		case PKCS11EventCallback.WAITING_FOR_CARD:
+			fe = PKCS11EventCallback.CARD_WAIT_FAILED;
+			break;
+			
+		case PKCS11EventCallback.WAITING_FOR_SW_PIN:
+			// an IOException during software PIN entry is interpreted as an abort of
+			// the PIN entry process. This is done so, because there is no standard exception
+			// for such a situation defined.
+			if ((e instanceof IOException) &&
+					!(e instanceof PKCS11Exception))
+			{
+				fe = PKCS11EventCallback.PIN_ENTRY_ABORTED;
+				break;
+			}
+		
+		case PKCS11EventCallback.WAITING_FOR_HW_PIN:
+			// A PKCS11Exception with CKR_FUNCTION_CANCELED od CKR_CANCEL
+			// is interpreted as a PIN entry abort by the user.
+			if (e instanceof PKCS11Exception)
+			{
+				PKCS11Exception p11e = (PKCS11Exception)e;
+				
+				if (p11e.getErrorCode() == PKCS11Exception.CKR_FUNCTION_CANCELED ||
+						p11e.getErrorCode() == PKCS11Exception.CKR_CANCEL)
+				{
+					fe = PKCS11EventCallback.PIN_ENTRY_ABORTED;
+					break;
+				}
+			}
+
+			fe = PKCS11EventCallback.PIN_ENTRY_FAILED;
+			break;
+			
+		case PKCS11EventCallback.PIN_ENTRY_SUCEEDED:
+			fe = PKCS11EventCallback.AUHENTICATION_FAILED;
+			break;
+		}
+		
+		changeEvent(fe,eventHandler,cb);
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.security.KeyStoreSpi#engineLoad(java.security.KeyStore.LoadStoreParameter)
 	 */
@@ -459,6 +525,14 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	public void engineLoad(LoadStoreParameter param) throws IOException,
 			NoSuchAlgorithmException, CertificateException
 	{
+		PKCS11EventCallback evCb = new PKCS11EventCallback(PKCS11EventCallback.NO_EVENT);
+
+		ProtectionParameter pp = param.getProtectionParameter();
+		
+		CallbackHandler eventHandler = null;
+		if (pp instanceof CallbackHandlerProtection)
+			eventHandler = ((CallbackHandlerProtection)pp).getCallbackHandler();
+		
 		try
 		{
 			if (this.slot != null)
@@ -472,7 +546,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			PKCS11LoadStoreParameter p11_param = null;
 			if (param instanceof PKCS11LoadStoreParameter)
 				p11_param = (PKCS11LoadStoreParameter) param;
-
+			
 			// get the new slot.
 			PKCS11Slot s = null;
 
@@ -480,12 +554,14 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			if (p11_param != null && p11_param.getSlotId() != null)
 			{
 				s = new PKCS11Slot(this.provider, p11_param.getSlotId());
-
+				
 				// is there a token ?
 				// no token, but user wants to wait.
 				if (!s.isTokenPresent() && p11_param.isWaitForSlot())
 				{
 					s.destroy();
+
+					changeEvent(PKCS11EventCallback.WAITING_FOR_CARD,eventHandler,evCb);
 
 					// OK, someone might argue, that we could intrduce a loop
 					// here in order to wait for the right token.
@@ -523,7 +599,10 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 
 				// not a single token found and user wants to wait.
 				if (s == null && p11_param != null && p11_param.isWaitForSlot())
+				{
+					changeEvent(PKCS11EventCallback.WAITING_FOR_CARD,eventHandler,evCb);
 					s = PKCS11Slot.waitForSlot(this.provider);
+				}
 			}
 
 			// So, did we finally find a slot ?
@@ -561,8 +640,14 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 					char [] pin = null;
 					// do authenticate with the protected auth method of the token,
 					// if this is possible, otherwise use the callback to authenticate.
-					if (!this.slot.hasTokenProtectedAuthPath())
+					if (this.slot.hasTokenProtectedAuthPath())
 					{
+						changeEvent(PKCS11EventCallback.WAITING_FOR_HW_PIN,eventHandler,evCb);
+					}
+					else
+					{
+						changeEvent(PKCS11EventCallback.WAITING_FOR_SW_PIN,eventHandler,evCb);
+
 						CallbackHandler cbh =
 							((CallbackHandlerProtection)so_pp).getCallbackHandler();
 					
@@ -571,11 +656,12 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 						pin = pcb.getPassword();
 					}
 					
+					changeEvent(PKCS11EventCallback.PIN_ENTRY_SUCEEDED,eventHandler,evCb);
 					session.loginSO(pin);
+					changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
 				}
 			}
 
-			ProtectionParameter pp = param.getProtectionParameter();
 			if (pp instanceof PasswordProtection)
 			{
 				this.session.loginUser(((PasswordProtection)pp).getPassword());
@@ -585,8 +671,14 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				char [] pin = null;
 				// do authenticate with the protected auth method of the token,
 				// if this is possible, otherwise use the callback to authenticate. 
-				if (!this.slot.hasTokenProtectedAuthPath())
+				if (this.slot.hasTokenProtectedAuthPath())
 				{
+					changeEvent(PKCS11EventCallback.WAITING_FOR_HW_PIN,eventHandler,evCb);
+				}
+				else
+				{
+					changeEvent(PKCS11EventCallback.WAITING_FOR_SW_PIN,eventHandler,evCb);
+
 					CallbackHandler cbh =
 						((CallbackHandlerProtection)pp).getCallbackHandler();
 				
@@ -595,8 +687,10 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 					
 					pin = pcb.getPassword();
 				}
-				
+
+				changeEvent(PKCS11EventCallback.PIN_ENTRY_SUCEEDED,eventHandler,evCb);
 				this.session.loginUser(pin);
+				changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
 			}
 
 			// OK, the session is up and running, now get the certificates
@@ -661,13 +755,21 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				
 				this.entries.put(name,entry);
 			}
-
+		} catch (IOException e)
+		{
+			eventFailed(eventHandler,evCb,e);
+			throw e;	
+		} catch (CertificateException e)
+		{
+			eventFailed(eventHandler,evCb,e);
+			throw e;	
 		} catch (DestroyFailedException e)
 		{
+			eventFailed(eventHandler,evCb,e);
 			throw new PKCS11Exception("destroy exception caught: ",e);
 		}  catch (UnsupportedCallbackException e)
 		{
-			throw new PKCS11Exception("unsupported callback:",e);
+			throw new PKCS11Exception("PasswordCallback is not supported",e);
 		} 
 	}
 
