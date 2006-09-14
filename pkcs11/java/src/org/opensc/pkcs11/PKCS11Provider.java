@@ -59,7 +59,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	/* This value has to correspond to the value of version in build.xml */
 	private static final double version = 0.1;
 	/* This value has to correspond to the value of patchlevel in build.xml */
-	private static final double patchlevel = 0;
+	private static final double patchlevel = 1;
 	
 	static {
 		System.loadLibrary("opensc-PKCS11-"+version); 

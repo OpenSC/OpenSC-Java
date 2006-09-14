@@ -105,8 +105,11 @@ public class TestProvider extends TestCase
 
 		PKCS11LoadStoreParameter params  = new PKCS11LoadStoreParameter();
 		
+		PINEntry pe = new PINEntry();
+		
 		params.setWaitForSlot(true);
-		params.setProtectionParameter(new KeyStore.CallbackHandlerProtection(new PINEntry()));
+		params.setProtectionCallback(pe);
+		params.setEventHandler(pe);
 		
 		ks.load(params);
 		
@@ -148,8 +151,11 @@ public class TestProvider extends TestCase
 
 		PKCS11LoadStoreParameter params  = new PKCS11LoadStoreParameter();
 		
+		PINEntry pe = new PINEntry();
+		
 		params.setWaitForSlot(true);
-		params.setProtectionParameter(new KeyStore.CallbackHandlerProtection(new PINEntry()));
+		params.setProtectionCallback(pe);
+		params.setEventHandler(pe);
 		
 		ks.load(params);
 		
@@ -213,8 +219,11 @@ public class TestProvider extends TestCase
 
 		PKCS11LoadStoreParameter params  = new PKCS11LoadStoreParameter();
 		
+		PINEntry pe = new PINEntry();
+		
 		params.setWaitForSlot(true);
-		params.setProtectionParameter(new KeyStore.CallbackHandlerProtection(new PINEntry()));
+		params.setProtectionCallback(pe);
+		params.setEventHandler(pe);
 		
 		ks.load(params);
 		

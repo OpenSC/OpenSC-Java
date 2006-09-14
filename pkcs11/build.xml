@@ -19,8 +19,11 @@
       --> 
 	<property name="version" value="0.1"/>
 	<!-- The patchlevel is increased for each release, when the jni Interface
-	     remains binary compatible, i.e. no new native function is added. -->
-	<property name="patchlevel" value="0"/>
+	     remains binary compatible, i.e. no new native function is added. 
+	     This value should correspond to the value of the patchlevel
+		 in src/org/opensc/pkcs11/PKCS11Provider.java
+	  -->
+	<property name="patchlevel" value="1"/>
 
 	<property environment="env"/>
 
