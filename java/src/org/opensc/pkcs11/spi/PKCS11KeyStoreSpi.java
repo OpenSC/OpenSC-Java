@@ -482,17 +482,19 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			break;
 			
 		case PKCS11EventCallback.WAITING_FOR_SW_PIN:
+		case PKCS11EventCallback.WAITING_FOR_SW_SO_PIN:
 			// an IOException during software PIN entry is interpreted as an abort of
 			// the PIN entry process. This is done so, because there is no standard exception
 			// for such a situation defined.
 			if ((e instanceof IOException) &&
 					!(e instanceof PKCS11Exception))
 			{
-				fe = PKCS11EventCallback.PIN_ENTRY_ABORTED;
+				fe = (cb.getEvent() == PKCS11EventCallback.WAITING_FOR_SW_SO_PIN) ?
+						PKCS11EventCallback.SO_PIN_ENTRY_ABORTED :
+							PKCS11EventCallback.PIN_ENTRY_ABORTED;
 				break;
 			}
 		
-		case PKCS11EventCallback.WAITING_FOR_HW_PIN:
 			// A PKCS11Exception with CKR_FUNCTION_CANCELED od CKR_CANCEL
 			// is interpreted as a PIN entry abort by the user.
 			if (e instanceof PKCS11Exception)
@@ -502,16 +504,47 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				if (p11e.getErrorCode() == PKCS11Exception.CKR_FUNCTION_CANCELED ||
 						p11e.getErrorCode() == PKCS11Exception.CKR_CANCEL)
 				{
-					fe = PKCS11EventCallback.PIN_ENTRY_ABORTED;
+					fe = (cb.getEvent() == PKCS11EventCallback.WAITING_FOR_SW_SO_PIN) ?
+							PKCS11EventCallback.SO_PIN_ENTRY_ABORTED :
+								PKCS11EventCallback.PIN_ENTRY_ABORTED;
+					break;
+				}
+			}
+			
+			fe = (cb.getEvent() == PKCS11EventCallback.WAITING_FOR_SW_SO_PIN) ?
+					PKCS11EventCallback.SO_PIN_ENTRY_FAILED :
+						PKCS11EventCallback.PIN_ENTRY_FAILED;
+			break;
+			
+		case PKCS11EventCallback.HW_AUTHENTICATION_IN_PROGRESS:
+		case PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS:
+			// A PKCS11Exception with CKR_FUNCTION_CANCELED od CKR_CANCEL
+			// is interpreted as an authentication abort by the user.
+			if (e instanceof PKCS11Exception)
+			{
+				PKCS11Exception p11e = (PKCS11Exception)e;
+				
+				if (p11e.getErrorCode() == PKCS11Exception.CKR_FUNCTION_CANCELED ||
+						p11e.getErrorCode() == PKCS11Exception.CKR_CANCEL)
+				{
+					fe = (cb.getEvent() == PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS) ?
+							PKCS11EventCallback.SO_AUHENTICATION_ABORTED :
+								PKCS11EventCallback.AUHENTICATION_ABORTED;
 					break;
 				}
 			}
 
-			fe = PKCS11EventCallback.PIN_ENTRY_FAILED;
+			fe = (cb.getEvent() == PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS) ?
+					PKCS11EventCallback.SO_AUHENTICATION_FAILED :
+						PKCS11EventCallback.AUHENTICATION_FAILED;
 			break;
 			
-		case PKCS11EventCallback.PIN_ENTRY_SUCEEDED:
+		case PKCS11EventCallback.PIN_AUTHENTICATION_IN_PROGRESS:
 			fe = PKCS11EventCallback.AUHENTICATION_FAILED;
+			break;
+			
+		case PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS:
+			fe = PKCS11EventCallback.SO_AUHENTICATION_FAILED;
 			break;
 		}
 		
@@ -530,8 +563,8 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		ProtectionParameter pp = param.getProtectionParameter();
 		
 		CallbackHandler eventHandler = null;
-		if (pp instanceof CallbackHandlerProtection)
-			eventHandler = ((CallbackHandlerProtection)pp).getCallbackHandler();
+		if (param instanceof PKCS11LoadStoreParameter)
+			eventHandler = ((PKCS11LoadStoreParameter)param).getEventHandler();
 		
 		try
 		{
@@ -633,7 +666,9 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				ProtectionParameter so_pp = p11_param.getSOProtectionParameter();
 				if (so_pp instanceof PasswordProtection)
 				{
+					changeEvent(PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 					session.loginSO(((PasswordProtection)so_pp).getPassword());
+					changeEvent(PKCS11EventCallback.SO_AUHENTICATION_SUCEEDED,eventHandler,evCb);
 				}
 				else if (so_pp instanceof CallbackHandlerProtection)
 				{
@@ -642,11 +677,11 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 					// if this is possible, otherwise use the callback to authenticate.
 					if (this.slot.hasTokenProtectedAuthPath())
 					{
-						changeEvent(PKCS11EventCallback.WAITING_FOR_HW_PIN,eventHandler,evCb);
+						changeEvent(PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 					}
 					else
 					{
-						changeEvent(PKCS11EventCallback.WAITING_FOR_SW_PIN,eventHandler,evCb);
+						changeEvent(PKCS11EventCallback.WAITING_FOR_SW_SO_PIN,eventHandler,evCb);
 
 						CallbackHandler cbh =
 							((CallbackHandlerProtection)so_pp).getCallbackHandler();
@@ -654,17 +689,19 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 						PasswordCallback pcb = new PasswordCallback("Please enter the SO pin:",false);
 						cbh.handle(new Callback[] { pcb });
 						pin = pcb.getPassword();
+						changeEvent(PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 					}
 					
-					changeEvent(PKCS11EventCallback.PIN_ENTRY_SUCEEDED,eventHandler,evCb);
 					session.loginSO(pin);
-					changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
+					changeEvent(PKCS11EventCallback.SO_AUHENTICATION_SUCEEDED,eventHandler,evCb);
 				}
 			}
 
 			if (pp instanceof PasswordProtection)
 			{
+				changeEvent(PKCS11EventCallback.PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 				this.session.loginUser(((PasswordProtection)pp).getPassword());
+				changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
 			}
 			else if (pp instanceof CallbackHandlerProtection)
 			{
@@ -673,7 +710,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				// if this is possible, otherwise use the callback to authenticate. 
 				if (this.slot.hasTokenProtectedAuthPath())
 				{
-					changeEvent(PKCS11EventCallback.WAITING_FOR_HW_PIN,eventHandler,evCb);
+					changeEvent(PKCS11EventCallback.HW_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 				}
 				else
 				{
@@ -686,9 +723,9 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 					cbh.handle(new Callback[] { pcb });
 					
 					pin = pcb.getPassword();
+					changeEvent(PKCS11EventCallback.PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 				}
 
-				changeEvent(PKCS11EventCallback.PIN_ENTRY_SUCEEDED,eventHandler,evCb);
 				this.session.loginUser(pin);
 				changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
 			}
