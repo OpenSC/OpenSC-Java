@@ -35,6 +35,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	{
 		this.protectionParameter   = null;
 		this.SOProtectionParameter = null;
+		this.eventHandler          = null;
 		this.waitForSlot           = false;
 		this.slotId                = null;
 		this.writeEnabled          = false;
@@ -64,7 +65,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	}
 	
 	/**
-	 * This is convenience function for setting a password protection
+	 * This is a convenience function for setting a password protection
 	 * to the protection parameter.
 	 * 
 	 * Equivalent to calling
@@ -80,7 +81,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	}
 	
 	/**
-	 * This is convenience function for setting a callback protection
+	 * This is a convenience function for setting a callback protection
 	 * to the protection parameter. The callback handler will receive
 	 * callbacks of type <code>PasswordCallback</code>.
 	 * 
@@ -124,7 +125,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	}
 
 	/**
-	 * This is convenience function for setting a password protection
+	 * This is a convenience function for setting a password protection
 	 * to the SO protection parameter.
 	 * 
 	 * Equivalent to calling
@@ -140,7 +141,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	}
 	
 	/**
-	 * This is convenience function for setting a callback protection
+	 * This is a convenience function for setting a callback protection
 	 * to the SO protection parameter. The callback handler will receive
 	 * callbacks of type <code>PasswordCallback</code>.
 	 * 
