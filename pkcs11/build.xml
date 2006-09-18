@@ -266,6 +266,7 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
             <include name="${src.dir}/**/*.java"/>
             <include name="${lib.dir}"/>
             <include name="${test.src.dir}/**/*.java"/>
+            <include name="${test.src.dir}/log4j.properties"/>
             <include name="${test.lib.dir}"/>
             <include name="jni/src/**/*.h"/>
             <include name="jni/src/**/*.c"/>
