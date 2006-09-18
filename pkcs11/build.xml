@@ -258,7 +258,35 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
             </zip>   
         </target>
 
-        <!-- target build -->
+    <!-- target distsrczip -->
+   <target name="distsrczip" description="zip all sources for a distribution.">
+
+   	<zip zipfile="${dist.dir}/opensc-PKCS11-src-${version}.${patchlevel}.zip">
+        <fileset dir=".">
+            <include name="${src.dir}/**/*.java"/>
+            <include name="${lib.dir}"/>
+            <include name="${test.src.dir}/**/*.java"/>
+            <include name="${test.lib.dir}"/>
+            <include name="jni/src/**/*.h"/>
+            <include name="jni/src/**/*.c"/>
+            <include name="jni/src/**/*.in"/>
+            <include name="jni/src/scripts/*.pl"/>
+            <include name="jni/src/scripts/config.data.default"/>
+            <include name="jni/build/**/config.data"/>
+            <include name="conf/eclipse/classpath.tmpl"/>
+        	<include name="conf/eclipse/project.tmpl"/>
+        	<include name="conf/eclipse/TesProvider.launch"/>
+        	<include name="conf/keystore/README"/>
+            <include name="README"/>
+            <include name="TODO"/>
+            <include name="build.xml"/>
+            <include name=".project"/>
+            <include name=".classpath"/>
+         </fileset>
+       </zip>   
+   </target>
+
+       <!-- target build -->
 	<target name="build" description="Compile main source tree java files into class files">
 
 		<mkdir dir="${build.dir}"/>
@@ -321,7 +349,7 @@ tree java files into jar archive">
 	</target>
 		
 		<!-- target all -->
-    <target name="all" depends="clean,fetchjars,distzip" description="Clean,distzip"/>
+    <target name="all" depends="clean,fetchjars,distzip,distsrczip" description="Clean,distzip"/>
 
         <!-- target buildtest -->
 	<target name="buildtest" depends="signedjarfile" description="Compile test source tree java files into class files">
