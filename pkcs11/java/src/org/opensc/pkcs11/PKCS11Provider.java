@@ -45,6 +45,9 @@ import org.opensc.util.DestroyableParent;
 /**
  * The PKCS#11 provider of the OpenSC project.
  * 
+ * This provider is based on the
+ * <a href="http://www.rsasecurity.com/rsalabs/node.asp?id=2133">RSA Security Inc. PKCS#11 Cryptographic Token Interface (Cryptoki)</a>.
+ * 
  * @author wglas
  */
 public class PKCS11Provider extends Provider implements DestroyableParent
@@ -59,7 +62,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	/* This value has to correspond to the value of version in build.xml */
 	private static final double version = 0.1;
 	/* This value has to correspond to the value of patchlevel in build.xml */
-	private static final double patchlevel = 1;
+	private static final double patchlevel = 2;
 	
 	static {
 		System.loadLibrary("opensc-PKCS11-"+version); 

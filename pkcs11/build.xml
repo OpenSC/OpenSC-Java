@@ -23,7 +23,7 @@
 	     This value should correspond to the value of the patchlevel
 		 in src/org/opensc/pkcs11/PKCS11Provider.java
 	  -->
-	<property name="patchlevel" value="1"/>
+	<property name="patchlevel" value="2"/>
 
 	<property environment="env"/>
 
@@ -279,6 +279,7 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
         	<include name="conf/keystore/README"/>
             <include name="README"/>
             <include name="TODO"/>
+            <include name="LICENSE"/>
             <include name="build.xml"/>
             <include name=".project"/>
             <include name=".classpath"/>
