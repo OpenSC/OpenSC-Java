@@ -8,7 +8,7 @@ This is the PKCS#11 provider of the opensc project.
 
 It is still in an embryonic state, but it is possible to issue
 RSA/SHA1 signatures using a fully initialized card with a private
-key and at least on certificate.
+key and at least one certificate.
 
 Installation
 ------------
@@ -54,3 +54,13 @@ using the SVN-tree as an eclipse project.
 
 The file conf/eclipse/TestProvider.launch contain a complete
 'Run...' configuration for the JUnit test case.
+
+
+Credits
+-------
+
+The PKCS#11 provider is based on the 
+RSA Security Inc. PKCS!#11 Cryptographic Token Interface (Cryptoki).
+
+See also: http://www.rsasecurity.com/rsalabs/node.asp?id=2133
+
