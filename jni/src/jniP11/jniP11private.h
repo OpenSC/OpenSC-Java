@@ -30,10 +30,20 @@ typedef struct pkcs11_module_st pkcs11_module_t;
 
 #define PKCS11_MODULE_MAGIC 0xd0bed0be
 
+#ifdef WIN32
+#define PKCS11_MOD_NAME_FMT "%S"
+#else
+#define PKCS11_MOD_NAME_FMT "%s"
+#endif
+
 struct pkcs11_module_st
 {
   int _magic;
+#ifdef WIN32
+  wchar_t *name;
+#else
   char *name;
+#endif
   CK_INFO ck_info;
   CK_FUNCTION_LIST_PTR method;
   void *handle;
@@ -56,7 +66,7 @@ struct pkcs11_slot_st
 const char JNIX_INTERNAL_API * pkcs11_strerror(int rv);
 
 /* functions in pkcs11_module.c */
-pkcs11_module_t JNIX_INTERNAL_API * new_pkcs11_module(JNIEnv *env, const char *c_filename);
+pkcs11_module_t JNIX_INTERNAL_API * new_pkcs11_module(JNIEnv *env, jstring filename);
 
 jlong JNIX_INTERNAL_API pkcs11_module_to_jhandle(JNIEnv *env, pkcs11_module_t *mod);
 pkcs11_module_t JNIX_INTERNAL_API * pkcs11_module_from_jhandle(JNIEnv *env, jlong handle);

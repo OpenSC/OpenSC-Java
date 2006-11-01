@@ -30,13 +30,10 @@
  * Method:    loadPKCS11Module
  * Signature: ([B)J
  */
-jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_loadPKCS11Module)
-  (JNIEnv *env, jobject provider, jbyteArray filename)
+jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_loadNativePKCS11Module)
+  (JNIEnv *env, jobject provider, jstring filename)
 {
-  char * c_filename;
-  allocaCStringFromJByteArray(c_filename,env,filename);
-
-  pkcs11_module_t *mod =  new_pkcs11_module(env,c_filename);
+  pkcs11_module_t *mod =  new_pkcs11_module(env,filename);
 
   if (!mod) return 0;
 

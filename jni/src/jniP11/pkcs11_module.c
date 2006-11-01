@@ -31,6 +31,24 @@
 #ifdef WIN32
 #include <windows.h>
 
+static int throwWin32Error(JNIEnv *env, const char *msg, const wchar_t *module)
+{
+  wchar_t *strerr=0;
+  FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+                 FORMAT_MESSAGE_FROM_SYSTEM,
+                 NULL,
+                 GetLastError(),
+                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                 (LPWSTR)&strerr,
+                 0, NULL );
+
+  jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception","%s %S: %S",
+                     msg,module,strerr);
+
+  LocalFree(strerr);
+  return -1;
+}
+
 static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
 {
   if (ppMutex == NULL) return CKR_ARGUMENTS_BAD;
@@ -141,7 +159,7 @@ static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 
 #endif
 
-pkcs11_module_t *new_pkcs11_module(JNIEnv *env, const char *c_filename)
+pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
 {
   int rv;
   CK_RV (*c_get_function_list)(CK_FUNCTION_LIST_PTR_PTR);
@@ -156,31 +174,77 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, const char *c_filename)
     }
 
   mod->_magic = PKCS11_MODULE_MAGIC;
-  mod->name = strdup(c_filename);
+  mod->name = 0;
+  mod->handle = 0;
+
+  jclass sc = (*env)->FindClass(env,"java/lang/String");
+
+  if (!sc) goto failed;
 
 #ifdef WIN32
-  mod->handle = LoadLibraryA(c_filename);
+  jmethodID toCharArrayId = (*env)->GetMethodID(env,sc,"toCharArray","()[C");
 
-  if (mod->handle == INVALID_HANDLE_VALUE)
+  if (!toCharArrayId) goto failed;
+  	
+  jcharArray ucs2 = (*env)->CallObjectMethod(env,filename,toCharArrayId);
+ 
+  if (!ucs2) goto failed;
+ 
+  jsize sz = (*env)->GetArrayLength(env,ucs2);
+  mod->name = (wchar_t *)malloc(2*(sz+1));
+
+  if (!mod->name) 
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Cannot open PKCS11 module %s.",c_filename);
+                         "Out of memory allocating PKCS11 module name.");
+      goto failed;
+    }
+    
+  (*env)->GetCharArrayRegion(env,ucs2,0,sz,(jchar*)mod->name);
+  mod->name[sz] = 0;
+  
+  mod->handle = LoadLibraryW(mod->name);
+
+  if (!mod->handle)
+    {
+      throwWin32Error(env,"Cannot open PKCS11 module",mod->name);
       goto failed;
     }
 #else
   if (lt_dlinit() != 0)
-   {
-     jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                        "Unable ot initialize dynamic function loading.");
-     return 0;
-   }
+    {
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Unable ot initialize dynamic function loading.");
+      return 0;
+    }
 
-   mod->handle = lt_dlopen(c_filename);
+  jmethodID getBytesId = (*env)->GetMethodID(env,sc,"getBytes","()[B");
+
+  if (!getBytesId) goto failed;
+  	
+  jbyteArray filename8 = (*env)->CallObjectMethod(env,filename,getBytesId);
+ 
+  if (!filename8) goto failed;
+
+  jsize sz = (*env)->GetArrayLength(env,filename8);
+  mod->name = (char*)malloc(sz+1);
+
+  if (!mod->name) 
+    {
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Out of memory allocating PKCS11 module name.");
+      goto failed;
+    }
+    
+  (*env)->GetByteArrayRegion(env,filename8,0,sz,(jbyte*)mod->name);
+  mod->name[sz] = 0;
+
+  mod->handle = lt_dlopen(mod->name);
 
   if (mod->handle == NULL)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Cannot open PKCS11 module %s: %s.",c_filename,lt_dlerror());
+                         "Cannot open PKCS11 module %s: %s.",mod->name,lt_dlerror());
       goto failed;
     }
 #endif
@@ -188,24 +252,32 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, const char *c_filename)
 #ifdef WIN32
   c_get_function_list = (CK_RV (*)(CK_FUNCTION_LIST_PTR_PTR))
     GetProcAddress(mod->handle, "C_GetFunctionList");
-#else
-  c_get_function_list = (CK_RV (*)(CK_FUNCTION_LIST_PTR_PTR))
-    lt_dlsym(mod->handle, "C_GetFunctionList");
-#endif
 
   if (!c_get_function_list)
     {
-      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Cannot find function C_GetFunctionList in PKCS11 module %s.",c_filename);
+    	throwWin32Error(env,"Cannot find function C_GetFunctionList in PKCS11 module",mod->name);
       goto failed;
     }
+      
+#else
+  c_get_function_list = (CK_RV (*)(CK_FUNCTION_LIST_PTR_PTR))
+    lt_dlsym(mod->handle, "C_GetFunctionList");
+    
+  if (!c_get_function_list)
+    {
+      jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
+                         "Cannot find function C_GetFunctionList in PKCS11 module %s: %s.",
+                         mod->name,lt_dlerror());
+      goto failed;
+    }
+#endif
 
   rv = c_get_function_list(&mod->method);
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
-                          "C_GetFunctionList in PKCS11 module %s failed.",
-                          c_filename);
+                          "C_GetFunctionList in PKCS11 module " PKCS11_MOD_NAME_FMT " failed.",
+                          mod->name);
       goto failed;
     }
 
@@ -223,8 +295,8 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, const char *c_filename)
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
-                          "C_Initialize in PKCS11 module %s failed.",
-                          c_filename);
+                          "C_Initialize in PKCS11 module " PKCS11_MOD_NAME_FMT " failed.",
+                          mod->name);
       goto failed;
     }
   
@@ -233,12 +305,12 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, const char *c_filename)
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
-                          "C_GetInfo in PKCS11 module %s failed.",c_filename);
+                          "C_GetInfo in PKCS11 module " PKCS11_MOD_NAME_FMT " failed.",mod->name);
       goto failed;
     }
 
 #ifdef DEBUG_PKCS11_MODULE
-  fprintf(stderr,"Loaded module: %s.\n",c_filename);
+  fprintf(stderr,"Loaded module: " PKCS11_MOD_NAME_FMT ".\n",mod->name);
   fprintf(stderr,"handle= %p.\n",mod);
   fprintf(stderr,"version= %d.%d.\n",
           (int)mod->ck_info.cryptokiVersion.major,
@@ -253,7 +325,7 @@ failed:
   if (mod->name) free(mod->name);
  
 #ifdef WIN32
-  if (mod->handle!=INVALID_HANDLE_VALUE)
+  if (mod->handle)
     FreeLibrary(mod->handle);
 #else
   if (mod->handle)
@@ -290,7 +362,7 @@ void destroy_pkcs11_module(JNIEnv *env, pkcs11_module_t *mod)
 {
  
 #ifdef DEBUG_PKCS11_MODULE
-  fprintf(stderr,"Unloading module: %s.\n",mod->name);
+  fprintf(stderr,"Unloading module: " PKCS11_MOD_NAME_FMT ".\n",mod->name);
   fprintf(stderr,"handle= %p.\n",mod);
 #endif
 
@@ -298,7 +370,7 @@ void destroy_pkcs11_module(JNIEnv *env, pkcs11_module_t *mod)
   mod->method->C_Finalize(NULL);
 
 #ifdef WIN32
-  if (mod->handle!=INVALID_HANDLE_VALUE)
+  if (mod->handle)
     FreeLibrary(mod->handle);
 #else
   if (mod->handle)
