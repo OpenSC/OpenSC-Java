@@ -60,9 +60,9 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	private static final long serialVersionUID = -2568219416560640437L;
 
 	/* This value has to correspond to the value of version in build.xml */
-	private static final double version = 0.1;
+	private static final double version = 0.2;
 	/* This value has to correspond to the value of patchlevel in build.xml */
-	private static final double patchlevel = 2;
+	private static final double patchlevel = 0;
 	
 	static {
 		System.loadLibrary("opensc-PKCS11-"+version); 
@@ -72,7 +72,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 private ShutdownThread shutdownThread;
 	 private DestroyableHolder destroyableHolder;
 
-	 private native long loadPKCS11Module(byte[] nativeFilename) throws PKCS11Exception;
+	 private native long loadNativePKCS11Module(String filename) throws PKCS11Exception;
 	 private native void unloadPKCS11Module(long handle) throws PKCS11Exception;
 	
 	 /* (non-Javadoc)
@@ -151,7 +151,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	
 	private void initialize(String filename) throws IOException
 	{
-		pkcs11ModuleHandle = loadPKCS11Module(filename.getBytes());
+		pkcs11ModuleHandle = loadNativePKCS11Module(filename);
 		destroyableHolder = new DestroyableHolder();
 		shutdownThread = new ShutdownThread(this);
 		Runtime.getRuntime().addShutdownHook(shutdownThread);

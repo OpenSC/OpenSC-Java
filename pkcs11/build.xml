@@ -17,13 +17,13 @@
 		 in src/org/opensc/pkcs11/PKCS11Provider.java
 		 and jni/src/jniP11/Makefile.in
       --> 
-	<property name="version" value="0.1"/>
+	<property name="version" value="0.2"/>
 	<!-- The patchlevel is increased for each release, when the jni Interface
 	     remains binary compatible, i.e. no new native function is added. 
 	     This value should correspond to the value of the patchlevel
 		 in src/org/opensc/pkcs11/PKCS11Provider.java
 	  -->
-	<property name="patchlevel" value="2"/>
+	<property name="patchlevel" value="0"/>
 
 	<property environment="env"/>
 

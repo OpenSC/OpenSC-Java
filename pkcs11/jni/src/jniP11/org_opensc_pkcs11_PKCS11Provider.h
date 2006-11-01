@@ -22,14 +22,16 @@ extern "C" {
 #undef org_opensc_pkcs11_PKCS11Provider_serialVersionUID
 #define org_opensc_pkcs11_PKCS11Provider_serialVersionUID -2568219416560640437LL
 #undef org_opensc_pkcs11_PKCS11Provider_version
-#define org_opensc_pkcs11_PKCS11Provider_version 0.1
+#define org_opensc_pkcs11_PKCS11Provider_version 0.2
+#undef org_opensc_pkcs11_PKCS11Provider_patchlevel
+#define org_opensc_pkcs11_PKCS11Provider_patchlevel 0.0
 /*
  * Class:     org_opensc_pkcs11_PKCS11Provider
- * Method:    loadPKCS11Module
- * Signature: ([B)J
+ * Method:    loadNativePKCS11Module
+ * Signature: (Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_loadPKCS11Module)
-  (JNIEnv *, jobject, jbyteArray);
+JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_loadNativePKCS11Module)
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     org_opensc_pkcs11_PKCS11Provider
