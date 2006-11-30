@@ -46,7 +46,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public ProtectionParameter getProtectionParameter()
 	{
-		return protectionParameter;
+		return this.protectionParameter;
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public ProtectionParameter getSOProtectionParameter()
 	{
-		return SOProtectionParameter;
+		return this.SOProtectionParameter;
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public void setSOProtectionParameter(ProtectionParameter protectionParameter)
 	{
-		SOProtectionParameter = protectionParameter;
+        this.SOProtectionParameter = protectionParameter;
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public CallbackHandler getEventHandler()
 	{
-		return eventHandler;
+		return this.eventHandler;
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public Long getSlotId()
 	{
-		return slotId;
+		return this.slotId;
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public boolean isWaitForSlot()
 	{
-		return waitForSlot;
+		return this.waitForSlot;
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class PKCS11LoadStoreParameter implements LoadStoreParameter
 	 */
 	public boolean isWriteEnabled()
 	{
-		return writeEnabled;
+		return this.writeEnabled;
 	}
 
 	/**

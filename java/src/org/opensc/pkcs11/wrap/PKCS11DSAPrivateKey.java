@@ -76,7 +76,7 @@ public class PKCS11DSAPrivateKey extends PKCS11PrivateKey implements
 	 */
 	public BigInteger getX()
 	{
-		return x;
+		return this.x;
 	}
 
 	/* (non-Javadoc)
@@ -84,7 +84,7 @@ public class PKCS11DSAPrivateKey extends PKCS11PrivateKey implements
 	 */
 	public DSAParams getParams()
 	{
-		return params;
+		return this.params;
 	}
 
 }

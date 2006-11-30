@@ -138,7 +138,7 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 	 */
 	public boolean isExtractable()
 	{
-		return extractable;
+		return this.extractable;
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 	 */
 	public boolean isSensitive()
 	{
-		return sensitive;
+		return this.sensitive;
 	}
 	
 	

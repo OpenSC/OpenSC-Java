@@ -91,11 +91,11 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	public synchronized void cleanup()
 	{
-		if (pkcs11ModuleHandle != 0L)
+		if (this.pkcs11ModuleHandle != 0L)
 		{
 			try
 			{
-				destroyableHolder.destroy();
+                this.destroyableHolder.destroy();
 			} catch (DestroyFailedException e)
 			{
 				log.error("Failure during destruction of C resources:",e);
@@ -103,23 +103,23 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 			
 			try
 			{
-				unloadPKCS11Module(pkcs11ModuleHandle);
+				unloadPKCS11Module(this.pkcs11ModuleHandle);
 			} catch (PKCS11Exception e)
 			{
 				log.error("Failure unloading PKCS#11 module:",e);
 			}
 			
-			pkcs11ModuleHandle = 0L;
-			if (shutdownThread!=null) {
-				Runtime.getRuntime().removeShutdownHook(shutdownThread);
-				shutdownThread=null;
+            this.pkcs11ModuleHandle = 0L;
+			if (this.shutdownThread!=null) {
+				Runtime.getRuntime().removeShutdownHook(this.shutdownThread);
+                this.shutdownThread=null;
 			}
 		}		
 	}
 	
 	private synchronized void deregisterSutdownThread()
 	{
-		shutdownThread=null;
+        this.shutdownThread=null;
 	}
 	
 	/**
@@ -144,17 +144,17 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 		@Override
 		public void run()
 		{
-			provider.deregisterSutdownThread();
-			provider.cleanup();
+            this.provider.deregisterSutdownThread();
+            this.provider.cleanup();
 		}
 	}
 	
 	private void initialize(String filename) throws IOException
 	{
-		pkcs11ModuleHandle = loadNativePKCS11Module(filename);
-		destroyableHolder = new DestroyableHolder();
-		shutdownThread = new ShutdownThread(this);
-		Runtime.getRuntime().addShutdownHook(shutdownThread);
+        this.pkcs11ModuleHandle = loadNativePKCS11Module(filename);
+        this.destroyableHolder = new DestroyableHolder();
+        this.shutdownThread = new ShutdownThread(this);
+		Runtime.getRuntime().addShutdownHook(this.shutdownThread);
 		
 		putService(new PKCS11Service
         		(this, "KeyStore", "PKCS11", "org.opensc.pkcs11.spi.PKCS11KeyStoreSpi"));
@@ -307,7 +307,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	public long getPkcs11ModuleHandle()
 	{
-		return pkcs11ModuleHandle;
+		return this.pkcs11ModuleHandle;
 	}
 	
 	/* (non-Javadoc)
@@ -315,7 +315,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	public void register(Destroyable destroyable)
 	{
-		destroyableHolder.register(destroyable);
+        this.destroyableHolder.register(destroyable);
 	}
 	
 	/* (non-Javadoc)
@@ -323,7 +323,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	 */
 	public void deregister(Destroyable destroyable)
 	{
-		destroyableHolder.deregister(destroyable);
+        this.destroyableHolder.deregister(destroyable);
 	}
 	
 }

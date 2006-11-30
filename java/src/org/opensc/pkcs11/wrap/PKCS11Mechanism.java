@@ -543,7 +543,7 @@ public class PKCS11Mechanism
 	 */
 	public int getFlags()
 	{
-		return flags;
+		return this.flags;
 	}
 
 	/**
@@ -551,7 +551,7 @@ public class PKCS11Mechanism
 	 */
 	public int getMaxKeySize()
 	{
-		return maxKeySize;
+		return this.maxKeySize;
 	}
 
 	/**
@@ -559,7 +559,7 @@ public class PKCS11Mechanism
 	 */
 	public int getMinKeySize()
 	{
-		return minKeySize;
+		return this.minKeySize;
 	}
 
 	/**
@@ -567,7 +567,7 @@ public class PKCS11Mechanism
 	 */
 	public int getType()
 	{
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -575,7 +575,7 @@ public class PKCS11Mechanism
 	 */
 	public String getTypeName()
 	{
-		return getTypeName(type);
+		return getTypeName(this.type);
 	}
 
 }

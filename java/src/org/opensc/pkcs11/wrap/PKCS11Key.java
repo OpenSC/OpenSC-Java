@@ -95,7 +95,7 @@ public class PKCS11Key extends PKCS11Object implements Key
 	 */
 	public int getKeyType()
 	{
-		return keyType;
+		return this.keyType;
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class PKCS11Key extends PKCS11Object implements Key
 	 */
 	public int getKeyBits()
 	{
-		return keyBits;
+		return this.keyBits;
 	}
 
 	/* (non-Javadoc)
@@ -111,7 +111,7 @@ public class PKCS11Key extends PKCS11Object implements Key
 	 */
 	public String getAlgorithm()
 	{
-		switch (keyType)
+		switch (this.keyType)
 		{
 		case CKK_RSA: return "RSA";
 		case CKK_DSA: return "DSA";

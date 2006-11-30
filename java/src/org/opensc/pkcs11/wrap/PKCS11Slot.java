@@ -55,8 +55,8 @@ public class PKCS11Slot extends DestroyableHolder
 	 */
 	private long handle;
 	
-	private native long initSlotNative(long pvh, long id) throws PKCS11Exception;
-	private native void destroySlotNative(long pvh, long handle) throws DestroyFailedException;
+	private native long initSlotNative(long _pvh, long _id) throws PKCS11Exception;
+	private native void destroySlotNative(long _pvh, long _handle) throws DestroyFailedException;
 	
 	/**
 	 * This contructor constructs an instance of an individual slot.
@@ -160,37 +160,37 @@ public class PKCS11Slot extends DestroyableHolder
 		return new PKCS11Slot(provider, id);
 	}
 	
-	private native boolean isTokenPresentNative(long pvh, long handle) throws PKCS11Exception;
+	private native boolean isTokenPresentNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return Whether a token is present in this slot.
 	 */
 	public boolean isTokenPresent() throws PKCS11Exception
 	{
-		return isTokenPresentNative(pvh,handle);
+		return isTokenPresentNative(this.pvh,this.handle);
 	}
 	
-	private native boolean isRemovableDeviceNative(long pvh, long handle) throws PKCS11Exception;
+	private native boolean isRemovableDeviceNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return Whether a token is present in this slot.
 	 */
 	public boolean isRemovableDevice() throws PKCS11Exception
 	{
-		return isRemovableDeviceNative(pvh,handle);
+		return isRemovableDeviceNative(this.pvh,this.handle);
 	}
 	
-	private native boolean isHardwareDeviceNative(long pvh, long handle) throws PKCS11Exception;
+	private native boolean isHardwareDeviceNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return Whether a token is present in this slot.
 	 */
 	public boolean isHardwareDevice() throws PKCS11Exception
 	{
-		return isHardwareDeviceNative(pvh,handle);
+		return isHardwareDeviceNative(this.pvh,this.handle);
 	}
 	
-	private native byte[] getManufaturerNative(long pvh, long handle) throws PKCS11Exception;
+	private native byte[] getManufaturerNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The manufacturer of the slot.
@@ -199,14 +199,14 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getManufaturerNative(pvh,handle),"UTF-8");
+			return new String(getManufaturerNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;
 		}
 	}
 	
-	private native byte[] getDescriptionNative(long pvh, long handle) throws PKCS11Exception;
+	private native byte[] getDescriptionNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return A description of the slot.
@@ -215,34 +215,34 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getDescriptionNative(pvh,handle),"UTF-8");
+			return new String(getDescriptionNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;
 		}
 	}
 	
-	private native double getHardwareVersionNative(long pvh, long handle) throws PKCS11Exception;
+	private native double getHardwareVersionNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The hardware verion of the slot.
 	 */
 	public double getHardwareVersion() throws PKCS11Exception
 	{
-		return getHardwareVersionNative(pvh,handle);
+		return getHardwareVersionNative(this.pvh,this.handle);
 	}
 	
-	private native double getFirmwareVersionNative(long pvh, long handle) throws PKCS11Exception;
+	private native double getFirmwareVersionNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The Firmware verion of the slot.
 	 */
 	public double getFirmwareVersion() throws PKCS11Exception
 	{
-		return getFirmwareVersionNative(pvh,handle);
+		return getFirmwareVersionNative(this.pvh,this.handle);
 	}
 	
-	private native PKCS11Mechanism[] getMechanismsNative(long pvh, long handle) throws PKCS11Exception;
+	private native PKCS11Mechanism[] getMechanismsNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return A list of mechanisms supported by this slot.
@@ -250,10 +250,10 @@ public class PKCS11Slot extends DestroyableHolder
 	 */
 	public PKCS11Mechanism[] getMechanisms() throws PKCS11Exception
 	{
-		return getMechanismsNative(pvh,handle);
+		return getMechanismsNative(this.pvh,this.handle);
 	}
 	
-	private native byte[] getTokenLabelNative(long pvh, long handle) throws PKCS11Exception;
+	private native byte[] getTokenLabelNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The label of the token.
@@ -266,14 +266,14 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getTokenLabelNative(pvh,handle),"UTF-8");
+			return new String(getTokenLabelNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;
 		}
 	}
 	
-	private native byte[] getTokenManufacturerNative(long pvh, long handle) throws PKCS11Exception;
+	private native byte[] getTokenManufacturerNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The manufacturer of the token.
@@ -286,14 +286,14 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getTokenManufacturerNative(pvh,handle),"UTF-8");
+			return new String(getTokenManufacturerNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;
 		}
 	}
 	
-	private native byte[] getTokenModelNative(long pvh, long handle) throws PKCS11Exception;
+	private native byte[] getTokenModelNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The model of the token.
@@ -306,14 +306,14 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getTokenModelNative(pvh,handle),"UTF-8");
+			return new String(getTokenModelNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;
 		}
 	}
 		
-	private native byte[] getTokenSerialNumberNative(long pvh, long handle) throws PKCS11Exception;
+	private native byte[] getTokenSerialNumberNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The serial number of the token.
@@ -326,14 +326,14 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getTokenSerialNumberNative(pvh,handle),"UTF-8");
+			return new String(getTokenSerialNumberNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;
 		}
 	}
 			
-	private native int getTokenMinPinLenNative(long pvh, long handle) throws PKCS11Exception;
+	private native int getTokenMinPinLenNative(long _pvh, long _handle) throws PKCS11Exception;
 
 	/**
 	 * @return The minimal PIN length of the token.
@@ -345,10 +345,10 @@ public class PKCS11Slot extends DestroyableHolder
 	public int getTokenMinPinLen() throws PKCS11Exception
 	{
 		
-		return getTokenMinPinLenNative(pvh,handle);
+		return getTokenMinPinLenNative(this.pvh,this.handle);
 	}
 			
-	private native int getTokenMaxPinLenNative(long pvh, long handle) throws PKCS11Exception;
+	private native int getTokenMaxPinLenNative(long _pvh, long _handle) throws PKCS11Exception;
 
 	/**
 	 * @return The maximal PIN length of the token.
@@ -360,10 +360,10 @@ public class PKCS11Slot extends DestroyableHolder
 	public int getTokenMaxPinLen() throws PKCS11Exception
 	{
 		
-		return getTokenMaxPinLenNative(pvh,handle);
+		return getTokenMaxPinLenNative(this.pvh,this.handle);
 	}
 			
-	private native boolean hasTokenProtectedAuthPathNative(long pvh, long handle) throws PKCS11Exception;
+	private native boolean hasTokenProtectedAuthPathNative(long _pvh, long _handle) throws PKCS11Exception;
 
 	/**
 	 * Checks, if the token has an protected authentication path via a PINpad
@@ -382,7 +382,7 @@ public class PKCS11Slot extends DestroyableHolder
 	 */
 	public boolean hasTokenProtectedAuthPath() throws PKCS11Exception
 	{
-		return hasTokenProtectedAuthPathNative(pvh,handle);
+		return hasTokenProtectedAuthPathNative(this.pvh,this.handle);
 	}
 			
 	/**
@@ -390,7 +390,7 @@ public class PKCS11Slot extends DestroyableHolder
 	 */
 	public long getId()
 	{
-		return id;
+		return this.id;
 	}
 
 	/* (non-Javadoc)
@@ -401,10 +401,10 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		super.destroy();
 
-		if (handle != 0)
+		if (this.handle != 0)
 		{
-			destroySlotNative(pvh,handle);
-			handle = 0;
+			destroySlotNative(this.pvh,this.handle);
+            this.handle = 0;
 		}
 	}
 	
@@ -413,7 +413,7 @@ public class PKCS11Slot extends DestroyableHolder
 	 */
 	protected long getPvh()
 	{
-		return pvh;
+		return this.pvh;
 	}
 	
 	/**
@@ -421,7 +421,7 @@ public class PKCS11Slot extends DestroyableHolder
 	 */
 	protected long getHandle()
 	{
-		return handle;
+		return this.handle;
 	}
 	
 }

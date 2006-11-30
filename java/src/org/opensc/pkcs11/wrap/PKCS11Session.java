@@ -100,7 +100,7 @@ public class PKCS11Session extends DestroyableHolder
 		return new PKCS11Session(slot,handle);
 	}
 
-	private native void loginNative(long pvh, long shandle, long handle, int type, byte[] pin) throws PKCS11Exception;
+	private native void loginNative(long _pvh, long _shandle, long _handle, int type, byte[] pin) throws PKCS11Exception;
 	
 	/**
 	 * Presents the user PIN to the token. Should only be called after open().
@@ -114,12 +114,12 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	public void loginUser(char[] pin) throws PKCS11Exception
 	{
-		if (userLoggedIn)
+		if (this.userLoggedIn)
 			throw new PKCS11Exception("The user is already logged in.");
 
-		loginNative(pvh,shandle,handle,LOGIN_TYPE_USER,Util.translatePin(pin));
+		loginNative(this.pvh,this.shandle,this.handle,LOGIN_TYPE_USER,Util.translatePin(pin));
 		
-		userLoggedIn = true;
+        this.userLoggedIn = true;
 	}
 	
 	/**
@@ -134,12 +134,12 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	public void loginSO(char[] pin) throws PKCS11Exception
 	{
-		if (SOLoggedIn)
+		if (this.SOLoggedIn)
 			throw new PKCS11Exception("The security officer is already logged in.");
 		
-		loginNative(pvh,shandle,handle,LOGIN_TYPE_SO,Util.translatePin(pin));
+		loginNative(this.pvh,this.shandle,this.handle,LOGIN_TYPE_SO,Util.translatePin(pin));
 		
-		SOLoggedIn = true;
+        this.SOLoggedIn = true;
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	public boolean isSOLoggedIn()
 	{
-		return SOLoggedIn;
+		return this.SOLoggedIn;
 	}
 
 	/**
@@ -157,22 +157,22 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	public boolean isUserLoggedIn()
 	{
-		return userLoggedIn;
+		return this.userLoggedIn;
 	}
 	
-	private native void logoutNative(long pvh, long shandle, long handle) throws PKCS11Exception;
+	private native void logoutNative(long _pvh, long _shandle, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * Logs out from the token.
 	 */
 	public void logout() throws PKCS11Exception
 	{
-		if (!userLoggedIn && ! SOLoggedIn) return;
+		if (!this.userLoggedIn && ! this.SOLoggedIn) return;
 		
-		logoutNative(pvh,shandle,handle);
+		logoutNative(this.pvh,this.shandle,this.handle);
 		
-		userLoggedIn = false;
-		SOLoggedIn = false;
+        this.userLoggedIn = false;
+        this.SOLoggedIn = false;
 	}
 
 	/* (non-Javadoc)
@@ -181,12 +181,12 @@ public class PKCS11Session extends DestroyableHolder
 	@Override
 	public void destroy() throws DestroyFailedException
 	{
-		closeNative(pvh,shandle,handle);
-		handle = 0;
-		shandle = 0;
-		pvh = 0;
-		userLoggedIn = false;
-		SOLoggedIn = false;
+		closeNative(this.pvh,this.shandle,this.handle);
+        this.handle = 0;
+        this.shandle = 0;
+        this.pvh = 0;
+        this.userLoggedIn = false;
+        this.SOLoggedIn = false;
 		super.destroy();
 	}
 
@@ -195,7 +195,7 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	protected long getPvh()
 	{
-		return pvh;
+		return this.pvh;
 	}
 	
 	/**
@@ -203,7 +203,7 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	protected long getSlotHandle()
 	{
-		return shandle;
+		return this.shandle;
 	}
 	
 	/**
@@ -211,6 +211,6 @@ public class PKCS11Session extends DestroyableHolder
 	 */
 	protected long getHandle()
 	{
-		return handle;
+		return this.handle;
 	}
 }

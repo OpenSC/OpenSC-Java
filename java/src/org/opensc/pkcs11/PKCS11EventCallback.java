@@ -197,7 +197,7 @@ public class PKCS11EventCallback implements Callback
 	 */
 	public int getEvent()
 	{
-		return event;
+		return this.event;
 	}
 
 	/**
