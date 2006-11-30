@@ -79,25 +79,25 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	{
 		int pkcs11_alg;
 		
-		if (algorithm.equals("NONEwithRSA")) 
+		if (this.algorithm.equals("NONEwithRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_RSA_PKCS;
-		else if (algorithm.equals("MD5withRSA")) 
+		else if (this.algorithm.equals("MD5withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_MD5_RSA_PKCS;
-		else if (algorithm.equals("SHA1withRSA")) 
+		else if (this.algorithm.equals("SHA1withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_SHA1_RSA_PKCS;
-		else if (algorithm.equals("SHA256withRSA")) 
+		else if (this.algorithm.equals("SHA256withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_SHA256_RSA_PKCS;
-		else if (algorithm.equals("SHA384withRSA")) 
+		else if (this.algorithm.equals("SHA384withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_SHA384_RSA_PKCS;
-		else if (algorithm.equals("SHA512withRSA")) 
+		else if (this.algorithm.equals("SHA512withRSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_SHA512_RSA_PKCS;
-		else if (algorithm.equals("SHA1withDSA")) 
+		else if (this.algorithm.equals("SHA1withDSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_DSA_SHA1;
-		else if (algorithm.equals("NONEwithDSA")) 
+		else if (this.algorithm.equals("NONEwithDSA")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_DSA;
 		else
 			throw new InvalidKeyException("Signature algorithm ["+
-					algorithm+"] is unsupported.");
+                    this.algorithm+"] is unsupported.");
 	
 		return pkcs11_alg;
 	}
@@ -112,11 +112,11 @@ public class PKCS11SignatureSpi extends SignatureSpi
 		if (! (pubKey instanceof PKCS11SessionChild))
 			throw new InvalidKeyException("PKCS11 signature engine expects a valid PKCS11 object.");
 		
-		if (!algorithm.endsWith(pubKey.getAlgorithm()))
+		if (!this.algorithm.endsWith(pubKey.getAlgorithm()))
 			throw new InvalidKeyException("PKCS11 key algorithm ["+
 					pubKey.getAlgorithm()+
 					"] is incompatible with signature algorithm ["+
-					algorithm+"].");
+                    this.algorithm+"].");
 
 		int pkcs11_alg = getPKCS11MechanismType();
 		
@@ -126,9 +126,9 @@ public class PKCS11SignatureSpi extends SignatureSpi
 		
 		try
 		{
-			initVerifyNative(worker.getPvh(),
-					worker.getSlotHandle(),worker.getSessionHandle(),
-					worker.getHandle(),pkcs11_alg);
+			initVerifyNative(this.worker.getPvh(),
+                    this.worker.getSlotHandle(),this.worker.getSessionHandle(),
+                    this.worker.getHandle(),pkcs11_alg);
 			
 		} catch (PKCS11Exception e)
 		{
@@ -154,11 +154,11 @@ public class PKCS11SignatureSpi extends SignatureSpi
 		if (! (privKey instanceof PKCS11SessionChild))
 			throw new InvalidKeyException("PKCS11 signature engine expects a valid PKCS11 object.");
 			
-		if (!algorithm.endsWith(privKey.getAlgorithm()))
+		if (!this.algorithm.endsWith(privKey.getAlgorithm()))
 			throw new InvalidKeyException("PKCS11 key algorithm ["+
 					privKey.getAlgorithm()+
 					"] is incompatible with signature algorithm ["+
-					algorithm+"].");
+                    this.algorithm+"].");
 
 		int pkcs11_alg = getPKCS11MechanismType();
 		this.worker = (PKCS11SessionChild)privKey;
@@ -167,9 +167,9 @@ public class PKCS11SignatureSpi extends SignatureSpi
 		
 		try
 		{
-			initSignNative(worker.getPvh(),
-					worker.getSlotHandle(),worker.getSessionHandle(),
-					worker.getHandle(),pkcs11_alg);
+			initSignNative(this.worker.getPvh(),
+                    this.worker.getSlotHandle(),this.worker.getSessionHandle(),
+                    this.worker.getHandle(),pkcs11_alg);
 			
 		} catch (PKCS11Exception e)
 		{
@@ -183,17 +183,17 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	@Override
 	protected void engineUpdate(byte b) throws SignatureException
 	{
-		if (worker == null)
+		if (this.worker == null)
 			throw new SignatureException("Signature not initialized through initSign() or initVerify().");
 		
 		try
 		{
-			if (privateKey != null)
-				updateSignNative1(worker.getPvh(),
-						worker.getSlotHandle(),worker.getSessionHandle(),b);
+			if (this.privateKey != null)
+				updateSignNative1(this.worker.getPvh(),
+                        this.worker.getSlotHandle(),this.worker.getSessionHandle(),b);
 			else
-				updateVerifyNative1(worker.getPvh(),
-						worker.getSlotHandle(),worker.getSessionHandle(),b);
+				updateVerifyNative1(this.worker.getPvh(),
+                        this.worker.getSlotHandle(),this.worker.getSessionHandle(),b);
 				
 		} catch (PKCS11Exception e)
 		{
@@ -208,17 +208,17 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	protected void engineUpdate(byte[] data, int off, int len)
 			throws SignatureException
 	{
-		if (worker == null)
+		if (this.worker == null)
 			throw new SignatureException("Signature not initialized through initSign() or initVerify().");
 
 		try
 		{
-			if (privateKey != null)
-				updateSignNative(worker.getPvh(),
-						worker.getSlotHandle(),worker.getSessionHandle(),data,off,len);
+			if (this.privateKey != null)
+				updateSignNative(this.worker.getPvh(),
+                        this.worker.getSlotHandle(),this.worker.getSessionHandle(),data,off,len);
 			else
-				updateVerifyNative(worker.getPvh(),
-						worker.getSlotHandle(),worker.getSessionHandle(),data,off,len);
+				updateVerifyNative(this.worker.getPvh(),
+                        this.worker.getSlotHandle(),this.worker.getSessionHandle(),data,off,len);
 				
 		} catch (PKCS11Exception e)
 		{
@@ -232,17 +232,17 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	@Override
 	protected byte[] engineSign() throws SignatureException
 	{
-		if (worker == null)
+		if (this.worker == null)
 			throw new SignatureException("Signature not initialized through initSign() or initVerify().");
 
-		if (privateKey == null)
+		if (this.privateKey == null)
 			throw new SignatureException("Signature not initialized through initSign().");
 		
 		try
 		{
 			
-			return signNative(worker.getPvh(),
-					worker.getSlotHandle(),worker.getSessionHandle());
+			return signNative(this.worker.getPvh(),
+                    this.worker.getSlotHandle(),this.worker.getSessionHandle());
 				
 		} catch (PKCS11Exception e)
 		{
@@ -256,16 +256,16 @@ public class PKCS11SignatureSpi extends SignatureSpi
 	@Override
 	protected boolean engineVerify(byte[] signature) throws SignatureException
 	{
-		if (worker == null)
+		if (this.worker == null)
 			throw new SignatureException("Signature not initialized through initSign() or initVerify().");
 
-		if (publicKey == null)
+		if (this.publicKey == null)
 			throw new SignatureException("Signature not initialized through initVerify().");
 		
 		try
 		{
-			return verifyNative(worker.getPvh(),
-					worker.getSlotHandle(),worker.getSessionHandle(),signature);
+			return verifyNative(this.worker.getPvh(),
+                    this.worker.getSlotHandle(),this.worker.getSessionHandle(),signature);
 				
 		} catch (PKCS11Exception e)
 		{

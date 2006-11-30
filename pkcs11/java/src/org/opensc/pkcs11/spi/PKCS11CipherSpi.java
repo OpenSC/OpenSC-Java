@@ -90,9 +90,9 @@ public class PKCS11CipherSpi extends CipherSpi
 	 * @see javax.crypto.CipherSpi#engineSetMode(java.lang.String)
 	 */
 	@Override
-	protected void engineSetMode(String mode) throws NoSuchAlgorithmException
+	protected void engineSetMode(String engineMode) throws NoSuchAlgorithmException
 	{
-		if (!mode.equals("ECB"))
+		if (!engineMode.equals("ECB"))
 			throw new NoSuchAlgorithmException("Only ECB mode is supported.");
 	}
 
@@ -177,11 +177,11 @@ public class PKCS11CipherSpi extends CipherSpi
 	{
 		int pkcs11_alg;
 		
-		if (algorithm.equals("RSA/ECB/PKCS1Padding")) 
+		if (this.algorithm.equals("RSA/ECB/PKCS1Padding")) 
 			pkcs11_alg = PKCS11Mechanism.CKM_RSA_PKCS;
 		else
 			throw new InvalidKeyException("Signature algorithm ["+
-					algorithm+"] is unsupported.");
+                    this.algorithm+"] is unsupported.");
 	
 		return pkcs11_alg;
 	}
@@ -201,11 +201,11 @@ public class PKCS11CipherSpi extends CipherSpi
 			if (! (key instanceof PKCS11SessionChild))
 				throw new InvalidKeyException("PKCS11 signature engine expects a valid PKCS11 object.");
 
-			if (!algorithm.startsWith(key.getAlgorithm()))
+			if (!this.algorithm.startsWith(key.getAlgorithm()))
 				throw new InvalidKeyException("PKCS11 key algorithm ["+
 						key.getAlgorithm()+
 						"] is incompatible with signature algorithm ["+
-						algorithm+"].");
+                        this.algorithm+"].");
 			
 			int pkcs11_alg = getPKCS11MechanismType();
 			
@@ -228,9 +228,9 @@ public class PKCS11CipherSpi extends CipherSpi
 			
 			try
 			{
-				initEncryptNative(worker.getPvh(),
-						worker.getSlotHandle(),worker.getSessionHandle(),
-						worker.getHandle(),pkcs11_alg);
+				initEncryptNative(this.worker.getPvh(),
+                        this.worker.getSlotHandle(),this.worker.getSessionHandle(),
+                        this.worker.getHandle(),pkcs11_alg);
 				
 			} catch (PKCS11Exception e)
 			{
@@ -242,11 +242,11 @@ public class PKCS11CipherSpi extends CipherSpi
 			if (! (key instanceof PKCS11SessionChild))
 				throw new InvalidKeyException("PKCS11 signature engine expects a valid PKCS11 object.");
 			
-			if (!algorithm.startsWith(key.getAlgorithm()))
+			if (!this.algorithm.startsWith(key.getAlgorithm()))
 				throw new InvalidKeyException("PKCS11 key algorithm ["+
 						key.getAlgorithm()+
 						"] is incompatible with signature algorithm ["+
-						algorithm+"].");
+                        this.algorithm+"].");
 			
 			int pkcs11_alg = getPKCS11MechanismType();
 			
@@ -268,9 +268,9 @@ public class PKCS11CipherSpi extends CipherSpi
 
 			try
 			{
-				initDecryptNative(worker.getPvh(),
-						worker.getSlotHandle(),worker.getSessionHandle(),
-						worker.getHandle(),pkcs11_alg);
+				initDecryptNative(this.worker.getPvh(),
+                        this.worker.getSlotHandle(),this.worker.getSessionHandle(),
+                        this.worker.getHandle(),pkcs11_alg);
 				
 			} catch (PKCS11Exception e)
 			{

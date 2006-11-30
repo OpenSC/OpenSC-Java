@@ -294,7 +294,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	 */
 	public long getPvh()
 	{
-		return pvh;
+		return this.pvh;
 	}
 	
 	/* (non-Javadoc)
@@ -302,7 +302,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	 */
 	public long getSlotHandle()
 	{
-		return shandle;
+		return this.shandle;
 	}
 	
 	/* (non-Javadoc)
@@ -310,7 +310,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	 */
 	public long getSessionHandle()
 	{
-		return hsession;
+		return this.hsession;
 	}
 
 	/* (non-Javadoc)
@@ -318,7 +318,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	 */
 	public long getHandle()
 	{
-		return handle;
+		return this.handle;
 	}
 
 	/* (non-Javadoc)
@@ -328,10 +328,10 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	public void destroy() throws DestroyFailedException
 	{
 		// just invalidate the handles.
-		pvh = 0;
-		shandle = 0;
-		hsession = 0;
-		handle = 0;
+        this.pvh = 0;
+        this.shandle = 0;
+        this.hsession = 0;
+        this.handle = 0;
 		super.destroy();
 	}
 

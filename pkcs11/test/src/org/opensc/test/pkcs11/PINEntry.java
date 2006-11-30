@@ -181,18 +181,18 @@ public class PINEntry implements CallbackHandler
 	/**
 	 * Get a PIN from the user using a simple AWT window.
 	 * 
-	 * @param prompt The prompt shown to the user.
+	 * @param promptText The prompt shown to the user.
 	 * @return The entered PIN, if the user pressed the return key.
 	 * @throws IOException If the user presses escape or closes the window.
 	 */
-	public char [] getPIN (String prompt) throws IOException
+	public char [] getPIN (String promptText) throws IOException
 	{
-		this.prompt.setText(prompt);
+		this.prompt.setText(promptText);
 		
-		if (!listener.waitForUser())
+		if (!this.listener.waitForUser())
 			throw new IOException("The Password dialog has been interrupted by the user.");
 		
-		String pw = textField.getText();
+		String pw = this.textField.getText();
 		char pin[] = pw.toCharArray();
 		return pin;
 	}

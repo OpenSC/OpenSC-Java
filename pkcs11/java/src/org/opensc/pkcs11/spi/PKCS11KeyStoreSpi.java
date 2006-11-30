@@ -622,12 +622,12 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				List<PKCS11Slot> slots = PKCS11Slot
 						.enumerateSlots(this.provider);
 
-				for (PKCS11Slot slot : slots)
+				for (PKCS11Slot checkSlot : slots)
 				{
-					if (s == null && slot.isTokenPresent())
-						s = slot;
+					if (s == null && checkSlot.isTokenPresent())
+						s = checkSlot;
 					else
-						slot.destroy();
+						checkSlot.destroy();
 				}
 
 				// not a single token found and user wants to wait.
@@ -667,7 +667,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				if (so_pp instanceof PasswordProtection)
 				{
 					changeEvent(PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-					session.loginSO(((PasswordProtection)so_pp).getPassword());
+					this.session.loginSO(((PasswordProtection)so_pp).getPassword());
 					changeEvent(PKCS11EventCallback.SO_AUHENTICATION_SUCEEDED,eventHandler,evCb);
 				}
 				else if (so_pp instanceof CallbackHandlerProtection)
@@ -692,7 +692,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 						changeEvent(PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
 					}
 					
-					session.loginSO(pin);
+                    this.session.loginSO(pin);
 					changeEvent(PKCS11EventCallback.SO_AUHENTICATION_SUCEEDED,eventHandler,evCb);
 				}
 			}

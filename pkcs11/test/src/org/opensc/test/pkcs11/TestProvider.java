@@ -77,25 +77,25 @@ public class TestProvider extends TestCase
 		else
 			pkcs11_path = "/usr/lib/opensc-pkcs11.so";
 			
-		provider = new PKCS11Provider(pkcs11_path);
-		Security.addProvider(provider);
+        this.provider = new PKCS11Provider(pkcs11_path);
+		Security.addProvider(this.provider);
 				
 		Provider providers[] = Security.getProviders();
 		for (Provider p : providers)
 			System.out.println("Found provider: " + p.getName());
 		
-		testData = new byte[199];
+        this.testData = new byte[199];
 		
 		Random random = new Random(System.currentTimeMillis());
 		
-		random.nextBytes(testData);
+		random.nextBytes(this.testData);
 	}
 	
 	public void tearDown()
 	{
-		provider.cleanup();
-		provider = null;
-		testData = null;
+        this.provider.cleanup();
+        this.provider = null;
+        this.testData = null;
 		Security.removeProvider("OpenSC-PKCS11");
 	}
 	
@@ -181,7 +181,7 @@ public class TestProvider extends TestCase
 					System.out.println("certificate="+certificate);
 					System.out.println("key.class="+key.getClass());
 					
-					assertTrue(provider.getService("Signature","SHA1withRSA").supportsParameter(key));
+					assertTrue(this.provider.getService("Signature","SHA1withRSA").supportsParameter(key));
 					
 					//
 					// We do not specify the provider here in order to test
@@ -192,7 +192,7 @@ public class TestProvider extends TestCase
 					sig.initSign((PrivateKey)key);
 					System.out.println("sig.provider="+sig.getProvider().getName());
 					
-					sig.update(testData);
+					sig.update(this.testData);
 					byte[] signature = sig.sign();
 					
 					System.out.print("sig=");
@@ -206,7 +206,7 @@ public class TestProvider extends TestCase
 					Signature vfy = Signature.getInstance("SHA1withRSA");
 					vfy.initVerify(certificate);
 					System.out.println("vfy.provider="+vfy.getProvider().getName());
-					vfy.update(testData);
+					vfy.update(this.testData);
 					assertEquals(vfy.verify(signature),true);
 				}
 			}
@@ -250,13 +250,13 @@ public class TestProvider extends TestCase
 					
 					Cipher enc = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 					enc.init(Cipher.ENCRYPT_MODE,certificate);
-					byte[] encData = enc.doFinal(testData);
+					byte[] encData = enc.doFinal(this.testData);
 
-					Cipher dec = Cipher.getInstance("RSA/ECB/PKCS1Padding",provider);
+					Cipher dec = Cipher.getInstance("RSA/ECB/PKCS1Padding",this.provider);
 					dec.init(Cipher.DECRYPT_MODE,key);
 					byte[] origData = dec.doFinal(encData);
 					
-					assertEquals(testData,origData);
+					assertEquals(this.testData,origData);
 				}
 			}
 		}		
@@ -264,7 +264,7 @@ public class TestProvider extends TestCase
 	
 	public void testWrapper() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException, PKCS11Exception
 	{
-		List<PKCS11Slot> slots = PKCS11Slot.enumerateSlots(provider);
+		List<PKCS11Slot> slots = PKCS11Slot.enumerateSlots(this.provider);
 		
 		char [] pin = null;
 		

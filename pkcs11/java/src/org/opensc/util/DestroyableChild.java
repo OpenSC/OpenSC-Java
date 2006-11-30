@@ -90,7 +90,7 @@ public class DestroyableChild implements Destroyable
 	 */
 	public DestroyableParent getParent()
 	{
-		return parent;
+		return this.parent;
 	}
 
 }
