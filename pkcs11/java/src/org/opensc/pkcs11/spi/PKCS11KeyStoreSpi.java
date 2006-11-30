@@ -645,10 +645,11 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 						"Could not find a valid slot with a present token.");
 			} else if (!s.isTokenPresent())
 			{
+                long slotId = s.getId();
 				s.destroy();
 				throw new PKCS11Exception(
 						"No token is present in the given slot number "
-								+ p11_param.getSlotId());
+								+ slotId);
 			}
 
 			this.slot = s;
