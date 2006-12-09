@@ -118,15 +118,18 @@
 
 
 	<!-- target Clean -->
-	<target name="clean" description="Clean output dirs (build, dist)">
+	<target name="clean" depends="jniclean" description="Clean output dirs (build, dist)">
 
 		<delete dir="${build.dir}"/>
 		<delete dir="${test.build.dir}"/>
 		<delete dir="${dist.tmp.dir}"/>
 		<delete dir="${javadoc.dir}"/>
+  </target>
+
+		<target name="jniclean" description="Clean jni dirs.">
 	    <exec dir="${c.build.dir}" executable="${make.exe}">
                  <arg line="distclean"/>
-            </exec>
+      </exec>
 	</target>
 
 	<!-- target distclean -->
@@ -222,15 +225,26 @@ src="http://apache.4any.org/jakarta/commons/logging/binaries/commons-logging-${c
 
 	</target>
 
-        <!-- target jnidist -->
-        <target name="jnidist" depends="jnibuild" description="Copy C shared library to the dist directory.">
-	    <mkdir dir="${dist.tmp.dir}"/>
-            <copy todir="${dist.tmp.dir}">
-               <fileset dir="${c.build.dir}/jniP11">
-                   <include name="${jni.lib}"/>
-               </fileset>
-            </copy>   
-        </target>
+  <!-- target jnidist -->
+  <target name="jnidist" depends="jnibuild" description="Copy C shared library to the dist directory.">
+<mkdir dir="${dist.tmp.dir}"/>
+      <copy todir="${dist.tmp.dir}">
+         <fileset dir="${c.build.dir}/jniP11">
+             <include name="${jni.lib}"/>
+         </fileset>
+      </copy>   
+  </target>
+
+  <!-- target jniinst -->
+  <target name="jniinst" depends="jnibuild" description="Copy C shared library to the maven target dir.">
+   <mkdir dir="target/lib"/>
+      <copy todir="target/lib">
+         <fileset dir="${c.build.dir}/jniP11">
+             <include name="${jni.lib}"/>
+         </fileset>
+      </copy>
+  	  <chmod file="target/lib/${jni.lib}" perm="ugo+rx"/>  
+  </target>
 
          <!-- target srcdist -->
         <target name="srcdist" description="zip source files for use in the exported eclipse project.">
