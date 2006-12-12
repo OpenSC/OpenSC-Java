@@ -18,8 +18,8 @@
   
   <distributionManagement>
     <repository>
-      <id>ev-i-repository</id>
-      <url>scpexe://cvs.ev-i.at/srv/www.ev-i.at/maven2</url>
+      <id>clazzes-repository</id>
+      <url>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</url>
     </repository>
   </distributionManagement>
    <build>
