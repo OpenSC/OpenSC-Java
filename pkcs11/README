@@ -13,38 +13,109 @@ key and at least one certificate.
 Installation
 ------------
 
+opensc-java uses maven (http://maven.apache.org) for managing
+builds and releases of the project.
+
 In order to build the beast, try
 
- ant all
+ mvn pacakge
 
-in the root directory. This script will automagically
+in the root directory. Maven will automagically
 fetches some popular java libraries via http, if called for the
 first time.
 
-Please note, that when running main methods or JUnit tests
+Please note, that when running main methods or JUnit tests of
 the project you must supply the command line argument
 
--Djava.library.path=<opensc-java-root>/dist
+-Djava.library.path=<opensc-java-root>/target/lib
 
 to the java virtual machine in order to locate the jni
-plugin libopensc-PKCS1-0.1.so resp. opensc-PKCS1-0.1.dll
+plugin libopensc-PKCS1-0.2.so resp. opensc-PKCS1-0.2.dll
 
-Eclipse integration
--------------------
+Maven integration
+------------------
 
-If you like to use the PKCS11 provider inside an eclipse
-project, you should import the file
+If you like to use the PKCS11 provider inside a maven
+project, you should add the following to your pom.xml file
   
-  dist/opensc-PKCS11-<os>-<arch>-0.1.zip
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  ...
+  <build>
+     ...
+     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0-alpha-1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <!-- Unpack all JNI zip dependencies (e.g. from opensc-java) -->
+            <id>unpack-jni</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+             <type>zip</type>
+             <excludeTypes>jar</excludeTypes>
+             <outputDirectory>${project.build.directory}/lib</outputDirectory>
+             </configuration>
+           </execution>
+         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Add JNI dependencies to java.library.path (e.g. from opensc-java) -->
+          <argLine>-Djava.library.path=${project.build.directory}/lib</argLine>
+        </configuration>
+      </plugin>
+      ...
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>opensc-repo</id>
+      <name>opensc-project.org repository.</name>
+      <url>http://www.opensc-project.org/files/opensc-java/maven</url>
+    </repository>
+    ...
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+     <id>apache.snapshots</id>
+     <name>Maven Plugin Snapshots</name>
+     <url>http://people.apache.org/maven-snapshot-repository</url>
+     <releases><enabled>false</enabled></releases>
+     <snapshots><enabled>true</enabled></snapshots>
+    </pluginRepository>
+    ...
+  </pluginRepositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.opensc</groupId>
+      <artifactId>opensc-PKCS11</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+    ...
+  </dependencies>
+  ...
+</project>
 
-as a new eclipse project by using the
+Eclipse users are advised to use the Maven2 plugin for eclipse
+available from the following update site
 
-  File->Import->Import existing project into workspace->
-    archive file
-
-facility of eclipse. Afterwards, you should select the new
-project opensc-PKCS11 as a referenced project inside your
-own JAVA project.
+  http://m2eclipse.codehaus.org/
 
 Developping opensc-PKCS11
 -------------------------
