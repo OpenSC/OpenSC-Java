@@ -110,7 +110,7 @@
                   <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
                 </fileset>
               </copy>
-              <zip zipfile="${jni.targetDir}/${project.artifactId}-jni-${project.version}-${jni.classifier}.zip">
+              <zip zipfile="${jni.targetDir}/${project.artifactId}-${project.version}-${jni.classifier}.zip">
                 <fileset dir="${jni.targetDir}/lib">
                   <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
                 </fileset>
