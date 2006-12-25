@@ -185,6 +185,47 @@
        </dependency>
      </dependencies>
     </profile>
+    
+    <profile>
+      <id>deploy-extra-arch</id>
+      <activation>
+        <property>
+          <name>deploy.extra.arch</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+      <plugins>
+       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}-${extra.arch}.zip</file>
+                  <type>zip</type>
+                  <classifier>${extra.arch}</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}-${jni.classifier}.zip</file>
+                  <type>zip</type>
+                  <classifier>${jni.classifier}</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+     </plugins>
+    </build>
+   </profile>
   </profiles>
 
   <dependencies>
