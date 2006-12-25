@@ -13,6 +13,7 @@
     <jni.libPrefix>lib</jni.libPrefix>
     <jni.libExtension>so</jni.libExtension>
     <jni.targetDir>target</jni.targetDir>
+	  <jni.build.dir>jni/build/unix/release</jni.build.dir>
    </properties>
   <version>0.2.0-svn</version>
   
@@ -53,46 +54,68 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <!-- Version 1.0.2 refuses to search in the OS' PATH, so we use version 1.0.1 -->
+        <version>1.0.1</version>
+        <executions>
+          <execution>
+           <id>exec-jniconfig</id>
+           <goals><goal>exec</goal></goals>
+           <phase>compile</phase>
+           <configuration>
+              <executable>perl</executable>
+              <workingDirectory>${jni.build.dir}</workingDirectory>
+              <arguments>
+               <argument>../../../src/scripts/config.pl</argument>
+              </arguments>
+           </configuration>
+          </execution>
+          <execution>
+           <id>exec-jnibuild</id>
+           <goals><goal>exec</goal></goals>
+           <phase>compile</phase>
+           <configuration>
+              <executable>make</executable>
+              <workingDirectory>${jni.build.dir}</workingDirectory>
+           </configuration>
+          </execution>
+          <execution>
+           <id>exec-jniclean</id>
+           <goals><goal>exec</goal></goals>
+           <phase>clean</phase>
+           <configuration>
+              <executable>make</executable>
+              <workingDirectory>${jni.build.dir}</workingDirectory>
+              <arguments>
+               <argument>distclean</argument>
+              </arguments>
+           </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
-         <execution>
-           <id>ant-jnibuild</id>
-           <goals><goal>run</goal></goals>
-           <phase>compile</phase>
-           <configuration>
-            <tasks>
-              <ant target="jniinst"/>
-              <zip zipfile="${jni.targetDir}/${project.artifactId}-jni-${project.version}-${jni.classifier}.zip">
-                <fileset dir="${jni.targetDir}/lib">
-                  <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
-                </fileset>
-              </zip>
-             </tasks>
-           </configuration>
-         </execution>
-         <execution>
-           <id>ant-jniclean</id>
-           <goals><goal>run</goal></goals>
-           <phase>clean</phase>
-           <configuration>
-            <tasks>
-              <ant target="jniclean"/>
-            </tasks>
-           </configuration>
-         </execution>
          <execution>
            <id>ant-jnipkg</id>
            <goals><goal>run</goal></goals>
            <phase>package</phase>
            <configuration>
             <tasks>
-              <zip zipfile="${project.build.directory}/${project.artifactId}-${project.version}-${jni.classifier}.zip">
-                <fileset dir="${project.build.directory}/lib">
+              <mkdir dir="${jni.targetDir}/lib"/>
+              <copy todir="${jni.targetDir}/lib">
+                <fileset dir="${jni.build.dir}/jniP11">
+                  <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
+                </fileset>
+              </copy>
+              <zip zipfile="${jni.targetDir}/${project.artifactId}-jni-${project.version}-${jni.classifier}.zip">
+                <fileset dir="${jni.targetDir}/lib">
                   <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
                 </fileset>
               </zip>
-            </tasks>
+             </tasks>
            </configuration>
          </execution>
         </executions>
@@ -168,6 +191,7 @@
        <jni.classifier>Windows-${os.arch}</jni.classifier>
        <jni.libPrefix></jni.libPrefix>
        <jni.libExtension>dll</jni.libExtension>
+	     <jni.build.dir>jni/build/mingw/release</jni.build.dir>
       </properties>
     </profile>
     <profile>
@@ -248,4 +272,13 @@
       <optional>true</optional>
     </dependency>
    </dependencies>
+   
+   <pluginRepositories>
+     <pluginRepository>
+      <id>codehaus-mojo-repo</id>
+      <name>codehaus.org mojo plugin repository.</name>
+      <url>http://repository.codehaus.org/org/codehaus/mojo/</url>
+     </pluginRepository>
+   </pluginRepositories>
+   
 </project>
