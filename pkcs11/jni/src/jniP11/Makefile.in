@@ -68,6 +68,7 @@ JNIOBJECTS =	org_opensc_pkcs11_PKCS11Provider.$(OBJ) \
 		org_opensc_pkcs11_wrap_PKCS11Slot.$(OBJ) \
 		org_opensc_pkcs11_wrap_PKCS11Session.$(OBJ) \
 		org_opensc_pkcs11_wrap_PKCS11Object.$(OBJ) \
+		org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.$(OBJ) \
 		org_opensc_pkcs11_spi_PKCS11SignatureSpi.$(OBJ) \
 		org_opensc_pkcs11_spi_PKCS11CipherSpi.$(OBJ) \
 		pkcs11_module.$(OBJ) \

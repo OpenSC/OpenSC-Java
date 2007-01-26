@@ -51,21 +51,21 @@ public class PKCS11DSAPublicKey extends PKCS11PublicKey implements DSAPublicKey
 	 * @param handle
 	 * @throws PKCS11Exception
 	 */
-	protected PKCS11DSAPublicKey(PKCS11Session session, int type, long handle)
+	protected PKCS11DSAPublicKey(PKCS11Session session, long handle)
 			throws PKCS11Exception
 	{
-		super(session, type, handle);
+		super(session, CKK_DSA, handle);
 		
-		byte [] raw_x = getRawAttribute(CKA_VALUE);
+		byte [] raw_x = getRawAttribute(PKCS11Attribute.CKA_VALUE);
 		this.y = new BigInteger(raw_x);
 		
-		raw_x = getRawAttribute(CKA_PRIME);
+		raw_x = getRawAttribute(PKCS11Attribute.CKA_PRIME);
 		BigInteger p = new BigInteger(raw_x);
 			
-		raw_x = getRawAttribute(CKA_SUBPRIME);
+		raw_x = getRawAttribute(PKCS11Attribute.CKA_SUBPRIME);
 		BigInteger q = new BigInteger(raw_x);
 			
-		raw_x = getRawAttribute(CKA_BASE);
+		raw_x = getRawAttribute(PKCS11Attribute.CKA_BASE);
 		BigInteger g = new BigInteger(raw_x);
 		
 		this.params = new DSAParameterSpec(p,q,g);

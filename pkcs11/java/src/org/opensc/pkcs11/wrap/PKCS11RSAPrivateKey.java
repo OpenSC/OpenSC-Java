@@ -53,10 +53,10 @@ public class PKCS11RSAPrivateKey extends PKCS11PrivateKey implements RSAPrivateK
 	{
 		super(session, CKK_RSA, true, handle);
 		
-		byte [] raw_modulus = getRawAttribute(CKA_MODULUS);
+		byte [] raw_modulus = getRawAttribute(PKCS11Attribute.CKA_MODULUS);
 		this.modulus = new BigInteger(raw_modulus);
 		
-		byte [] raw_exp = getRawAttribute(CKA_PRIVATE_EXPONENT);
+		byte [] raw_exp = getRawAttribute(PKCS11Attribute.CKA_PRIVATE_EXPONENT);
 		this.privateExponent = new BigInteger(raw_exp);
 	}
 

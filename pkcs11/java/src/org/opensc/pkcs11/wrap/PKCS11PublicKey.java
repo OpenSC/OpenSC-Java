@@ -52,7 +52,7 @@ public class PKCS11PublicKey extends PKCS11Key implements PublicKey
 			throws PKCS11Exception
 	{
 		super(session, type, handle);
-		this.encoded = getRawAttribute(CKA_VALUE);
+		this.encoded = getRawAttribute(PKCS11Attribute.CKA_VALUE);
 	}
 	
 	/**
@@ -70,18 +70,18 @@ public class PKCS11PublicKey extends PKCS11Key implements PublicKey
 		
 		for (int i = 0; i < handles.length; i++)
 		{
-			int keyType = PKCS11Object.getULongAttribute(session,handles[i],CKA_KEY_TYPE);
+			int keyType = PKCS11Object.getULongAttribute(session,handles[i],PKCS11Attribute.CKA_KEY_TYPE);
 
 			PKCS11PublicKey key;
 			
 			switch (keyType)
 			{
 			case CKK_RSA:
-				key = new PKCS11RSAPublicKey(session,keyType,handles[i]);
+				key = new PKCS11RSAPublicKey(session,handles[i]);
 				break;
 				
 			case CKK_DSA:
-				key = new PKCS11DSAPublicKey(session,keyType,handles[i]);
+				key = new PKCS11DSAPublicKey(session,handles[i]);
 				break;
 				
 			default:

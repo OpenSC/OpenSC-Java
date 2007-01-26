@@ -55,7 +55,7 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 		super(session,type,handle);
 		
 		this.extractable = extractable;		
-		this.sensitive = super.getBooleanAttribute(CKA_SENSITIVE);
+		this.sensitive = super.getBooleanAttribute(PKCS11Attribute.CKA_SENSITIVE);
 	}
 
 	/**
@@ -74,10 +74,10 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 		for (int i = 0; i < handles.length; i++)
 		{
 			int keyType =
-				PKCS11Object.getULongAttribute(session,handles[i],CKA_KEY_TYPE);
+				PKCS11Object.getULongAttribute(session,handles[i],PKCS11Attribute.CKA_KEY_TYPE);
 			
 			boolean extractable=
-				PKCS11Object.getBooleanAttribute(session,handles[i],CKA_EXTRACTABLE);
+				PKCS11Object.getBooleanAttribute(session,handles[i],PKCS11Attribute.CKA_EXTRACTABLE);
 
 			PKCS11PrivateKey key=null;
 			

@@ -26,9 +26,12 @@
 package org.opensc.pkcs11.wrap;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +46,11 @@ import sun.security.util.BigInt;
  */
 public class PKCS11Certificate extends PKCS11Object
 {
-	private X500Principal subject;
+    public static final int CKC_X_509           = 0x00000000;
+    public static final int CKC_X_509_ATTR_CERT = 0x00000001;
+    public static final int CKC_VENDOR_DEFINED  = 0x80000000;
+
+    private X500Principal subject;
 	private X500Principal issuer;
 	private BigInt serial;
 	
@@ -58,13 +65,13 @@ public class PKCS11Certificate extends PKCS11Object
 	{
 		super(session, handle);
 		
-		byte[] raw_subject = getRawAttribute(CKA_SUBJECT);
+		byte[] raw_subject = getRawAttribute(PKCS11Attribute.CKA_SUBJECT);
 		this.subject = new X500Principal(raw_subject); 
 		
-		byte[] raw_issuer = getRawAttribute(CKA_ISSUER);
+		byte[] raw_issuer = getRawAttribute(PKCS11Attribute.CKA_ISSUER);
 		this.issuer = new X500Principal(raw_issuer); 
 		
-		byte[] raw_serial = getRawAttribute(CKA_SERIAL_NUMBER);
+		byte[] raw_serial = getRawAttribute(PKCS11Attribute.CKA_SERIAL_NUMBER);
 		this.serial = new BigInt(raw_serial);
 	}
 
@@ -88,6 +95,57 @@ public class PKCS11Certificate extends PKCS11Object
 		return ret;
 	}
 
+    /**
+     * Store a signed certificate to the token and return a refernce to the newly created token
+     * object.
+     * 
+     * Currently, the only supported certificate type is X.509.
+     * 
+     * @param session The session in which to create the new certificate.
+     * @param cert The certificate to be stored. Currently the certificate must
+     *             be an extension of {@link X509Certificate}.
+     * @param label An optional label for the certificate object on the token.
+     * @return A reference to the newly created certificate object on the token.
+     * @throws PKCS11Exception Upon errors from the underlying PKCS11 module.
+     * @throws CertificateEncodingException If the certificae could not be serialized
+     *                 or the certificate in not an X.509 certificate.
+     */
+    public static PKCS11Certificate storeCertificate(PKCS11Session session, Certificate cert, String label) throws PKCS11Exception, CertificateEncodingException
+    {
+        if (!(cert instanceof X509Certificate))
+            throw new CertificateEncodingException("Only X.509 certificates are supported.");
+        
+        X509Certificate x509 = (X509Certificate)cert;
+        
+        try
+        {
+            int nAttrs = 7;
+            if (label != null) ++nAttrs;
+            
+            PKCS11Attribute[] attrs = new PKCS11Attribute[nAttrs];
+            
+            attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_TOKEN,true);
+            attrs[1] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,CKO_CERTIFICATE);
+            attrs[2] = new PKCS11Attribute(PKCS11Attribute.CKA_CERTIFICATE_TYPE,CKC_X_509);
+            attrs[3] = new PKCS11Attribute(PKCS11Attribute.CKA_SUBJECT,
+                                           x509.getSubjectX500Principal().getEncoded());
+            attrs[4] = new PKCS11Attribute(PKCS11Attribute.CKA_ISSUER,
+                                           x509.getIssuerX500Principal().getEncoded());
+            attrs[5] = new PKCS11Attribute(PKCS11Attribute.CKA_SERIAL_NUMBER,
+                                           x509.getSerialNumber().toByteArray());
+            attrs[6] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,cert.getEncoded());
+             
+            if (label != null)
+                attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_LABEL,label.getBytes("UTF-8"));
+            
+            return new PKCS11Certificate(session,PKCS11Object.createObject(session, attrs));
+
+        } catch (UnsupportedEncodingException e)
+        {
+            throw new CertificateEncodingException("Unexpected error during utf-8 encoding",e); 
+        }
+    }
+    
 	/**
 	 * @return The decoded X509 certificate of this entry.
 	 * @throws CertificateException Upon errors when decoding the
@@ -95,7 +153,7 @@ public class PKCS11Certificate extends PKCS11Object
 	 */
 	public Certificate getCertificate() throws PKCS11Exception, CertificateException
 	{
-		byte[] asn1_certificate = getRawAttribute(CKA_VALUE);
+		byte[] asn1_certificate = getRawAttribute(PKCS11Attribute.CKA_VALUE);
 		
 		CertificateFactory factory =
 			CertificateFactory.getInstance("X.509");
