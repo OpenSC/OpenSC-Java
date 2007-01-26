@@ -59,7 +59,7 @@ import org.opensc.pkcs11.wrap.PKCS11SessionChild;
  */
 public class PKCS11CipherSpi extends CipherSpi
 {
-	static Log log = LogFactory.getLog(CipherSpi.class);
+	static Log log = LogFactory.getLog(PKCS11CipherSpi.class);
 	
 	PKCS11Provider provider;
 	String algorithm;

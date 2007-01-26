@@ -37,12 +37,11 @@ import java.security.NoSuchProviderException;
 import java.security.ProviderException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
-import java.security.KeyStore.CallbackHandlerProtection;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.LoadStoreParameter;
 import java.security.KeyStore.PasswordProtection;
-import java.security.KeyStore.ProtectionParameter;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -54,23 +53,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.security.auth.DestroyFailedException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opensc.pkcs11.PKCS11EventCallback;
 import org.opensc.pkcs11.PKCS11LoadStoreParameter;
 import org.opensc.pkcs11.PKCS11Provider;
+import org.opensc.pkcs11.PKCS11SessionStore;
 import org.opensc.pkcs11.wrap.PKCS11Certificate;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11PrivateKey;
-import org.opensc.pkcs11.wrap.PKCS11Session;
-import org.opensc.pkcs11.wrap.PKCS11Slot;
 
 /**
  * This is a JAVA KeyStore, which accesses a slot on a PKCS#11 cryptographic token.
@@ -112,8 +104,8 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	}
 	
 	private final PKCS11Provider provider;
-	private PKCS11Slot slot;
-	private PKCS11Session session;
+	private PKCS11SessionStore sessionStore;
+    private boolean needToCloseSessionStore;
 	private Map<String,PKCS11KSEntry> entries;
 	
 	/**
@@ -123,7 +115,10 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		super();
 		this.provider = provider;
-		
+        this.sessionStore = null;
+        this.entries = null;
+		this.needToCloseSessionStore = false;
+        
 		if (algorithm != "PKCS11")
 			throw new ProviderException("Algorithm for PKCS11 KeyStore can only be \"PKCS11\".");
 	}
@@ -317,7 +312,36 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	public void engineSetCertificateEntry(String name, Certificate certificate)
 			throws KeyStoreException
 	{
-		throw new KeyStoreException("setCertificateEntry is unimplmented.");
+	    try
+        {
+            PKCS11Certificate cert =
+                PKCS11Certificate.storeCertificate(this.sessionStore.getSession(),
+                                                   certificate, name);
+            
+            PKCS11KSEntry entry = new PKCS11KSEntry(cert);
+
+            String keyName = String.format("ID_%02X",cert.getId());
+
+            PKCS11KSEntry pk_entry = this.entries.get(keyName);
+                
+            if (pk_entry != null)
+            {
+                entry.privateKey = pk_entry.privateKey;
+                this.entries.remove(keyName);
+            }
+            
+            if (name == null)
+                this.entries.put(cert.getSubject().toString(),entry);
+            else
+                this.entries.put(name,entry);
+           
+        } catch (CertificateEncodingException e)
+        {
+            throw new KeyStoreException("Error encoding certificate",e);
+        } catch (PKCS11Exception e)
+        {
+            throw new KeyStoreException("Error storing certificate on the token",e);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -453,104 +477,6 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		engineLoad(param);
 	}
 
-	private static void changeEvent(int ev, CallbackHandler eventHandler, PKCS11EventCallback cb) throws IOException
-	{
-		cb.setEvent(ev);
-		if (eventHandler==null) return;
-		
-		try
-		{
-			eventHandler.handle(new Callback[]{cb});
-		} catch (UnsupportedCallbackException e)
-		{
-			log.warn("PKCSEventCallback not supported by CallbackHandler ["+eventHandler.getClass()+"]",e);
-		}
-	}
-	
-	private static void eventFailed(CallbackHandler eventHandler, PKCS11EventCallback cb, Exception e) throws IOException
-	{
-		int fe;
-		
-		switch (cb.getEvent())
-		{
-		default:
-			fe = PKCS11EventCallback.INITIALIZATION_FAILED;
-			break;
-			
-		case PKCS11EventCallback.WAITING_FOR_CARD:
-			fe = PKCS11EventCallback.CARD_WAIT_FAILED;
-			break;
-			
-		case PKCS11EventCallback.WAITING_FOR_SW_PIN:
-		case PKCS11EventCallback.WAITING_FOR_SW_SO_PIN:
-			// an IOException during software PIN entry is interpreted as an abort of
-			// the PIN entry process. This is done so, because there is no standard exception
-			// for such a situation defined.
-			if ((e instanceof IOException) &&
-					!(e instanceof PKCS11Exception))
-			{
-				fe = (cb.getEvent() == PKCS11EventCallback.WAITING_FOR_SW_SO_PIN) ?
-						PKCS11EventCallback.SO_PIN_ENTRY_ABORTED :
-							PKCS11EventCallback.PIN_ENTRY_ABORTED;
-				break;
-			}
-		
-			// A PKCS11Exception with CKR_FUNCTION_CANCELED od CKR_CANCEL
-			// is interpreted as a PIN entry abort by the user.
-			if (e instanceof PKCS11Exception)
-			{
-				PKCS11Exception p11e = (PKCS11Exception)e;
-				
-				if (p11e.getErrorCode() == PKCS11Exception.CKR_FUNCTION_CANCELED ||
-						p11e.getErrorCode() == PKCS11Exception.CKR_CANCEL)
-				{
-					fe = (cb.getEvent() == PKCS11EventCallback.WAITING_FOR_SW_SO_PIN) ?
-							PKCS11EventCallback.SO_PIN_ENTRY_ABORTED :
-								PKCS11EventCallback.PIN_ENTRY_ABORTED;
-					break;
-				}
-			}
-			
-			fe = (cb.getEvent() == PKCS11EventCallback.WAITING_FOR_SW_SO_PIN) ?
-					PKCS11EventCallback.SO_PIN_ENTRY_FAILED :
-						PKCS11EventCallback.PIN_ENTRY_FAILED;
-			break;
-			
-		case PKCS11EventCallback.HW_AUTHENTICATION_IN_PROGRESS:
-		case PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS:
-			// A PKCS11Exception with CKR_FUNCTION_CANCELED od CKR_CANCEL
-			// is interpreted as an authentication abort by the user.
-			if (e instanceof PKCS11Exception)
-			{
-				PKCS11Exception p11e = (PKCS11Exception)e;
-				
-				if (p11e.getErrorCode() == PKCS11Exception.CKR_FUNCTION_CANCELED ||
-						p11e.getErrorCode() == PKCS11Exception.CKR_CANCEL)
-				{
-					fe = (cb.getEvent() == PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS) ?
-							PKCS11EventCallback.SO_AUHENTICATION_ABORTED :
-								PKCS11EventCallback.AUHENTICATION_ABORTED;
-					break;
-				}
-			}
-
-			fe = (cb.getEvent() == PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS) ?
-					PKCS11EventCallback.SO_AUHENTICATION_FAILED :
-						PKCS11EventCallback.AUHENTICATION_FAILED;
-			break;
-			
-		case PKCS11EventCallback.PIN_AUTHENTICATION_IN_PROGRESS:
-			fe = PKCS11EventCallback.AUHENTICATION_FAILED;
-			break;
-			
-		case PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS:
-			fe = PKCS11EventCallback.SO_AUHENTICATION_FAILED;
-			break;
-		}
-		
-		changeEvent(fe,eventHandler,cb);
-	}
-	
 	/* (non-Javadoc)
 	 * @see java.security.KeyStoreSpi#engineLoad(java.security.KeyStore.LoadStoreParameter)
 	 */
@@ -558,257 +484,85 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	public void engineLoad(LoadStoreParameter param) throws IOException,
 			NoSuchAlgorithmException, CertificateException
 	{
-		PKCS11EventCallback evCb = new PKCS11EventCallback(PKCS11EventCallback.NO_EVENT);
-
-		ProtectionParameter pp = param.getProtectionParameter();
-		
-		CallbackHandler eventHandler = null;
-		if (param instanceof PKCS11LoadStoreParameter)
-			eventHandler = ((PKCS11LoadStoreParameter)param).getEventHandler();
-		
-		try
-		{
-			if (this.slot != null)
-			{
-				this.slot.destroy();
-				this.slot = null;
-				this.session = null;
-				this.entries = null;
-			}
-
-			PKCS11LoadStoreParameter p11_param = null;
-			if (param instanceof PKCS11LoadStoreParameter)
-				p11_param = (PKCS11LoadStoreParameter) param;
+	    if (this.sessionStore != null)
+	    {
+	        if (this.needToCloseSessionStore)
+	            this.sessionStore.close();
+	    }
+            
+	    if (param instanceof PKCS11SessionStore)
+	    {
+	        this.sessionStore = (PKCS11SessionStore)param;
+	        this.needToCloseSessionStore = false;
+	    }
+	    else
+	    {
+	        this.sessionStore = new PKCS11SessionStore();
+	        this.needToCloseSessionStore = true;
+	        this.sessionStore.open(this.provider, param);
+	    }
+	    
+	    // OK, the session is up and running, now get the certificates
+	    // and keys.
+	    this.entries = new HashMap<String,PKCS11KSEntry>();
 			
-			// get the new slot.
-			PKCS11Slot s = null;
-
-			// OK, the user knows, which slot is desired.
-			if (p11_param != null && p11_param.getSlotId() != null)
-			{
-				s = new PKCS11Slot(this.provider, p11_param.getSlotId());
+	    List<PKCS11PrivateKey> privKeys =
+	        PKCS11PrivateKey.getPrivateKeys(this.sessionStore.getSession());
+			
+	    Map<Integer,PKCS11KSEntry> privKeysById =
+	        new HashMap<Integer,PKCS11KSEntry>();
+			
+	    for (PKCS11PrivateKey privKey : privKeys)
+	    {
+	        privKeysById.put(privKey.getId(),new PKCS11KSEntry(privKey));
+	    }
+			
+	    List<PKCS11Certificate> certificates =
+	        PKCS11Certificate.getCertificates(this.sessionStore.getSession());
+			
+	    for (PKCS11Certificate certificate : certificates)
+	    {
+	        // contruct a unique name for certificate entries.
+	        String subj = certificate.getSubject().toString();
+	        String name = subj;
+	        
+	        name = subj;
 				
-				// is there a token ?
-				// no token, but user wants to wait.
-				if (!s.isTokenPresent() && p11_param.isWaitForSlot())
-				{
-					s.destroy();
-
-					changeEvent(PKCS11EventCallback.WAITING_FOR_CARD,eventHandler,evCb);
-
-					// OK, someone might argue, that we could intrduce a loop
-					// here in order to wait for the right token.
-					// For the moment, I prefer to throw an exception, if the
-					// user
-					// inserts a token into the wrong slot.
-					s = PKCS11Slot.waitForSlot(this.provider);
-
-					if (s.getId() != p11_param.getSlotId().longValue())
-					{
-						s.destroy();
-						throw new PKCS11Exception(
-								"A token has been inserted in slot number "
-										+ s.getId()
-										+ " instead of slot number "
-										+ p11_param.getSlotId());
-					}
-				}
-
-			}
-			// The user does not know, which slot is desired, so go and find
-			// one.
-			else
-			{
-				List<PKCS11Slot> slots = PKCS11Slot
-						.enumerateSlots(this.provider);
-
-				for (PKCS11Slot checkSlot : slots)
-				{
-					if (s == null && checkSlot.isTokenPresent())
-						s = checkSlot;
-					else
-						checkSlot.destroy();
-				}
-
-				// not a single token found and user wants to wait.
-				if (s == null && p11_param != null && p11_param.isWaitForSlot())
-				{
-					changeEvent(PKCS11EventCallback.WAITING_FOR_CARD,eventHandler,evCb);
-					s = PKCS11Slot.waitForSlot(this.provider);
-				}
-			}
-
-			// So, did we finally find a slot ?
-			if (s == null)
-			{
-				throw new PKCS11Exception(
-						"Could not find a valid slot with a present token.");
-			} else if (!s.isTokenPresent())
-			{
-                long slotId = s.getId();
-				s.destroy();
-				throw new PKCS11Exception(
-						"No token is present in the given slot number "
-								+ slotId);
-			}
-
-			this.slot = s;
-
-			int open_mode = PKCS11Session.OPEN_MODE_READ_ONLY;
-			
-			if (p11_param != null && p11_param.isWriteEnabled())
-				open_mode = PKCS11Session.OPEN_MODE_READ_WRITE;
-			
-			// open the session.
-			this.session = PKCS11Session.open(this.slot,open_mode);
-			
-			if (p11_param != null)
-			{
-				ProtectionParameter so_pp = p11_param.getSOProtectionParameter();
-				if (so_pp instanceof PasswordProtection)
-				{
-					changeEvent(PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-					this.session.loginSO(((PasswordProtection)so_pp).getPassword());
-					changeEvent(PKCS11EventCallback.SO_AUHENTICATION_SUCEEDED,eventHandler,evCb);
-				}
-				else if (so_pp instanceof CallbackHandlerProtection)
-				{
-					char [] pin = null;
-					// do authenticate with the protected auth method of the token,
-					// if this is possible, otherwise use the callback to authenticate.
-					if (this.slot.hasTokenProtectedAuthPath())
-					{
-						changeEvent(PKCS11EventCallback.SO_HW_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-					}
-					else
-					{
-						changeEvent(PKCS11EventCallback.WAITING_FOR_SW_SO_PIN,eventHandler,evCb);
-
-						CallbackHandler cbh =
-							((CallbackHandlerProtection)so_pp).getCallbackHandler();
+	        int i = 1;
 					
-						PasswordCallback pcb = new PasswordCallback("Please enter the SO pin:",false);
-						cbh.handle(new Callback[] { pcb });
-						pin = pcb.getPassword();
-						changeEvent(PKCS11EventCallback.SO_PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-					}
-					
-                    this.session.loginSO(pin);
-					changeEvent(PKCS11EventCallback.SO_AUHENTICATION_SUCEEDED,eventHandler,evCb);
-				}
-			}
-
-			if (pp instanceof PasswordProtection)
-			{
-				changeEvent(PKCS11EventCallback.PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-				this.session.loginUser(((PasswordProtection)pp).getPassword());
-				changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
-			}
-			else if (pp instanceof CallbackHandlerProtection)
-			{
-				char [] pin = null;
-				// do authenticate with the protected auth method of the token,
-				// if this is possible, otherwise use the callback to authenticate. 
-				if (this.slot.hasTokenProtectedAuthPath())
-				{
-					changeEvent(PKCS11EventCallback.HW_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-				}
-				else
-				{
-					changeEvent(PKCS11EventCallback.WAITING_FOR_SW_PIN,eventHandler,evCb);
-
-					CallbackHandler cbh =
-						((CallbackHandlerProtection)pp).getCallbackHandler();
+	        while (this.entries.containsKey(name) && i < MAX_SIMILAR_CERTIFICATES)
+	        {
+	            ++i;
+	            name = String.format("%s_%02X",subj,i);
+	        }
 				
-					PasswordCallback pcb = new PasswordCallback("Please enter the user pin:",false);
-					cbh.handle(new Callback[] { pcb });
-					
-					pin = pcb.getPassword();
-					changeEvent(PKCS11EventCallback.PIN_AUTHENTICATION_IN_PROGRESS,eventHandler,evCb);
-				}
-
-				this.session.loginUser(pin);
-				changeEvent(PKCS11EventCallback.AUHENTICATION_SUCEEDED,eventHandler,evCb);
-			}
-
-			// OK, the session is up and running, now get the certificates
-			// and keys.
-			this.entries = new HashMap<String,PKCS11KSEntry>();
-			
-			List<PKCS11PrivateKey> privKeys =
-				PKCS11PrivateKey.getPrivateKeys(this.session);
-			
-			Map<Integer,PKCS11KSEntry> privKeysById =
-				new HashMap<Integer,PKCS11KSEntry>();
-			
-			for (PKCS11PrivateKey privKey : privKeys)
-			{
-				privKeysById.put(privKey.getId(),new PKCS11KSEntry(privKey));
-			}
-			
-			List<PKCS11Certificate> certificates =
-				PKCS11Certificate.getCertificates(this.session);
-			
-			for (PKCS11Certificate certificate : certificates)
-			{
-				// contruct a unique name for certificate entries.
-				String subj = certificate.getSubject().toString();
-				String name = subj;
+	        if (i >= MAX_SIMILAR_CERTIFICATES) {
+	            throw new CertificateException("More than "+MAX_SIMILAR_CERTIFICATES+
+	                                           " instances of the same certificate subject ["+subj+
+	                                           "]found on the token.");
+	        }
 				
-				name = subj;
+	        PKCS11KSEntry entry = new PKCS11KSEntry(certificate);
+	        PKCS11KSEntry pk_entry = privKeysById.get(certificate.getId());
 				
-				int i = 1;
-					
-				while (this.entries.containsKey(name) && i < MAX_SIMILAR_CERTIFICATES)
-				{
-					++i;
-					name = String.format("%s_%02X",subj,i);
-				}
+	        if (pk_entry != null)
+	        {
+	            entry.privateKey = pk_entry.privateKey;
+	            pk_entry.certificate = certificate;
+	        }
 				
-				if (i >= MAX_SIMILAR_CERTIFICATES) {
-					throw new CertificateException("More than "+MAX_SIMILAR_CERTIFICATES+
-							" instances of the same certificate subject ["+subj+
-							"]found on the token.");
-				}
+	        this.entries.put(name,entry);
+	    }
+	    
+	    for (Integer id : privKeysById.keySet())
+	    {
+	        PKCS11KSEntry entry = privKeysById.get(id);
 				
-				PKCS11KSEntry entry = new PKCS11KSEntry(certificate);
-				PKCS11KSEntry pk_entry = privKeysById.get(certificate.getId());
+	        if (entry.certificate != null) continue;
 				
-				if (pk_entry != null)
-				{
-					entry.privateKey = pk_entry.privateKey;
-					pk_entry.certificate = certificate;
-				}
+	        String name = String.format("ID_%02X",id);
 				
-				this.entries.put(name,entry);
-			}
-			
-			for (Integer id : privKeysById.keySet())
-			{
-				PKCS11KSEntry entry = privKeysById.get(id);
-				
-				if (entry.certificate != null) continue;
-				
-				String name = String.format("ID_%02X",id);
-				
-				this.entries.put(name,entry);
-			}
-		} catch (IOException e)
-		{
-			eventFailed(eventHandler,evCb,e);
-			throw e;	
-		} catch (CertificateException e)
-		{
-			eventFailed(eventHandler,evCb,e);
-			throw e;	
-		} catch (DestroyFailedException e)
-		{
-			eventFailed(eventHandler,evCb,e);
-			throw new PKCS11Exception("destroy exception caught: ",e);
-		}  catch (UnsupportedCallbackException e)
-		{
-			throw new PKCS11Exception("PasswordCallback is not supported",e);
-		} 
+	        this.entries.put(name,entry);
+	    }
 	}
-
 }

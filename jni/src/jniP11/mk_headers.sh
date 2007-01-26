@@ -13,6 +13,7 @@ classes="org.opensc.pkcs11.PKCS11Provider \
          org.opensc.pkcs11.wrap.PKCS11Slot \
          org.opensc.pkcs11.wrap.PKCS11Session \
          org.opensc.pkcs11.wrap.PKCS11Object \
+         org.opensc.pkcs11.wrap.PKCS11KeyPairGenerator \
          org.opensc.pkcs11.spi.PKCS11SignatureSpi \
          org.opensc.pkcs11.spi.PKCS11CipherSpi"
 

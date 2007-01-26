@@ -86,8 +86,8 @@ public class PKCS11Key extends PKCS11Object implements Key
 	protected PKCS11Key(PKCS11Session session, int type, long handle) throws PKCS11Exception
 	{
 		super(session, handle);
-		this.keyType = super.getULongAttribute(CKA_KEY_TYPE);
-		this.keyBits = super.getULongAttribute(CKA_MODULUS_BITS);
+		this.keyType = super.getULongAttribute(PKCS11Attribute.CKA_KEY_TYPE);
+		this.keyBits = super.getULongAttribute(PKCS11Attribute.CKA_MODULUS_BITS);
 	}
 	
 	/**

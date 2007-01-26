@@ -312,3 +312,59 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBool
 
   return ret;
 }
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Object
+ * Method:    createObjectNative
+ * Signature: (JJJ[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;)J
+ */
+JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_createObjectNative)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jobjectArray attrs)
+{
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  if (!mod) return 0;
+  
+  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  if (!slot) return 0;
+
+  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Atribute");
+
+  if (!clazz) return 0;
+
+  jmethodID getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
+
+  if (!getKindID) return 0;
+
+  jmethodID getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
+
+  if (!getDataID) return 0;
+
+  CK_ULONG i;
+  CK_ULONG ulAttributeCount = (*env)->GetArrayLength(env,attrs);
+  CK_ATTRIBUTE_PTR pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
+
+  for (i=0;i<ulAttributeCount;++i)
+    {
+      jobject jattr = (*env)->GetObjectArrayElement(env,attrs,i);
+      if (!jattr) return 0;
+
+      pAttributes[i].type = (*env)->CallIntMethod(env,jattr,getKindID);
+
+      jbyteArray data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
+
+      allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
+    }
+
+  CK_OBJECT_HANDLE hObject;
+
+  int rv = C_CreateObject(hsession, pAttributes, ulAttributeCount, &hObject);
+
+  if (rv  != CKR_OK)
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
+                          "C_CreateObject failed.");
+      return 0;
+    }
+
+  return hObject;
+}

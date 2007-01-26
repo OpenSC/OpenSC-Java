@@ -55,13 +55,13 @@ public class PKCS11NeDSAPrivateKey extends PKCS11PrivateKey implements DSAKey
 
 		byte [] raw_x;
 		
-		raw_x = getRawAttribute(CKA_PRIME);
+		raw_x = getRawAttribute(PKCS11Attribute.CKA_PRIME);
 		BigInteger p = new BigInteger(raw_x);
 			
-		raw_x = getRawAttribute(CKA_SUBPRIME);
+		raw_x = getRawAttribute(PKCS11Attribute.CKA_SUBPRIME);
 		BigInteger q = new BigInteger(raw_x);
 			
-		raw_x = getRawAttribute(CKA_BASE);
+		raw_x = getRawAttribute(PKCS11Attribute.CKA_BASE);
 		BigInteger g = new BigInteger(raw_x);
 			
 		this.params = new DSAParameterSpec(p,q,g);

@@ -37,6 +37,8 @@ import javax.security.auth.Destroyable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opensc.pkcs11.spec.PKCS11DSAKeyPairGenParameterSpec;
+import org.opensc.pkcs11.spec.PKCS11RSAKeyPairGenParameterSpec;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11SessionChild;
 import org.opensc.util.DestroyableHolder;
@@ -174,8 +176,12 @@ public class PKCS11Provider extends Provider implements DestroyableParent
         		(this, "Signature", "SHA1withDSA", "org.opensc.pkcs11.spi.PKCS11SignatureSpi"));
 		putService(new PKCS11SignatureService
         		(this, "Signature", "NONEwithDSA", "org.opensc.pkcs11.spi.PKCS11SignatureSpi"));
-		putService(new PKCS11CipherService
-        		(this, "Cipher", "RSA/ECB/PKCS1Padding", "org.opensc.pkcs11.spi.PKCS11CipherSpi"));
+        putService(new PKCS11CipherService
+                   (this, "Cipher", "RSA/ECB/PKCS1Padding", "org.opensc.pkcs11.spi.PKCS11CipherSpi"));
+        putService(new PKCS11KeyPairGeneratorService
+                   (this, "KeyPairGenerator", "RSA", "org.opensc.pkcs11.spi.PKCS11KeyPairGeneratorSpi"));
+        putService(new PKCS11KeyPairGeneratorService
+                   (this, "KeyPairGenerator", "DSA", "org.opensc.pkcs11.spi.PKCS11KeyPairGeneratorSpi"));
 	}
 	
 	/**
@@ -279,28 +285,51 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 		}
 	}
 	
-	private static class PKCS11CipherService extends PKCS11Service
-	{
-		PKCS11CipherService(Provider provider, String type, String algorithm, String className)
-		{
-			super(provider, type, algorithm, className);
-		}
+    private static class PKCS11CipherService extends PKCS11Service
+    {
+        PKCS11CipherService(Provider provider, String type, String algorithm, String className)
+        {
+            super(provider, type, algorithm, className);
+        }
 
-		/* (non-Javadoc)
-		 * @see java.security.Provider.Service#supportsParameter(java.lang.Object)
-		 */
-		@Override
-		public boolean supportsParameter(Object param)
-		{
-			if (! (param instanceof PKCS11SessionChild)) return false;
-			
-			if (param instanceof RSAKey)
-				return super.getAlgorithm().startsWith("RSA");
-			
-			return false;
-		}
-	}
-	
+        /* (non-Javadoc)
+         * @see java.security.Provider.Service#supportsParameter(java.lang.Object)
+         */
+        @Override
+        public boolean supportsParameter(Object param)
+        {
+            if (! (param instanceof PKCS11SessionChild)) return false;
+            
+            if (param instanceof RSAKey)
+                return super.getAlgorithm().startsWith("RSA");
+            
+            return false;
+        }
+    }
+    
+    private static class PKCS11KeyPairGeneratorService extends PKCS11Service
+    {
+        PKCS11KeyPairGeneratorService(Provider provider, String type, String algorithm, String className)
+        {
+            super(provider, type, algorithm, className);
+        }
+
+        /* (non-Javadoc)
+         * @see java.security.Provider.Service#supportsParameter(java.lang.Object)
+         */
+        @Override
+        public boolean supportsParameter(Object param)
+        {
+            if (param instanceof PKCS11RSAKeyPairGenParameterSpec)
+                return super.getAlgorithm().equals("RSA");
+            
+            if (param instanceof PKCS11DSAKeyPairGenParameterSpec)
+                return super.getAlgorithm().equals("DSA");
+            
+            return false;
+        }
+    }
+    
 	/**
 	 * @return Returns the pkcs11ModuleHandle used by calls to the
 	 *         natvie JNI functions of associated services.
