@@ -68,6 +68,7 @@ public class KeyGenerationTest extends PKCS11ProviderTestCase {
         
         lsp.setWaitForSlot(true);
         lsp.setSOProtectionCallback(pe);
+        lsp.setProtectionCallback(pe);
         lsp.setEventHandler(pe);
         lsp.setWriteEnabled(true);
         
