@@ -19,8 +19,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
@@ -30,17 +28,13 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import junit.framework.TestCase;
-
 import org.opensc.pkcs11.PKCS11LoadStoreParameter;
-import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.pkcs11.wrap.PKCS11Certificate;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11Mechanism;
@@ -50,55 +44,21 @@ import org.opensc.pkcs11.wrap.PKCS11Session;
 import org.opensc.pkcs11.wrap.PKCS11Slot;
 
 /**
- * JUnit test for the PKCS11 provider.
+ * JUnit test for the PKCS11 provider on a fully initialized token
+ * with a private key and a certificate..
  *
  * @author wglas
  */
-public class TestProvider extends TestCase
+public class BaseTest extends PKCS11ProviderTestCase
 {
-	PKCS11Provider provider;
-	byte[] testData;
-	
 	/**
 	 * Constructs a default instance of the provider test class.
 	 */
-	public TestProvider()
+	public BaseTest()
 	{
 		super();
 	}
 
-	public void setUp() throws IOException
-	{	
-		// Add provider "SunPKCS11-OpenSC"
-		String pkcs11_path;
-		
-		if (System.getProperty("os.name").contains("Windows"))
-			pkcs11_path = System.getenv("ProgramFiles")+"\\Smart Card Bundle\\opensc-pkcs11.dll";
-		else
-			pkcs11_path = "/usr/lib/opensc-pkcs11.so";
-			
-        this.provider = new PKCS11Provider(pkcs11_path);
-		Security.addProvider(this.provider);
-				
-		Provider providers[] = Security.getProviders();
-		for (Provider p : providers)
-			System.out.println("Found provider: " + p.getName());
-		
-        this.testData = new byte[199];
-		
-		Random random = new Random(System.currentTimeMillis());
-		
-		random.nextBytes(this.testData);
-	}
-	
-	public void tearDown()
-	{
-        this.provider.cleanup();
-        this.provider = null;
-        this.testData = null;
-		Security.removeProvider("OpenSC-PKCS11");
-	}
-	
 	public void testKeyStore() throws KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException, CertificateException, IOException, PKCS11Exception, UnrecoverableKeyException, InvalidKeyException, SignatureException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException
 	{
 		KeyStore ks = KeyStore.getInstance("PKCS11","OpenSC-PKCS11");
