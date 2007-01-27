@@ -48,7 +48,7 @@ public class Util
 	 * Translate a character array to an utf-8 encoded byte array.
 	 * 
 	 * @param pin The chracter array.
-	 * @return The UTF-8 encaoded byte-equivalent.
+	 * @return The UTF-8 encoded byte-equivalent.
 	 */
 	public static byte[] translatePin(char[] pin)
 	{

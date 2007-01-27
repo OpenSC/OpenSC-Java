@@ -169,8 +169,8 @@ public class PKCS11SessionStore implements LoadStoreParameter
             break;
         }
         
-        close();
         changeEvent(fe);
+        close();
     }
     
     /**
@@ -283,12 +283,13 @@ public class PKCS11SessionStore implements LoadStoreParameter
             // open the session.
             this.session = PKCS11Session.open(this.slot,open_mode);
             
+            this.authenticate(param.getProtectionParameter());
+            
             if (p11_param != null)
             {
                 this.authenticateSO(p11_param.getSOProtectionParameter());
             }
 
-            this.authenticate(param.getProtectionParameter());
         } catch (IOException e)
         {
             eventFailed(e);

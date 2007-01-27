@@ -40,7 +40,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ke
   pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
-  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Atribute");
+  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
 
   if (!clazz) return 0;
 

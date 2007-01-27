@@ -64,7 +64,7 @@ public class PKCS11KeyPairGeneratorSpi extends KeyPairGeneratorSpi
      * @param provider
      * @param algorithm
      */
-    PKCS11KeyPairGeneratorSpi(PKCS11Provider provider, String algorithm)
+    public PKCS11KeyPairGeneratorSpi(PKCS11Provider provider, String algorithm)
     {
         this.provider = provider;
         this.algorithm = algorithm;
