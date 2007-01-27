@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.opensc</groupId>
+  <artifactId>pkcs11-test</artifactId>
+  <version>0.2.0-svn</version>
+  <description>Test programs for the opensc PKCS#11 provider.</description>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0-alpha-1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>unpack-jni</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+             <type>zip</type>
+             <excludeTypes>jar</excludeTypes>
+             <outputDirectory>${project.build.directory}/lib</outputDirectory>
+             </configuration>
+           </execution>
+          </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Run test explicitly using 'mvn test -Dtest=TestProvider' -->
+          <skip>true</skip>
+          <argLine>-Djava.library.path=${jni.targetDir}/lib</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.opensc</groupId>
+      <artifactId>opensc-PKCS11</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.13</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central maven repository.</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+    <repository>
+      <id>org.clazzes</id>
+      <name>Clazzes.org repository.</name>
+      <url>http://maven.clazzes.org</url>
+    </repository>
+   </repositories>
+   
+   <pluginRepositories>
+     <pluginRepository>
+      <id>codehaus-mojo-repo</id>
+      <name>codehaus.org mojo plugin repository.</name>
+      <url>http://repository.codehaus.org/org/codehaus/mojo/</url>
+     </pluginRepository>
+   </pluginRepositories>
+</project>
