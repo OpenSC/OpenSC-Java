@@ -159,6 +159,17 @@ static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 
 #endif
 
+static CK_C_INITIALIZE_ARGS pkcs11_init_args =
+  {
+    pkcs11_create_mutex,
+    pkcs11_destroy_mutex,
+    pkcs11_lock_mutex,
+    pkcs11_unlock_mutex,
+    CKF_OS_LOCKING_OK,
+    NULL
+  };
+
+
 pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
 {
   int rv;
@@ -281,17 +292,7 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
       goto failed;
     }
 
-  CK_C_INITIALIZE_ARGS init_args =
-    {
-      pkcs11_create_mutex,
-      pkcs11_destroy_mutex,
-      pkcs11_lock_mutex,
-      pkcs11_unlock_mutex,
-      CKF_OS_LOCKING_OK,
-      NULL
-    };
-
-  rv = mod->method->C_Initialize(&init_args);
+  rv = mod->method->C_Initialize(&pkcs11_init_args);
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
