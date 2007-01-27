@@ -57,19 +57,27 @@ public class PINEntry implements CallbackHandler
 	private PINListener listener;
 	private TextField textField;
 	
-	static private class PINListener implements KeyListener, WindowListener
+	private class PINListener implements KeyListener, WindowListener
 	{
 		private boolean accepted = false;
 		private boolean interacted = false;
 		private Frame frame;
-		
+		private String pin;
+        
 		PINListener(Frame frame)
 		{
 			this.frame=frame;
 		}
 		
+        public String getPin()
+        {
+            return this.pin;
+        }
+        
 		private synchronized void accept()
 		{
+            this.pin = PINEntry.this.textField.getText();
+            PINEntry.this.textField.setText("");
 			this.frame.setVisible(false);
 			this.frame.dispose();
 			this.accepted = true;
@@ -79,6 +87,8 @@ public class PINEntry implements CallbackHandler
 		
 		private synchronized void reject()
 		{
+            this.pin = null;
+            PINEntry.this.textField.setText("");
 			this.frame.setVisible(false);
 			this.frame.dispose();
 			this.accepted = false;
@@ -109,13 +119,21 @@ public class PINEntry implements CallbackHandler
 		{
 			try
 			{
+                this.frame.setVisible(true);
+                
 				if (!this.interacted)
 					this.wait();
 			} catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
-			return this.accepted;
+            
+            boolean ret = this.accepted;
+            
+            this.interacted = false;
+            this.accepted = false;
+            
+			return ret;
 		}
 
 		public void windowOpened(WindowEvent arg0)
@@ -192,7 +210,8 @@ public class PINEntry implements CallbackHandler
 		if (!this.listener.waitForUser())
 			throw new IOException("The Password dialog has been interrupted by the user.");
 		
-		String pw = this.textField.getText();
+		String pw = this.listener.getPin();
+        
 		char pin[] = pw.toCharArray();
 		return pin;
 	}
