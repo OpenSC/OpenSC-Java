@@ -29,6 +29,8 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opensc.util.PKCS11Id;
+
 /**
  * @author wglas
  *
@@ -58,6 +60,46 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 		this.sensitive = super.getBooleanAttribute(PKCS11Attribute.CKA_SENSITIVE);
 	}
 
+    private static PKCS11PrivateKey makePrivateKey(PKCS11Session session, long handle, int keyType, boolean extractable) throws PKCS11Exception
+    {
+        //
+        // Well the rationale behind all this code below is, that we
+        // have to export non-extractable keys as a plain PrivateKey
+        // implementation, because the interfaces {RSA,DSA}PrivateKey
+        // grant access to all private information of the private key.
+        //
+        // Moreover, the delayed provider selection described in
+        // http://java.sun.com/j2se/1.5.0/docs/guide/security/p11guide.html
+        // come to the end, that implementations of {RSA,DSA}PrivateKey
+        // are supported by the SunRSA provider, which causes the signature to
+        // fail lateron, because the the private informations are null.
+        // (e.g. RSAPrivateKey.getPrivateExponent() == null).
+        //
+        // This would render the private keys unusable for SSL peer
+        // authentication, so this is another argument for exporting a
+        // non-extractable key as an implementation of the plain PrivateKey
+        // interface.
+        //
+        switch (keyType)
+        {
+        case CKK_RSA:
+            if (extractable)
+                return new PKCS11RSAPrivateKey(session,handle);
+            else
+                return new PKCS11NeRSAPrivateKey(session,handle);
+                
+        case CKK_DSA:
+            if (extractable)
+                return new PKCS11DSAPrivateKey(session,handle);
+            else
+                return new PKCS11NeDSAPrivateKey(session,handle);
+            
+        default:
+            return new PKCS11PrivateKey(session,keyType,extractable, handle);
+        }
+        
+    }
+    
 	/**
 	 * Fetches all private keys stored in the specified slot.
 	 * 
@@ -79,51 +121,43 @@ public class PKCS11PrivateKey extends PKCS11Key implements PrivateKey
 			boolean extractable=
 				PKCS11Object.getBooleanAttribute(session,handles[i],PKCS11Attribute.CKA_EXTRACTABLE);
 
-			PKCS11PrivateKey key=null;
-			
-			//
-			// Well the rationale behind all this code below is, that we
-			// have to export non-extractable keys as a plain PrivateKey
-			// implementation, because the interfaces {RSA,DSA}PrivateKey
-			// grant access to all private information of the private key.
-			//
-			// Moreover, the delayed provider selection described in
-			// http://java.sun.com/j2se/1.5.0/docs/guide/security/p11guide.html
-			// come to the end, that implementations of {RSA,DSA}PrivateKey
-			// are supported by the SunRSA provider, which causes the signature to
-			// fail lateron, because the the private informations are null.
-			// (e.g. RSAPrivateKey.getPrivateExponent() == null).
-			//
-			// This would render the private keys unusable for SSL peer
-			// authentication, so this is another argument for exporting a
-			// non-extractable key as an implementation of the plain PrivateKey
-			// interface.
-			//
-			switch (keyType)
-			{
-			case CKK_RSA:
-				if (extractable)
-					key = new PKCS11RSAPrivateKey(session,handles[i]);
-				else
-					key = new PKCS11NeRSAPrivateKey(session,handles[i]);
-				break;
-					
-			case CKK_DSA:
-				if (extractable)
-					key = new PKCS11DSAPrivateKey(session,handles[i]);
-				else
-					key = new PKCS11NeDSAPrivateKey(session,handles[i]);
-				break;
-				
-			default:
-				key = new PKCS11PrivateKey(session,keyType,extractable, handles[i]);
-			}
-				
+			PKCS11PrivateKey key= makePrivateKey(session, handles[i], keyType, extractable);
 			ret.add(key);
 		}
 		return ret;
 	}
 
+    /**
+     * Get the private key with the given id from the session.
+     * 
+     * @param session The session of which to find a private key.
+     * @param id The Id of the key to be searched.
+     * @return The private key with the given id.
+     * @throws PKCS11Exception Upon error on the underlying PKCS11 module or
+     *                         when the key could not be found. 
+     */
+    public static PKCS11PrivateKey findPrivateKey(PKCS11Session session, PKCS11Id id) throws PKCS11Exception
+    {
+        long handle = findRawObject(session, PKCS11Object.CKO_PRIVATE_KEY, id);
+        
+        int keyType = PKCS11Object.getULongAttribute(session,handle,PKCS11Attribute.CKA_KEY_TYPE);
+        
+        boolean extractable=
+            PKCS11Object.getBooleanAttribute(session,handle,PKCS11Attribute.CKA_EXTRACTABLE);
+
+        return makePrivateKey(session,handle,keyType,extractable);
+    }
+    
+    /**
+     * @return The matching public key, if it is stored on the token.
+     * @throws PKCS11Exception upon errors of the underlying PKCS#11 module or when
+     *              the crresponding public key could not be found on the token.
+     */
+    public PKCS11PublicKey getPublicKey() throws PKCS11Exception
+    {
+        return PKCS11PublicKey.findPublicKey((PKCS11Session)this.getParent(), this.getId());
+    }
+    
 	/* (non-Javadoc)
 	 * @see org.opensc.pkcs11.wrap.PKCS11Key#getFormat()
 	 */

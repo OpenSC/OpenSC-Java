@@ -31,6 +31,7 @@ import javax.security.auth.DestroyFailedException;
 
 import org.opensc.pkcs11.PKCS11Provider;
 import org.opensc.util.DestroyableChild;
+import org.opensc.util.PKCS11Id;
 
 /**
  * @author wglas
@@ -63,7 +64,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	/**
 	 * The Id of the object, i.e. the CKA_ID attribute value.
 	 */
-	private int id;
+	private PKCS11Id id;
 	
 	/**
 	 * The Id of the object, i.e. the CKA_ID attribute value.
@@ -79,7 +80,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	static protected final int CKO_SECRET_KEY    =    0x00000004;
 	
 	/* internal native interface */
-	private static native long[] enumObjectsNative(long pvh, long slot_handle, long hsession, int pkcs11_cls) throws PKCS11Exception;
+    private static native long[] enumObjectsNative(long pvh, long slot_handle, long hsession, PKCS11Attribute[] attrs) throws PKCS11Exception;
 	private static native byte[] getAttributeNative(long pvh, long slot_handle, long hsession, long handle, int att) throws PKCS11Exception;
 	private static native int getULongAttributeNative(long pvh, long slot_handle, long hsession, long handle, int att) throws PKCS11Exception;
 	private static native boolean getBooleanAttributeNative(long pvh, long slot_handle, long hsession, long handle, int att) throws PKCS11Exception;
@@ -141,20 +142,52 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 		return  getBooleanAttributeNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),handle,att);
 	}
 	
-	/**
-	 * Just a small wrapper around the native function.
-	 * @param session The session for which to enumerate the objects.
-	 * @param pkcs11_cls The object class to be seeked.
-	 *        Should be one of the CKO_* constants
-	 * @return The object handles of the retrieved objects,
-	 *         which have to be passed to the constructor.
-	 * @throws PKCS11Exception Upon errors of the underlying PKCS#11 module.
-	 */
-	protected static long[] enumRawObjects(PKCS11Session session, int pkcs11_cls) throws PKCS11Exception
-	{
-		return enumObjectsNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),pkcs11_cls);
-	}
-	
+    /**
+     * Just a small wrapper around the native function.
+     * @param session The session for which to enumerate the objects.
+     * @param pkcs11_cls The object class to be seeked.
+     *        Should be one of the CKO_* constants
+     * @return The object handles of the retrieved objects,
+     *         which have to be passed to the constructor.
+     * @throws PKCS11Exception Upon errors of the underlying PKCS#11 module.
+     */
+    protected static long[] enumRawObjects(PKCS11Session session, int pkcs11_cls) throws PKCS11Exception
+    {
+        PKCS11Attribute attrs[] = new PKCS11Attribute[1];
+        attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,pkcs11_cls);
+        
+        return enumObjectsNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),
+                                 attrs);
+    }
+    
+    /**
+     * Just a small wrapper around the native function.
+     * @param session The session for which to find an object.
+     * @param pkcs11_cls The object class to be seeked.
+     *        Should be one of the CKO_* constants.
+     * @param id The object id to be searched.
+     * @return The object handles of the retrieved objects,
+     *         which have to be passed to the constructor.
+     * @throws PKCS11Exception Upon errors of the underlying PKCS#11 module.
+     */
+    protected static long findRawObject(PKCS11Session session, int pkcs11_cls, PKCS11Id id) throws PKCS11Exception
+    {
+        PKCS11Attribute attrs[] = new PKCS11Attribute[2];
+        attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,pkcs11_cls);
+        attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_ID,id);
+        
+        long[] handles = enumObjectsNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),
+                                           attrs);
+        
+        if (handles == null || handles.length < 1)
+            throw new PKCS11Exception("The requested object with id "+id+" of class "+pkcs11_cls+" was not found.");
+
+        if (handles.length > 1)
+            throw new PKCS11Exception("There are more than one objects with id "+id+" of class "+pkcs11_cls+".");
+        
+        return handles[0];
+    }
+    
     /**
      * Just a small wrapper around the native function.
      * @param session The session in which to create the new objects.
@@ -181,8 +214,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 		
 		try
 		{
-			byte[] utf8_id = getRawAttribute(PKCS11Attribute.CKA_ID);
-			this.id = utf8_id[0];
+            this.id = new PKCS11Id(getRawAttribute(PKCS11Attribute.CKA_ID));
 			
 			byte[] utf8_label = getRawAttribute(PKCS11Attribute.CKA_LABEL);
 			this.label = new String(utf8_label,"UTF-8");
@@ -206,7 +238,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	/**
 	 * @return The Id of this object.
 	 */
-	public int getId()
+	public PKCS11Id getId()
 	{
 		return this.id;
 	}

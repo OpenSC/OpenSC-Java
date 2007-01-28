@@ -30,10 +30,10 @@
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Object
  * Method:    enumObjectsNative
- * Signature: (JJJI)[J
+ * Signature: (JJJ[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;)[J
  */
 JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_enumObjectsNative)
-  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jint p11_cls)
+  (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jobjectArray attrs)
 {
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
@@ -41,10 +41,33 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
   pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
-  CK_OBJECT_CLASS search_class = p11_cls;
-  CK_ATTRIBUTE search_attrs[] = {
-    {CKA_CLASS, &search_class, sizeof(search_class)}
-  };
+  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
+
+  if (!clazz) return 0;
+
+  jmethodID getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
+
+  if (!getKindID) return 0;
+
+  jmethodID getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
+
+  if (!getDataID) return 0;
+
+  CK_ULONG i;
+  CK_ULONG ulAttributeCount = (*env)->GetArrayLength(env,attrs);
+  CK_ATTRIBUTE_PTR pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
+
+  for (i=0;i<ulAttributeCount;++i)
+    {
+      jobject jattr = (*env)->GetObjectArrayElement(env,attrs,i);
+      if (!jattr) return 0;
+
+      pAttributes[i].type = (*env)->CallIntMethod(env,jattr,getKindID);
+
+      jbyteArray data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
+
+      allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
+    }
 
   CK_ULONG obj_ids[ENUM_HANDLES_BLOCK_SZ];
 
@@ -60,7 +83,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       goto failed;
     }
 
-  int rv = mod->method->C_FindObjectsInit(hsession,search_attrs,1);
+  int rv = mod->method->C_FindObjectsInit(hsession,pAttributes,ulAttributeCount);
 
   if (rv  != CKR_OK)
     {
@@ -71,7 +94,6 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
     }
 
   CK_ULONG count = 0;
-  int i;
 
   rv = mod->method->C_FindObjects(hsession,obj_ids, ENUM_HANDLES_BLOCK_SZ, &count);
 

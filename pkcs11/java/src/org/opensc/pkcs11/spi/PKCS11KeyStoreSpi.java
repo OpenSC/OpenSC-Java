@@ -63,6 +63,7 @@ import org.opensc.pkcs11.PKCS11SessionStore;
 import org.opensc.pkcs11.wrap.PKCS11Certificate;
 import org.opensc.pkcs11.wrap.PKCS11Exception;
 import org.opensc.pkcs11.wrap.PKCS11PrivateKey;
+import org.opensc.util.PKCS11Id;
 
 /**
  * This is a JAVA KeyStore, which accesses a slot on a PKCS#11 cryptographic token.
@@ -314,13 +315,13 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 	    try
         {
-            PKCS11Certificate cert =
+	        PKCS11Certificate cert =
                 PKCS11Certificate.storeCertificate(this.sessionStore.getSession(),
-                                                   certificate, name);
+                                                   certificate, name, true);
             
             PKCS11KSEntry entry = new PKCS11KSEntry(cert);
 
-            String keyName = String.format("ID_%02X",cert.getId());
+            String keyName = "ID_" + cert.getId();
 
             PKCS11KSEntry pk_entry = this.entries.get(keyName);
                 
@@ -509,8 +510,8 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	    List<PKCS11PrivateKey> privKeys =
 	        PKCS11PrivateKey.getPrivateKeys(this.sessionStore.getSession());
 			
-	    Map<Integer,PKCS11KSEntry> privKeysById =
-	        new HashMap<Integer,PKCS11KSEntry>();
+	    Map<PKCS11Id,PKCS11KSEntry> privKeysById =
+	        new HashMap<PKCS11Id,PKCS11KSEntry>();
 			
 	    for (PKCS11PrivateKey privKey : privKeys)
 	    {
@@ -554,13 +555,13 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	        this.entries.put(name,entry);
 	    }
 	    
-	    for (Integer id : privKeysById.keySet())
+	    for (PKCS11Id id : privKeysById.keySet())
 	    {
 	        PKCS11KSEntry entry = privKeysById.get(id);
 				
 	        if (entry.certificate != null) continue;
 				
-	        String name = String.format("ID_%02X",id);
+	        String name = "ID_"+id;
 				
 	        this.entries.put(name,entry);
 	    }

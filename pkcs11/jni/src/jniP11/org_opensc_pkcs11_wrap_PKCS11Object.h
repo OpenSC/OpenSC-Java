@@ -18,10 +18,10 @@ extern "C" {
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Object
  * Method:    enumObjectsNative
- * Signature: (JJJI)[J
+ * Signature: (JJJ[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;)[J
  */
 JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_enumObjectsNative)
-  (JNIEnv *, jclass, jlong, jlong, jlong, jint);
+  (JNIEnv *, jclass, jlong, jlong, jlong, jobjectArray);
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Object
