@@ -96,7 +96,7 @@ public class PKCS11Certificate extends PKCS11Object
 	}
 
     /**
-     * Store a signed certificate to the token and return a refernce to the newly created token
+     * Store a signed certificate to the token and return a reference to the newly created token
      * object.
      * 
      * Currently, the only supported certificate type is X.509.
@@ -105,12 +105,14 @@ public class PKCS11Certificate extends PKCS11Object
      * @param cert The certificate to be stored. Currently the certificate must
      *             be an extension of {@link X509Certificate}.
      * @param label An optional label for the certificate object on the token.
+     * @param trusted The PKCS#11 trusted flag of the certificate.
      * @return A reference to the newly created certificate object on the token.
      * @throws PKCS11Exception Upon errors from the underlying PKCS11 module.
      * @throws CertificateEncodingException If the certificae could not be serialized
      *                 or the certificate in not an X.509 certificate.
      */
-    public static PKCS11Certificate storeCertificate(PKCS11Session session, Certificate cert, String label) throws PKCS11Exception, CertificateEncodingException
+    public static PKCS11Certificate storeCertificate(PKCS11Session session, Certificate cert,
+                                                     String label, boolean trusted) throws PKCS11Exception, CertificateEncodingException
     {
         if (!(cert instanceof X509Certificate))
             throw new CertificateEncodingException("Only X.509 certificates are supported.");
@@ -119,7 +121,7 @@ public class PKCS11Certificate extends PKCS11Object
         
         try
         {
-            int nAttrs = 7;
+            int nAttrs = 8;
             if (label != null) ++nAttrs;
             
             PKCS11Attribute[] attrs = new PKCS11Attribute[nAttrs];
@@ -134,9 +136,10 @@ public class PKCS11Certificate extends PKCS11Object
             attrs[5] = new PKCS11Attribute(PKCS11Attribute.CKA_SERIAL_NUMBER,
                                            x509.getSerialNumber().toByteArray());
             attrs[6] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,cert.getEncoded());
+            attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,trusted);
              
             if (label != null)
-                attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_LABEL,label.getBytes("UTF-8"));
+                attrs[8] = new PKCS11Attribute(PKCS11Attribute.CKA_LABEL,label.getBytes("UTF-8"));
             
             return new PKCS11Certificate(session,PKCS11Object.createObject(session, attrs));
 

@@ -25,6 +25,8 @@
 
 package org.opensc.pkcs11.wrap;
 
+import org.opensc.util.PKCS11Id;
+
 /**
  * A PKCS11 attribute, which may be passed from JAVA to the native interface.
  * 
@@ -143,6 +145,18 @@ public class PKCS11Attribute
     }
 
     /**
+     * Contruct an Id attribute.
+     * 
+     * @param kind The kind of the attribute, which is one oof the CKA_* contants.
+     * @param data The PKCS11Id data of the attrribute.
+     */
+    public PKCS11Attribute(int kind, PKCS11Id id)
+    {
+        this.kind = kind;
+        this.data = id.getData();
+    }
+
+    /**
      * Contruct a DWORD attribute.
      * 
      * @param kind The kind of the attribute, which is one oof the CKA_* contants.
@@ -153,20 +167,20 @@ public class PKCS11Attribute
         this.kind = kind;
         this.data = new byte[4];
         
-       if (endianness == LITTLE_ENDIAN)
-       {
-           this.data[0] = (byte)(dword);
-           this.data[1] = (byte)(dword >> 8);
-           this.data[2] = (byte)(dword >> 16);
-           this.data[3] = (byte)(dword >> 24);
-       }
-       else
-       {
-           this.data[0] = (byte)(dword >> 24);
-           this.data[1] = (byte)(dword >> 16);
-           this.data[2] = (byte)(dword >> 8);
-           this.data[3] = (byte)(dword);
-       }
+        if (endianness == LITTLE_ENDIAN)
+        {
+            this.data[0] = (byte)(dword);
+            this.data[1] = (byte)(dword >> 8);
+            this.data[2] = (byte)(dword >> 16);
+            this.data[3] = (byte)(dword >> 24);
+        }
+        else
+        {
+            this.data[0] = (byte)(dword >> 24);
+            this.data[1] = (byte)(dword >> 16);
+            this.data[2] = (byte)(dword >> 8);
+            this.data[3] = (byte)(dword);
+        }
     }
 
     /**

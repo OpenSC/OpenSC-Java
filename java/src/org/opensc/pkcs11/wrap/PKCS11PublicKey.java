@@ -29,6 +29,8 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opensc.util.PKCS11Id;
+
 /**
  * @author wglas
  *
@@ -55,10 +57,25 @@ public class PKCS11PublicKey extends PKCS11Key implements PublicKey
 		this.encoded = getRawAttribute(PKCS11Attribute.CKA_VALUE);
 	}
 	
+    private static PKCS11PublicKey makePublicKey(PKCS11Session session, long handle, int keyType) throws PKCS11Exception
+    {
+        switch (keyType)
+        {
+        case CKK_RSA:
+            return new PKCS11RSAPublicKey(session,handle);
+            
+        case CKK_DSA:
+            return new PKCS11DSAPublicKey(session,handle);
+            
+        default:
+            return new PKCS11PublicKey(session,keyType,handle);
+        }
+    }
+    
 	/**
 	 * Fetches all private keys stored in the specified slot.
 	 * 
-	 * @param session The session of which to find the certificates. 
+	 * @param session The session of which to find the public keys. 
 	 * @return The list of all private keys found in this slot.
 	 * @throws PKCS11Exception Upon errors from the underlying PKCS11 module.
 	 */
@@ -72,28 +89,41 @@ public class PKCS11PublicKey extends PKCS11Key implements PublicKey
 		{
 			int keyType = PKCS11Object.getULongAttribute(session,handles[i],PKCS11Attribute.CKA_KEY_TYPE);
 
-			PKCS11PublicKey key;
-			
-			switch (keyType)
-			{
-			case CKK_RSA:
-				key = new PKCS11RSAPublicKey(session,handles[i]);
-				break;
-				
-			case CKK_DSA:
-				key = new PKCS11DSAPublicKey(session,handles[i]);
-				break;
-				
-			default:
-				key = new PKCS11PublicKey(session,keyType,handles[i]);
-			}
-			
+			PKCS11PublicKey key = makePublicKey(session,handles[i],keyType);
 			ret.add(key);
 		}
 		return ret;
 	}
 
-	/* (non-Javadoc)
+    /**
+     * Get the public key with the given id from the session.
+     * 
+     * @param session The session of which to find a public key.
+     * @param id The Id of the key to be searched.
+     * @return The public key with the given id.
+     * @throws PKCS11Exception Upon error on the underlying PKCS11 module or
+     *                         when the key could not be found. 
+     */
+    public static PKCS11PublicKey findPublicKey(PKCS11Session session, PKCS11Id id) throws PKCS11Exception
+    {
+        long handle = findRawObject(session, PKCS11Object.CKO_PUBLIC_KEY, id);
+        
+        int keyType = PKCS11Object.getULongAttribute(session,handle,PKCS11Attribute.CKA_KEY_TYPE);
+        
+        return makePublicKey(session,handle,keyType);
+    }
+    
+    /**
+     * @return The matching private key, if it is stored on the token.
+     * @throws PKCS11Exception upon errors of the underlying PKCS#11 module or when
+     *              the crresponding private key could not be found on the token.
+     */
+    public PKCS11PrivateKey getPrivateKey() throws PKCS11Exception
+    {
+        return PKCS11PrivateKey.findPrivateKey((PKCS11Session)this.getParent(), this.getId());
+    }
+
+    /* (non-Javadoc)
 	 * @see java.security.Key#getEncoded()
 	 */
 	public byte[] getEncoded()
