@@ -174,7 +174,7 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
     {
         PKCS11Attribute attrs[] = new PKCS11Attribute[2];
         attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,pkcs11_cls);
-        attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_ID,id);
+        attrs[1] = new PKCS11Attribute(PKCS11Attribute.CKA_ID,id);
         
         long[] handles = enumObjectsNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),
                                            attrs);
