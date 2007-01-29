@@ -136,7 +136,7 @@ public class PKCS11Certificate extends PKCS11Object
             attrs[5] = new PKCS11Attribute(PKCS11Attribute.CKA_SERIAL_NUMBER,
                                            x509.getSerialNumber().toByteArray());
             attrs[6] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,cert.getEncoded());
-            attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,trusted);
+            attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_TRUSTED,trusted);
              
             if (label != null)
                 attrs[8] = new PKCS11Attribute(PKCS11Attribute.CKA_LABEL,label.getBytes("UTF-8"));
