@@ -121,25 +121,24 @@ public class PKCS11Certificate extends PKCS11Object
         
         try
         {
-            int nAttrs = 8;
+            int nAttrs = 7;
             if (label != null) ++nAttrs;
             
             PKCS11Attribute[] attrs = new PKCS11Attribute[nAttrs];
             
-            attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_TOKEN,true);
-            attrs[1] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,CKO_CERTIFICATE);
-            attrs[2] = new PKCS11Attribute(PKCS11Attribute.CKA_CERTIFICATE_TYPE,CKC_X_509);
-            attrs[3] = new PKCS11Attribute(PKCS11Attribute.CKA_SUBJECT,
+            attrs[0] = new PKCS11Attribute(PKCS11Attribute.CKA_CLASS,CKO_CERTIFICATE);
+            attrs[1] = new PKCS11Attribute(PKCS11Attribute.CKA_CERTIFICATE_TYPE,CKC_X_509);
+            attrs[2] = new PKCS11Attribute(PKCS11Attribute.CKA_SUBJECT,
                                            x509.getSubjectX500Principal().getEncoded());
-            attrs[4] = new PKCS11Attribute(PKCS11Attribute.CKA_ISSUER,
+            attrs[3] = new PKCS11Attribute(PKCS11Attribute.CKA_ISSUER,
                                            x509.getIssuerX500Principal().getEncoded());
-            attrs[5] = new PKCS11Attribute(PKCS11Attribute.CKA_SERIAL_NUMBER,
+            attrs[4] = new PKCS11Attribute(PKCS11Attribute.CKA_SERIAL_NUMBER,
                                            x509.getSerialNumber().toByteArray());
-            attrs[6] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,cert.getEncoded());
-            attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_TRUSTED,trusted);
+            attrs[5] = new PKCS11Attribute(PKCS11Attribute.CKA_VALUE,cert.getEncoded());
+            attrs[6] = new PKCS11Attribute(PKCS11Attribute.CKA_TRUSTED,trusted);
              
             if (label != null)
-                attrs[8] = new PKCS11Attribute(PKCS11Attribute.CKA_LABEL,label.getBytes("UTF-8"));
+                attrs[7] = new PKCS11Attribute(PKCS11Attribute.CKA_LABEL,label.getBytes("UTF-8"));
             
             return new PKCS11Certificate(session,PKCS11Object.createObject(session, attrs));
 
