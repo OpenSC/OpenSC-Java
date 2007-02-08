@@ -51,9 +51,11 @@ static int throwWin32Error(JNIEnv *env, const char *msg, const wchar_t *module)
 
 static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
 {
+  LPCRITICAL_SECTION cs;
+
   if (ppMutex == NULL) return CKR_ARGUMENTS_BAD;
 
-  LPCRITICAL_SECTION cs = (LPCRITICAL_SECTION)malloc(sizeof(CRITICAL_SECTION));
+  cs = (LPCRITICAL_SECTION)malloc(sizeof(CRITICAL_SECTION));
 
   if (cs == NULL) return CKR_HOST_MEMORY;
 
@@ -66,9 +68,9 @@ static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
 
 static CK_RV pkcs11_destroy_mutex(CK_VOID_PTR pMutex)
 {
-  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
-
   LPCRITICAL_SECTION cs = (LPCRITICAL_SECTION)pMutex;
+
+  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   DeleteCriticalSection(cs);
   free(cs);
@@ -78,9 +80,9 @@ static CK_RV pkcs11_destroy_mutex(CK_VOID_PTR pMutex)
 
 static CK_RV pkcs11_lock_mutex(CK_VOID_PTR pMutex)
 {
-  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
-
   LPCRITICAL_SECTION cs = (LPCRITICAL_SECTION)pMutex;
+
+  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   EnterCriticalSection(cs);
  
@@ -89,9 +91,9 @@ static CK_RV pkcs11_lock_mutex(CK_VOID_PTR pMutex)
 
 static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 {
-  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
-
   LPCRITICAL_SECTION cs = (LPCRITICAL_SECTION)pMutex;
+
+  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   LeaveCriticalSection(cs);
  

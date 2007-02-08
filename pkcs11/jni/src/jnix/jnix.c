@@ -30,14 +30,14 @@ static void jnixThrowExceptionInternal(int *sz,
   int n;
   char *msg=alloca(*sz);
 
+#ifdef WIN32
+  n = _vsnprintf(msg,*sz,fmt,ap);
+#else
   va_list aq;
   va_copy(aq,ap);
-#ifdef WIN32
-  n = _vsnprintf(msg,*sz,fmt,aq);
-#else
   n = vsnprintf(msg,*sz,fmt,aq);
-#endif
   va_end(aq);
+#endif
 
   if (n < -1)
     { *sz *= 2; return; }
@@ -80,10 +80,14 @@ int jnixThrowExceptionV(JNIEnv *env,
 
   do
     {
+#ifdef WIN32
+      jnixThrowExceptionInternal(&sz,env,class_name,fmt,ap);
+#else
       va_list aq;
       va_copy(aq,ap);
       jnixThrowExceptionInternal(&sz,env,class_name,fmt,aq);
       va_end(aq);
+#endif
     }
   while (sz);
 
@@ -105,14 +109,14 @@ static void jnixThrowExceptionInternalI(int *sz,
   
   char *msg=alloca(*sz);
 
+#ifdef WIN32
+  n = _vsnprintf(msg,*sz,fmt,ap);
+#else
   va_list aq;
   va_copy(aq,ap);
-#ifdef WIN32
-  n = _vsnprintf(msg,*sz,fmt,aq);
-#else
   n = vsnprintf(msg,*sz,fmt,aq);
-#endif
   va_end(aq);
+#endif
 
   if (n < -1)
     { *sz *= 2; return; }
@@ -170,10 +174,14 @@ int jnixThrowExceptionIV(JNIEnv *env,
 
   do
     {
+#ifdef WIN32
+      jnixThrowExceptionInternalI(&sz,env,class_name,err,fmt,ap);
+#else
       va_list aq;
       va_copy(aq,ap);
       jnixThrowExceptionInternalI(&sz,env,class_name,err,fmt,aq);
       va_end(aq);
+#endif
     }
   while (sz);
 
