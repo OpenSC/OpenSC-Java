@@ -119,7 +119,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_wa
 
   CK_ULONG slotId;
 
-  // wait in blocking mode.
+  /* wait in blocking mode. */
   int rv = mod->method->C_WaitForSlotEvent(0,&slotId,NULL);
 
   if (rv != CKR_OK)
@@ -187,10 +187,10 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isHardwar
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
- * Method:    getManufaturerNative
+ * Method:    getManufacturerNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufaturerNative)
+jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufacturerNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);

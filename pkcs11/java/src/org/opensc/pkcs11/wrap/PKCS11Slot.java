@@ -190,7 +190,7 @@ public class PKCS11Slot extends DestroyableHolder
 		return isHardwareDeviceNative(this.pvh,this.handle);
 	}
 	
-	private native byte[] getManufaturerNative(long _pvh, long _handle) throws PKCS11Exception;
+	private native byte[] getManufacturerNative(long _pvh, long _handle) throws PKCS11Exception;
 	
 	/**
 	 * @return The manufacturer of the slot.
@@ -199,7 +199,7 @@ public class PKCS11Slot extends DestroyableHolder
 	{
 		try
 		{
-			return new String(getManufaturerNative(this.pvh,this.handle),"UTF-8");
+			return new String(getManufacturerNative(this.pvh,this.handle),"UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
 			return null;

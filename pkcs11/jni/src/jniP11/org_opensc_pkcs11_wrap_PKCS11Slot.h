@@ -65,10 +65,10 @@ JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
- * Method:    getManufaturerNative
+ * Method:    getManufacturerNative
  * Signature: (JJ)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufaturerNative)
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufacturerNative)
   (JNIEnv *, jobject, jlong, jlong);
 
 /*

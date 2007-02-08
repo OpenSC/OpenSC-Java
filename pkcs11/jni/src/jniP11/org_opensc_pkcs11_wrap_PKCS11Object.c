@@ -153,7 +153,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       goto failed;
     }
 
-  // OK, akc it into JAVA's realm.
+  /* OK, akc it into JAVA's realm. */
   jlongArray ret = (*env)->NewLongArray(env,nobjs);
   (*env)->SetLongArrayRegion(env,ret,0,nobjs,ret_obj_ids);
 
