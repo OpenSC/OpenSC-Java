@@ -24,7 +24,7 @@ in the root directory. Maven will automagically
 fetches some popular java libraries via http, if called for the
 first time.
 
-Please note, that when running main methods or JUnit tests of
+Please note, that when running main programs or JUnit tests of
 the project you must supply the command line argument
 
 -Djava.library.path=<opensc-java-root>/target/lib
@@ -123,9 +123,13 @@ Developping opensc-PKCS11
 opensc-PKCS11 comes with the necessary project files for
 using the SVN-tree as an eclipse project.
 
-The file conf/eclipse/TestProvider.launch contain a complete
-'Run...' configuration for the JUnit test case.
+The testcases are now located in a seperate project pkcs11-test, which
+you can check out from
 
+  http://www.opensc-project.org/svn/opensc-java/trunk/pkcs11-test/
+
+This is necessary, because the jar-file of the cryptographic provide needs to
+be signed and hence cannot be easily tested from within the same maven project.
 
 Credits
 -------
@@ -135,3 +139,5 @@ RSA Security Inc. PKCS!#11 Cryptographic Token Interface (Cryptoki).
 
 See also: http://www.rsasecurity.com/rsalabs/node.asp?id=2133
 
+Many thank to andreas.schwier@cardcontact.de for donating a MSVC project
+file and reviewing the C source code.
