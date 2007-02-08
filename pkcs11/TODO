@@ -4,10 +4,7 @@
 # Author: Wolfgang Glas / ev-i Informationstechnologie GmbH
 #
 
- - Implement key pair generation and storing of certificates, which
+ - Test key pair generation and storing of certificates, which
    involve presenting a SO pin to the card.
 
  - Implement more ciphers, key unwrapping et al.
-
- - Add a MSVC nmake Makefile and port the thing to Win64.
- 
