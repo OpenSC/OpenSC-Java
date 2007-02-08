@@ -33,14 +33,15 @@
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_initEncryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
+  int rv;
+  CK_MECHANISM mechanism;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
-
-  int rv;
-  CK_MECHANISM mechanism;
 
   memset(&mechanism, 0, sizeof(mechanism));
   mechanism.mechanism = alg;
@@ -64,14 +65,15 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_initDecryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
+  int rv;
+  CK_MECHANISM mechanism;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
-
-  int rv;
-  CK_MECHANISM mechanism;
 
   memset(&mechanism, 0, sizeof(mechanism));
   mechanism.mechanism = alg;
@@ -95,10 +97,17 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateDecryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pInputPart;
+  CK_BYTE_PTR pOutputPart = 0;
+  CK_ULONG ulOutputLen = 0;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -122,13 +131,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  CK_BYTE_PTR pInputPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
-
-  CK_BYTE_PTR pOutputPart = 0;
-  CK_ULONG ulOutputLen = 0;
 
   rv = mod->method->C_DecryptUpdate(hsession,pInputPart,len,pOutputPart,&ulOutputLen);
 
@@ -152,7 +155,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulOutputLen);
+  ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
   
@@ -167,10 +170,17 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateEncryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pInputPart;
+  CK_BYTE_PTR pOutputPart = 0;
+  CK_ULONG ulOutputLen = 0;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -194,13 +204,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  CK_BYTE_PTR pInputPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
-
-  CK_BYTE_PTR pOutputPart = 0;
-  CK_ULONG ulOutputLen = 0;
 
   rv = mod->method->C_EncryptUpdate(hsession,pInputPart,len,pOutputPart,&ulOutputLen);
 
@@ -224,7 +228,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulOutputLen);
+  ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
   
@@ -239,10 +243,14 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
 JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateDecryptNativeOff)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
+  int rv;
+  CK_BYTE_PTR pOutputPart,pInputPart;
+  CK_ULONG ulOutputLen;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -273,7 +281,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen = (*env)->GetArrayLength(env,output);
+  ulOutputLen = (*env)->GetArrayLength(env,output);
   
   if (output_off < 0 || output_off > ulOutputLen)
     {
@@ -283,10 +291,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
     }
  
   ulOutputLen -= output_off;
-  CK_BYTE_PTR pOutputPart = alloca(ulOutputLen);
-
-  CK_BYTE_PTR pInputPart;
-  int rv;
+  pOutputPart = alloca(ulOutputLen);
 
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
@@ -313,10 +318,14 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateEncryptNativeOff)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
+  int rv;
+  CK_ULONG ulOutputLen;
+  CK_BYTE_PTR pOutputPart,pInputPart;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -347,7 +356,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen = (*env)->GetArrayLength(env,output);
+  ulOutputLen = (*env)->GetArrayLength(env,output);
   
   if (output_off < 0 || output_off > ulOutputLen)
     {
@@ -357,10 +366,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
     }
  
   ulOutputLen -= output_off;
-  CK_BYTE_PTR pOutputPart = alloca(ulOutputLen);
-
-  CK_BYTE_PTR pInputPart;
-  int rv;
+  pOutputPart = alloca(ulOutputLen);
 
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
@@ -387,10 +393,19 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalDecryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pInputPart;
+  CK_BYTE_PTR pOutputPart0 = 0;
+  CK_ULONG ulOutputLen0 = 0;
+  CK_BYTE_PTR pOutputPart1 = 0;
+  CK_ULONG ulOutputLen1 = 0;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -414,13 +429,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  CK_BYTE_PTR pInputPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
-
-  CK_BYTE_PTR pOutputPart0 = 0;
-  CK_ULONG ulOutputLen0 = 0;
 
   rv = mod->method->C_DecryptUpdate(hsession,pInputPart,len,pOutputPart0,&ulOutputLen0);
 
@@ -447,9 +456,6 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
         }
     }
 
-  CK_BYTE_PTR pOutputPart1 = 0;
-  CK_ULONG ulOutputLen1 = 0;
-
   rv = mod->method->C_DecryptFinal(hsession,pOutputPart1,&ulOutputLen1);
 
   if (rv  != CKR_OK)
@@ -475,7 +481,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
         }
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulOutputLen0+ulOutputLen1);
+  ret = (*env)->NewByteArray(env,ulOutputLen0+ulOutputLen1);
   if (ret)
     {
       if (ulOutputLen0)
@@ -495,10 +501,19 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalEncryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pInputPart;
+  CK_BYTE_PTR pOutputPart0 = 0;
+  CK_ULONG ulOutputLen0 = 0;
+  CK_BYTE_PTR pOutputPart1 = 0;
+  CK_ULONG ulOutputLen1 = 0;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -522,13 +537,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  CK_BYTE_PTR pInputPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
-
-  CK_BYTE_PTR pOutputPart0 = 0;
-  CK_ULONG ulOutputLen0 = 0;
 
   rv = mod->method->C_EncryptUpdate(hsession,pInputPart,len,pOutputPart0,&ulOutputLen0);
 
@@ -555,9 +564,6 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
         }
     }
 
-  CK_BYTE_PTR pOutputPart1 = 0;
-  CK_ULONG ulOutputLen1 = 0;
-
   rv = mod->method->C_EncryptFinal(hsession,pOutputPart1,&ulOutputLen1);
 
   if (rv  != CKR_OK)
@@ -583,7 +589,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
         }
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulOutputLen0+ulOutputLen1);
+  ret = (*env)->NewByteArray(env,ulOutputLen0+ulOutputLen1);
   if (ret)
     {
       if (ulOutputLen0)
@@ -603,10 +609,16 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
 JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalDecryptNativeOff)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
+  int rv;
+  CK_BYTE_PTR pOutputPart;
+  CK_ULONG ulOutputLen0;
+  CK_BYTE_PTR pInputPart;
+  CK_ULONG ulOutputLen,ulOutputLen1;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -630,7 +642,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen = (*env)->GetArrayLength(env,output);
+  ulOutputLen = (*env)->GetArrayLength(env,output);
   
   if (output_off < 0 || output_off > ulOutputLen)
     {
@@ -640,11 +652,8 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
     }
  
   ulOutputLen -= output_off;
-  CK_BYTE_PTR pOutputPart = alloca(ulOutputLen);
-  CK_ULONG ulOutputLen0 = ulOutputLen;
-
-  CK_BYTE_PTR pInputPart;
-  int rv;
+  pOutputPart = alloca(ulOutputLen);
+  ulOutputLen0 = ulOutputLen;
 
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
@@ -658,7 +667,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen1 = ulOutputLen - ulOutputLen0;
+  ulOutputLen1 = ulOutputLen - ulOutputLen0;
 
   rv = mod->method->C_DecryptFinal(hsession,pOutputPart+ulOutputLen0,&ulOutputLen1);
 
@@ -685,10 +694,16 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalEncryptNativeOff)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
+  int rv;
+  CK_BYTE_PTR pOutputPart;
+  CK_ULONG ulOutputLen,ulOutputLen0,ulOutputLen1;
+  CK_BYTE_PTR pInputPart;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -712,7 +727,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen = (*env)->GetArrayLength(env,output);
+  ulOutputLen = (*env)->GetArrayLength(env,output);
   
   if (output_off < 0 || output_off > ulOutputLen)
     {
@@ -722,11 +737,8 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
     }
  
   ulOutputLen -= output_off;
-  CK_BYTE_PTR pOutputPart = alloca(ulOutputLen);
-  CK_ULONG ulOutputLen0 = ulOutputLen;
-
-  CK_BYTE_PTR pInputPart;
-  int rv;
+  pOutputPart = alloca(ulOutputLen);
+  ulOutputLen0 = ulOutputLen;
 
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
@@ -740,7 +752,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen1 = ulOutputLen - ulOutputLen0;
+  ulOutputLen1 = ulOutputLen - ulOutputLen0;
 
   rv = mod->method->C_EncryptFinal(hsession,pOutputPart+ulOutputLen0,&ulOutputLen1);
 
@@ -769,10 +781,17 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doDecryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pInputPart;
+  CK_BYTE_PTR pOutputPart;
+  CK_ULONG ulOutputLen;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -796,13 +815,10 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  CK_BYTE_PTR pInputPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
-  CK_BYTE_PTR pOutputPart = 0;
-  CK_ULONG ulOutputLen = 0;
+  pOutputPart = 0;
+  ulOutputLen = 0;
 
   rv = mod->method->C_Decrypt(hsession,pInputPart,len,pOutputPart,&ulOutputLen);
 
@@ -826,7 +842,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulOutputLen);
+  ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
   
@@ -841,10 +857,17 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doEncryptNative)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pInputPart;
+  CK_BYTE_PTR pOutputPart;
+  CK_ULONG ulOutputLen;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -868,13 +891,10 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  CK_BYTE_PTR pInputPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
-  CK_BYTE_PTR pOutputPart = 0;
-  CK_ULONG ulOutputLen = 0;
+  pOutputPart = 0;
+  ulOutputLen = 0;
 
   rv = mod->method->C_Encrypt(hsession,pInputPart,len,pOutputPart,&ulOutputLen);
 
@@ -898,7 +918,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
       return 0;
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulOutputLen);
+  ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
   
@@ -913,10 +933,14 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
 JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doDecryptNativeOff)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
+  int rv;
+  CK_BYTE_PTR pOutputPart,pInputPart;
+  CK_ULONG ulOutputLen;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -947,7 +971,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen = (*env)->GetArrayLength(env,output);
+  ulOutputLen = (*env)->GetArrayLength(env,output);
   
   if (output_off < 0 || output_off > ulOutputLen)
     {
@@ -957,10 +981,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
     }
  
   ulOutputLen -= output_off;
-  CK_BYTE_PTR pOutputPart = alloca(ulOutputLen);
-
-  CK_BYTE_PTR pInputPart;
-  int rv;
+  pOutputPart = alloca(ulOutputLen);
 
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 
@@ -987,10 +1008,15 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
 JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doEncryptNativeOff)
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
+  int rv;
+  CK_BYTE_PTR pOutputPart,pInputPart;
+  CK_ULONG ulOutputLen;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
   if (len < 0)
@@ -1021,7 +1047,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
       return 0;
     }
 
-  CK_ULONG ulOutputLen = (*env)->GetArrayLength(env,output);
+  ulOutputLen = (*env)->GetArrayLength(env,output);
   
   if (output_off < 0 || output_off > ulOutputLen)
     {
@@ -1031,10 +1057,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
     }
  
   ulOutputLen -= output_off;
-  CK_BYTE_PTR pOutputPart = alloca(ulOutputLen);
-
-  CK_BYTE_PTR pInputPart;
-  int rv;
+  pOutputPart = alloca(ulOutputLen);
 
   allocaCArrayFromJByteArrayOffLen(pInputPart,env,input,off,len);
 

@@ -26,14 +26,16 @@ static void jnixThrowExceptionInternal(int *sz,
                                        const char *class_name,
                                        const char *fmt, va_list ap)
 {
+  jclass clazz;
+  int n;
   char *msg=alloca(*sz);
 
   va_list aq;
   va_copy(aq,ap);
 #ifdef WIN32
-  int n = _vsnprintf(msg,*sz,fmt,aq);
+  n = _vsnprintf(msg,*sz,fmt,aq);
 #else
-  int n = vsnprintf(msg,*sz,fmt,aq);
+  n = vsnprintf(msg,*sz,fmt,aq);
 #endif
   va_end(aq);
 
@@ -45,7 +47,7 @@ static void jnixThrowExceptionInternal(int *sz,
 
   *sz = 0;
 
-  jclass clazz = (*env)->FindClass(env,class_name);
+  clazz = (*env)->FindClass(env,class_name);
 
   if (!clazz) return;
 
@@ -95,14 +97,20 @@ static void jnixThrowExceptionInternalI(int *sz,
                                         int err,
                                         const char *fmt, va_list ap)
 {
+  int n;
+  jclass clazz;
+  jstring jmsg;
+  jmethodID ctorID;
+  jobject e;
+  
   char *msg=alloca(*sz);
 
   va_list aq;
   va_copy(aq,ap);
 #ifdef WIN32
-  int n = _vsnprintf(msg,*sz,fmt,aq);
+  n = _vsnprintf(msg,*sz,fmt,aq);
 #else
-  int n = vsnprintf(msg,*sz,fmt,aq);
+  n = vsnprintf(msg,*sz,fmt,aq);
 #endif
   va_end(aq);
 
@@ -114,19 +122,19 @@ static void jnixThrowExceptionInternalI(int *sz,
 
   *sz = 0;
 
-  jclass clazz = (*env)->FindClass(env,class_name);
+  clazz = (*env)->FindClass(env,class_name);
 
   if (!clazz) return;
 
-  jmethodID ctorID = (*env)->GetMethodID(env,clazz,"<init>","(ILjava/lang/String;)V");
+  ctorID = (*env)->GetMethodID(env,clazz,"<init>","(ILjava/lang/String;)V");
 
   if (!ctorID) return;
 
-  jstring jmsg = (*env)->NewStringUTF(env,msg);
+  jmsg = (*env)->NewStringUTF(env,msg);
 
   if (!jmsg) return;
 
-  jobject e = (*env)->NewObject(env,clazz,ctorID,
+  e = (*env)->NewObject(env,clazz,ctorID,
                                 (jint)err,jmsg);
 
   if (!e) return;

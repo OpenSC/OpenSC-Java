@@ -34,65 +34,78 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ke
   (JNIEnv *env, jobject jp11kpg, jlong mh, jlong shandle, jlong hsession,
    jint algo, jobjectArray pubAttrs, jobjectArray privAttrs)
 {
+  int rv;
+  CK_ULONG i;
+  CK_ULONG ulPublicKeyAttributeCount;
+  CK_ATTRIBUTE_PTR pPublicKeyTemplate;
+  CK_ULONG ulPrivateKeyAttributeCount;
+  CK_ATTRIBUTE_PTR pPrivateKeyTemplate;
+  CK_MECHANISM keyPairMechanism;
+  CK_OBJECT_HANDLE hPublicKey, hPrivateKey;
+  jclass clazz;
+  jmethodID getKindID;
+  jmethodID getDataID;
+  jlong buf[2];
+  jlongArray ret;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
   
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
-  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
+  clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
 
   if (!clazz) return 0;
 
-  jmethodID getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
+  getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
 
   if (!getKindID) return 0;
 
-  jmethodID getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
+  getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
 
   if (!getDataID) return 0;
 
-  CK_ULONG i;
-  CK_ULONG ulPublicKeyAttributeCount = (*env)->GetArrayLength(env,pubAttrs);
-  CK_ATTRIBUTE_PTR pPublicKeyTemplate = alloca(ulPublicKeyAttributeCount * sizeof(CK_ATTRIBUTE));
+  ulPublicKeyAttributeCount = (*env)->GetArrayLength(env,pubAttrs);
+  pPublicKeyTemplate = alloca(ulPublicKeyAttributeCount * sizeof(CK_ATTRIBUTE));
 
   for (i=0;i<ulPublicKeyAttributeCount;++i)
     {
+      jbyteArray data;
       jobject jattr = (*env)->GetObjectArrayElement(env,pubAttrs,i);
       if (!jattr) return 0;
 
       pPublicKeyTemplate[i].type = (*env)->CallIntMethod(env,jattr,getKindID);
 
-      jbyteArray data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
+      data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
 
       allocaCArrayFromJByteArray(pPublicKeyTemplate[i].pValue,pPublicKeyTemplate[i].ulValueLen,env,data);
     }
 
-  CK_ULONG ulPrivateKeyAttributeCount = (*env)->GetArrayLength(env,privAttrs);
-  CK_ATTRIBUTE_PTR pPrivateKeyTemplate = alloca(ulPrivateKeyAttributeCount * sizeof(CK_ATTRIBUTE));
+  ulPrivateKeyAttributeCount = (*env)->GetArrayLength(env,privAttrs);
+  pPrivateKeyTemplate = alloca(ulPrivateKeyAttributeCount * sizeof(CK_ATTRIBUTE));
 
   for (i=0;i<ulPrivateKeyAttributeCount;++i)
     {
+      jbyteArray data;
       jobject jattr = (*env)->GetObjectArrayElement(env,privAttrs,i);
       if (!jattr) return 0;
 
       pPrivateKeyTemplate[i].type = (*env)->CallIntMethod(env,jattr,getKindID);
 
-      jbyteArray data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
+      data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
 
       allocaCArrayFromJByteArray(pPrivateKeyTemplate[i].pValue,pPrivateKeyTemplate[i].ulValueLen,env,data);
     }
 
-  CK_MECHANISM keyPairMechanism = {
-    algo, NULL_PTR, 0
-  };
+  keyPairMechanism.mechanism      = algo;
+  keyPairMechanism.pParameter     = NULL_PTR;
+  keyPairMechanism.ulParameterLen = 0;
 
-  CK_OBJECT_HANDLE hPublicKey, hPrivateKey;
-
-  int rv = C_GenerateKeyPair(hsession, &keyPairMechanism,
-                             pPublicKeyTemplate, ulPublicKeyAttributeCount,
-                             pPrivateKeyTemplate, ulPrivateKeyAttributeCount,
-                             &hPublicKey, &hPrivateKey);
+  rv = mod->method->C_GenerateKeyPair(hsession, &keyPairMechanism,
+                                      pPublicKeyTemplate, ulPublicKeyAttributeCount,
+                                      pPrivateKeyTemplate, ulPrivateKeyAttributeCount,
+                                      &hPublicKey, &hPrivateKey);
 
   if (rv  != CKR_OK)
     {
@@ -101,12 +114,13 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ke
       return 0;
     }
 
-  jlong buf[2] = { hPublicKey, hPrivateKey };
-  jlongArray ret = (*env)->NewLongArray(env,2);
+  ret = (*env)->NewLongArray(env,2);
 
   if (!ret) return 0;
 
+  buf[0] = hPublicKey;
+  buf[1] = hPrivateKey;
   (*env)->SetLongArrayRegion(env,ret,0,2,buf);
-  
+
   return ret;
 }

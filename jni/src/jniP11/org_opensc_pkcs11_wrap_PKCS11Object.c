@@ -35,45 +35,55 @@
 JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_enumObjectsNative)
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jobjectArray attrs)
 {
+  jclass clazz;
+  jmethodID getKindID,getDataID;
+  CK_ULONG ulAttributeCount;
+  CK_ATTRIBUTE_PTR pAttributes;
+  CK_ULONG i,count;
+  int nobjs,rv;
+  CK_ULONG obj_ids[ENUM_HANDLES_BLOCK_SZ];
+  size_t ret_obj_ids_sz;
+  jlong *ret_obj_ids;
+  jlongArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
-  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
+  clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
 
   if (!clazz) return 0;
 
-  jmethodID getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
+  getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
 
   if (!getKindID) return 0;
 
-  jmethodID getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
+  getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
 
   if (!getDataID) return 0;
 
-  CK_ULONG i;
-  CK_ULONG ulAttributeCount = (*env)->GetArrayLength(env,attrs);
-  CK_ATTRIBUTE_PTR pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
+  ulAttributeCount = (*env)->GetArrayLength(env,attrs);
+  pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
 
   for (i=0;i<ulAttributeCount;++i)
     {
+      jbyteArray data;
       jobject jattr = (*env)->GetObjectArrayElement(env,attrs,i);
       if (!jattr) return 0;
 
       pAttributes[i].type = (*env)->CallIntMethod(env,jattr,getKindID);
 
-      jbyteArray data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
+      data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
 
       allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
     }
 
-  CK_ULONG obj_ids[ENUM_HANDLES_BLOCK_SZ];
-
-  size_t ret_obj_ids_sz = ENUM_HANDLES_BLOCK_SZ;
-  int nobjs = 0;
-  jlong *ret_obj_ids=(jlong*)malloc(ret_obj_ids_sz * sizeof(jlong));
+  ret_obj_ids_sz = ENUM_HANDLES_BLOCK_SZ;
+  nobjs = 0;
+  ret_obj_ids=(jlong*)malloc(ret_obj_ids_sz * sizeof(jlong));
 
   if (!ret_obj_ids)
     {
@@ -83,7 +93,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       goto failed;
     }
 
-  int rv = mod->method->C_FindObjectsInit(hsession,pAttributes,ulAttributeCount);
+  rv = mod->method->C_FindObjectsInit(hsession,pAttributes,ulAttributeCount);
 
   if (rv  != CKR_OK)
     {
@@ -93,7 +103,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       goto failed;
     }
 
-  CK_ULONG count = 0;
+  count = 0;
 
   rv = mod->method->C_FindObjects(hsession,obj_ids, ENUM_HANDLES_BLOCK_SZ, &count);
 
@@ -107,15 +117,17 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
 
   for (i=0; i<count ;++i)
     {
-      ret_obj_ids[nobjs] = obj_ids[i];
+      jlong id = (jlong)obj_ids[i];
+      ret_obj_ids[nobjs] = id;
       ++nobjs;
     }
 
   while (count == ENUM_HANDLES_BLOCK_SZ)
     {
+      jlong *new_obj_ids;
       ret_obj_ids_sz += ENUM_HANDLES_BLOCK_SZ;
 
-      jlong *new_obj_ids=(jlong*)realloc(ret_obj_ids,ret_obj_ids_sz * sizeof(jlong));
+      new_obj_ids=(jlong*)realloc(ret_obj_ids,ret_obj_ids_sz * sizeof(jlong));
      
       if (!new_obj_ids)
         {
@@ -139,7 +151,8 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
 
       for (i=0; i<count ;++i)
         {
-          ret_obj_ids[nobjs] = obj_ids[i];
+          jlong id = (jlong)obj_ids[i];
+          ret_obj_ids[nobjs] = id;
           ++nobjs;
         }
     }
@@ -154,7 +167,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
     }
 
   /* OK, akc it into JAVA's realm. */
-  jlongArray ret = (*env)->NewLongArray(env,nobjs);
+  ret = (*env)->NewLongArray(env,nobjs);
   (*env)->SetLongArrayRegion(env,ret,0,nobjs,ret_obj_ids);
 
   free(ret_obj_ids);
@@ -173,15 +186,16 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getAttributeNative)
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
 {
+  int rv;
+  CK_ATTRIBUTE templ;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
-
-  CK_ATTRIBUTE templ;
-
-  int rv;
 
   templ.type = att;
   templ.pValue = NULL;
@@ -209,7 +223,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       return 0;
     }
   
-  jbyteArray ret = (*env)->NewByteArray(env,templ.ulValueLen);
+  ret = (*env)->NewByteArray(env,templ.ulValueLen);
   (*env)->SetByteArrayRegion(env,ret,0,templ.ulValueLen,(jbyte*)templ.pValue);
   
   return ret;
@@ -223,15 +237,17 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
 jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getAllowedMechanismsNative)
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle)
 {
+  int rv;
+  CK_ATTRIBUTE templ;
+  CK_MECHANISM_TYPE_PTR mechanisms;
+  CK_ULONG n_mechanisms;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
-
-  CK_ATTRIBUTE templ;
-
-  int rv;
 
   templ.type = CKA_ALLOWED_MECHANISMS;
   templ.pValue = NULL;
@@ -257,8 +273,8 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_get
       return 0;
     }
 
-  CK_MECHANISM_TYPE_PTR mechanisms = (CK_MECHANISM_TYPE_PTR)templ.pValue;
-  CK_ULONG n_mechanisms = templ.ulValueLen/sizeof(CK_MECHANISM_TYPE);
+  mechanisms = (CK_MECHANISM_TYPE_PTR)templ.pValue;
+  n_mechanisms = templ.ulValueLen/sizeof(CK_MECHANISM_TYPE);
 
   return pkcs11_slot_make_jmechanisms(env,mod,slot,mechanisms,n_mechanisms);
 }
@@ -271,16 +287,16 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_get
 jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAttributeNative)
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
 {
+  int rv;
+  CK_ATTRIBUTE templ;
+  CK_ULONG ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
-
-  CK_ATTRIBUTE templ;
-  CK_ULONG ret;
-
-  int rv;
 
   templ.type = att;
   templ.pValue = &ret;
@@ -307,16 +323,16 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAtt
 jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBooleanAttributeNative)
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
 {
+  int rv;
+  CK_ATTRIBUTE templ;
+  CK_BBOOL ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
-
-  CK_ATTRIBUTE templ;
-  CK_BBOOL ret;
-
-  int rv;
 
   templ.type = att;
   templ.pValue = &ret;
@@ -343,43 +359,50 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBool
 JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_createObjectNative)
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jobjectArray attrs)
 {
+  int rv;
+  CK_ULONG i;
+  CK_ULONG ulAttributeCount;
+  CK_ATTRIBUTE_PTR pAttributes;
+  CK_OBJECT_HANDLE hObject;
+  jclass clazz;
+  jmethodID getKindID,getDataID;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
   
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
-  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
+  clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Attribute");
 
   if (!clazz) return 0;
 
-  jmethodID getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
+  getKindID = (*env)->GetMethodID(env,clazz,"getKind","()I");
 
   if (!getKindID) return 0;
 
-  jmethodID getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
+   getDataID = (*env)->GetMethodID(env,clazz,"getData","()[B");
 
   if (!getDataID) return 0;
 
-  CK_ULONG i;
-  CK_ULONG ulAttributeCount = (*env)->GetArrayLength(env,attrs);
-  CK_ATTRIBUTE_PTR pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
+  ulAttributeCount = (*env)->GetArrayLength(env,attrs);
+  pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
 
   for (i=0;i<ulAttributeCount;++i)
     {
+      jbyteArray data;
       jobject jattr = (*env)->GetObjectArrayElement(env,attrs,i);
       if (!jattr) return 0;
 
       pAttributes[i].type = (*env)->CallIntMethod(env,jattr,getKindID);
 
-      jbyteArray data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
+      data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
 
       allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
     }
 
-  CK_OBJECT_HANDLE hObject;
 
-  int rv = C_CreateObject(hsession, pAttributes, ulAttributeCount, &hObject);
+  rv = mod->method->C_CreateObject(hsession, pAttributes, ulAttributeCount, &hObject);
 
   if (rv  != CKR_OK)
     {

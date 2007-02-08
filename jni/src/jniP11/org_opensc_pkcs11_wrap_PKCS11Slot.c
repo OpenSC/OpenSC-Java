@@ -33,10 +33,11 @@
 jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_initSlotNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong id)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
   
-  pkcs11_slot_t *slot = new_pkcs11_slot(env,mod,id);
+  slot = new_pkcs11_slot(env,mod,id);
   if (!slot) return 0;
 
   return pkcs11_slot_to_jhandle(env,slot);
@@ -50,10 +51,11 @@ jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_initSlotNati
 void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_destroySlotNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return;
 
   destroy_pkcs11_slot(env,mod,slot);
@@ -68,12 +70,17 @@ void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_destroySlotNa
 jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumerateSlotsNative)
   (JNIEnv *env, jclass clazz, jlong mh)
 {
+  CK_ULONG nslots=0;
+  CK_ULONG i;
+  CK_SLOT_ID *slot_ids;
+  jlong *long_slot_ids;
+  jlongArray ret;
+  int rv;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  CK_ULONG nslots=0;
-
-  int rv = mod->method->C_GetSlotList(FALSE /* tokenPresent */,(CK_SLOT_ID_PTR)0,&nslots);
+  rv = mod->method->C_GetSlotList(FALSE /* tokenPresent */,(CK_SLOT_ID_PTR)0,&nslots);
 
   if (rv  != CKR_OK)
     {
@@ -83,7 +90,7 @@ jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumera
       return 0;
     }
 
-  CK_SLOT_ID *slot_ids = (CK_SLOT_ID *)alloca(sizeof(CK_SLOT_ID)*nslots);
+  slot_ids = (CK_SLOT_ID *)alloca(sizeof(CK_SLOT_ID)*nslots);
 
   rv = mod->method->C_GetSlotList(FALSE /* tokenPresent */,slot_ids,&nslots);
 
@@ -94,13 +101,12 @@ jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumera
       return 0;
     }
   
-  jlong *long_slot_ids = (jlong *)alloca(sizeof(jlong)*nslots);
+  long_slot_ids = (jlong *)alloca(sizeof(jlong)*nslots);
 
-  CK_ULONG i;
   for (i=0;i<nslots;++i)
     long_slot_ids[i] = slot_ids[i];
 
-  jlongArray ret = (*env)->NewLongArray(env,nslots);
+  ret = (*env)->NewLongArray(env,nslots);
   (*env)->SetLongArrayRegion(env,ret,0,nslots,long_slot_ids);
 
   return ret;
@@ -114,13 +120,14 @@ jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumera
 JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_waitForSlotNative)
   (JNIEnv *env, jclass jslot, jlong mh)
 {
+  CK_ULONG slotId;
+  int rv;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  CK_ULONG slotId;
-
   /* wait in blocking mode. */
-  int rv = mod->method->C_WaitForSlotEvent(0,&slotId,NULL);
+  rv = mod->method->C_WaitForSlotEvent(0,&slotId,NULL);
 
   if (rv != CKR_OK)
     {
@@ -140,10 +147,11 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_wa
 jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isTokenPresentNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   return (slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) != 0;
@@ -158,10 +166,11 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isTokenPr
 jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isRemovableDeviceNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   return (slot->ck_slot_info.flags & CKF_REMOVABLE_DEVICE) != 0;
@@ -176,10 +185,11 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isRemovab
 jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isHardwareDeviceNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   return (slot->ck_slot_info.flags & CKF_HW_SLOT) != 0;
@@ -193,18 +203,22 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isHardwar
 jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufacturerNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int l;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
-  int l = 32;
+  l = 32;
 
   while (l > 0 && slot->ck_slot_info.manufacturerID[l-1] == ' ')
     --l;
 
-  jbyteArray ret = (*env)->NewByteArray(env,l);
+  ret = (*env)->NewByteArray(env,l);
   (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_slot_info.manufacturerID);
 
   return ret;
@@ -218,18 +232,22 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManu
 jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getDescriptionNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int l;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
-  int l = 64;
+  l = 64;
 
   while (l > 0 && slot->ck_slot_info.slotDescription[l-1] == ' ')
     --l;
 
-  jbyteArray ret = (*env)->NewByteArray(env,l);
+  ret = (*env)->NewByteArray(env,l);
   (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_slot_info.slotDescription);
 
   return ret;
@@ -243,10 +261,11 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getDesc
 jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getHardwareVersionNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   return (jdouble)slot->ck_slot_info.hardwareVersion.major + 
@@ -261,10 +280,11 @@ jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getHardwar
 jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getFirmwareVersionNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   return (jdouble)slot->ck_slot_info.firmwareVersion.major + 
@@ -279,14 +299,16 @@ jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getFirmwar
 jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMechanismsNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int rv;
+  CK_ULONG n_mechanisms = 0;
+  CK_MECHANISM_TYPE_PTR mechanisms;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return 0;
-
-  CK_ULONG n_mechanisms = 0;
-  int rv;
 
   rv = mod->method->C_GetMechanismList(slot->id,NULL,&n_mechanisms);
 
@@ -298,7 +320,7 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMe
       return 0;
     }
 
-  CK_MECHANISM_TYPE_PTR mechanisms =
+  mechanisms =
     (CK_MECHANISM_TYPE_PTR)alloca(n_mechanisms*sizeof(CK_MECHANISM_TYPE));
 
   rv = mod->method->C_GetMechanismList(slot->id,mechanisms,&n_mechanisms);
@@ -322,10 +344,14 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMe
 jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenlabelNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int l;
+  pkcs11_slot_t *slot;
+  jbyteArray ret;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
@@ -333,12 +359,12 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
                         "No token present in slot %d.",
                         (int)slot->id);
 
-  int l = sizeof(slot->ck_token_info.label)/sizeof(CK_UTF8CHAR);
+  l = sizeof(slot->ck_token_info.label)/sizeof(CK_UTF8CHAR);
 
   while (l > 0 && slot->ck_token_info.label[l-1] == ' ')
     --l;
 
-  jbyteArray ret = (*env)->NewByteArray(env,l);
+  ret = (*env)->NewByteArray(env,l);
   (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.label);
 
   return ret;
@@ -352,10 +378,13 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
 jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenManufacturerNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int l;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
@@ -363,12 +392,12 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
                         "No token present in slot %d.",
                         (int)slot->id);
 
-  int l = sizeof(slot->ck_token_info.manufacturerID)/sizeof(CK_UTF8CHAR);
+  l = sizeof(slot->ck_token_info.manufacturerID)/sizeof(CK_UTF8CHAR);
 
   while (l > 0 && slot->ck_token_info.manufacturerID[l-1] == ' ')
     --l;
 
-  jbyteArray ret = (*env)->NewByteArray(env,l);
+  ret = (*env)->NewByteArray(env,l);
   (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.manufacturerID);
 
   return ret;
@@ -382,10 +411,14 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
 jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenModelNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int l;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
@@ -393,12 +426,12 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
                         "No token present in slot %d.",
                         (int)slot->id);
 
-  int l = sizeof(slot->ck_token_info.model)/sizeof(CK_UTF8CHAR);
+  l = sizeof(slot->ck_token_info.model)/sizeof(CK_UTF8CHAR);
 
   while (l > 0 && slot->ck_token_info.model[l-1] == ' ')
     --l;
 
-  jbyteArray ret = (*env)->NewByteArray(env,l);
+  ret = (*env)->NewByteArray(env,l);
   (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.model);
 
   return ret;
@@ -412,10 +445,13 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
 jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenSerialNumberNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  int l;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
@@ -423,12 +459,12 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
                         "No token present in slot %d.",
                         (int)slot->id);
 
-  int l = sizeof(slot->ck_token_info.serialNumber)/sizeof(CK_UTF8CHAR);
+  l = sizeof(slot->ck_token_info.serialNumber)/sizeof(CK_UTF8CHAR);
 
   while (l > 0 && slot->ck_token_info.serialNumber[l-1] == ' ')
     --l;
 
-  jbyteArray ret = (*env)->NewByteArray(env,l);
+  ret = (*env)->NewByteArray(env,l);
   (*env)->SetByteArrayRegion(env,ret,0,l,(jbyte*)slot->ck_token_info.serialNumber);
 
   return ret;
@@ -442,10 +478,11 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
 jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPinLenNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
@@ -470,10 +507,11 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPi
 jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPinLenNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)
@@ -498,10 +536,11 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPi
 jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_hasTokenProtectedAuthPathNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
- pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+  pkcs11_slot_t *slot;
+  pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,handle);
+  slot = pkcs11_slot_from_jhandle(env,handle);
   if (!slot) return JNI_FALSE;
 
   if ((slot->ck_slot_info.flags & CKF_TOKEN_PRESENT) == 0)

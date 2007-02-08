@@ -30,6 +30,7 @@
 
 pkcs11_slot_t *new_pkcs11_slot(JNIEnv *env,  pkcs11_module_t *mod, CK_SLOT_ID id)
 {
+  int rv;
   pkcs11_slot_t *slot = (pkcs11_slot_t *) malloc(sizeof(pkcs11_slot_t));
 
   if (!slot)
@@ -44,7 +45,7 @@ pkcs11_slot_t *new_pkcs11_slot(JNIEnv *env,  pkcs11_module_t *mod, CK_SLOT_ID id
   slot->_magic = PKCS11_SLOT_MAGIC;
   slot->id = id;
 
-  int rv = mod->method->C_GetSlotInfo(id,&slot->ck_slot_info);
+  rv = mod->method->C_GetSlotInfo(id,&slot->ck_slot_info);
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
@@ -110,7 +111,7 @@ pkcs11_slot_t *pkcs11_slot_from_jhandle(JNIEnv *env, jlong handle)
   if (!slot || slot->_magic != PKCS11_SLOT_MAGIC)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Invalid PKCS11 slot handle %p.",slot);
+                         "Invalid PKCS11 slot handle %p.",(void*)slot);
       return 0;
     }
   
@@ -132,22 +133,26 @@ jobjectArray pkcs11_slot_make_jmechanisms(JNIEnv *env, pkcs11_module_t *mod, pkc
                                           CK_MECHANISM_TYPE_PTR mechanisms, CK_ULONG n_mechanisms)
 {
   CK_ULONG i;
+  jclass clazz;
+  jmethodID ctorID;
+  jobjectArray ret;
   int rv;
 
-  jclass clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Mechanism");
+  clazz = (*env)->FindClass(env,"org/opensc/pkcs11/wrap/PKCS11Mechanism");
 
   if (!clazz) return 0;
 
-  jmethodID ctorID = (*env)->GetMethodID(env,clazz,"<init>","(IIII)V");
+  ctorID = (*env)->GetMethodID(env,clazz,"<init>","(IIII)V");
 
   if (!ctorID) return 0;
 
-  jobjectArray ret = (*env)->NewObjectArray(env,n_mechanisms,clazz,NULL /* initialElement */);
+  ret = (*env)->NewObjectArray(env,n_mechanisms,clazz,NULL /* initialElement */);
 
   if (!ret) return 0;
 
   for (i=0;i<n_mechanisms;++i)
     {
+      jobject m;
       CK_MECHANISM_INFO mechanismInfo;
 
       rv = mod->method->C_GetMechanismInfo(slot->id,mechanisms[i], &mechanismInfo);
@@ -160,11 +165,11 @@ jobjectArray pkcs11_slot_make_jmechanisms(JNIEnv *env, pkcs11_module_t *mod, pkc
           return 0;
         }
 
-      jobject m = (*env)->NewObject(env,clazz,ctorID,
-                                    (jint)mechanisms[i],
-                                    (jint)mechanismInfo.ulMinKeySize,
-                                    (jint)mechanismInfo.ulMaxKeySize,
-                                    (jint)mechanismInfo.flags  );
+      m = (*env)->NewObject(env,clazz,ctorID,
+                            (jint)mechanisms[i],
+                            (jint)mechanismInfo.ulMinKeySize,
+                            (jint)mechanismInfo.ulMaxKeySize,
+                            (jint)mechanismInfo.flags  );
 
       if (!m) return 0;
 
