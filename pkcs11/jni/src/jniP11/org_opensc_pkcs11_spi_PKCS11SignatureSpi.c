@@ -33,14 +33,15 @@
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_initSignNative)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
+  int rv;
+  CK_MECHANISM mechanism;
+  pkcs11_slot_t *slot;
+
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
-
-  int rv;
-  CK_MECHANISM mechanism;
 
   memset(&mechanism, 0, sizeof(mechanism));
   mechanism.mechanism = alg;
@@ -64,10 +65,14 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateSignNative)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyteArray ba, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pPart;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
+
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
 
   if (len < 0)
@@ -91,9 +96,6 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
       return;
     }
 
-  CK_BYTE_PTR pPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pPart,env,ba,off,len);
 
   rv = mod->method->C_SignUpdate(hsession,pPart,len);
@@ -115,14 +117,16 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateSignNative1)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyte b)
 {
+  int rv;
+  CK_BYTE bb;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
 
-  CK_BYTE bb = (CK_BYTE)b;
-  int rv;
+  bb = (CK_BYTE)b;
 
   rv = mod->method->C_SignUpdate(hsession,&bb,1);
 
@@ -143,15 +147,16 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
 JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_signNative)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession)
 {
+  int rv;
+  CK_BYTE_PTR pSignature = NULL;
+  CK_ULONG    ulSignatureLen = 0;
+  jbyteArray ret;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
-
-  CK_BYTE_PTR pSignature = NULL;
-  CK_ULONG    ulSignatureLen = 0;
-  int rv;
 
   rv = mod->method->C_SignFinal(hsession,pSignature,&ulSignatureLen);
 
@@ -175,9 +180,10 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Sig
       return 0;
     }
 
-  jbyteArray ret = (*env)->NewByteArray(env,ulSignatureLen);
+  ret = (*env)->NewByteArray(env,ulSignatureLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulSignatureLen,(jbyte*)pSignature);
+
   return ret;
 }
 
@@ -189,14 +195,14 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Sig
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_initVerifyNative)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
+  int rv;
+  CK_MECHANISM mechanism;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
-
-  int rv;
-  CK_MECHANISM mechanism;
 
   memset(&mechanism, 0, sizeof(mechanism));
   mechanism.mechanism = alg;
@@ -220,10 +226,13 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyteArray data, jint off, jint len)
 {
+  int rv;
+  CK_BYTE_PTR pPart;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
 
   if (len < 0)
@@ -248,9 +257,6 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
     }
 
 
-  CK_BYTE_PTR pPart;
-  int rv;
-
   allocaCArrayFromJByteArrayOffLen(pPart,env,data,off,len);
 
   rv = mod->method->C_VerifyUpdate(hsession,pPart,len);
@@ -271,15 +277,15 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  */
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative1)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyte b)
-{
+{ 
+  int rv;
+  CK_BYTE bb = (CK_BYTE)b;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
-
-  CK_BYTE bb = (CK_BYTE)b;
-  int rv;
 
   rv = mod->method->C_VerifyUpdate(hsession,&bb,1);
 
@@ -300,10 +306,14 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
 JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_verifyNative)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyteArray data)
 {
+  int rv;
+  CK_BYTE_PTR pSignature;
+  CK_ULONG    ulSignatureLen;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return JNI_FALSE;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return JNI_FALSE;
 
   if (data == NULL)
@@ -312,10 +322,6 @@ JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signa
                          "NULL input data.");
       return JNI_FALSE;
     }
-
-  CK_BYTE_PTR pSignature;
-  CK_ULONG    ulSignatureLen;
-  int rv;
 
   allocaCArrayFromJByteArray(pSignature,ulSignatureLen,env,data);
 

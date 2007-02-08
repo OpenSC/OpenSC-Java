@@ -33,18 +33,20 @@
 JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_openNative)
   (JNIEnv *env, jclass jsession, jlong mh, jlong shandle, jint rw)
 {
+  int rv;
+  CK_SESSION_HANDLE hsession;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return 0;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return 0;
 
-  CK_SESSION_HANDLE hsession;
 
-  int rv = mod->method->C_OpenSession(slot->id,
-                                      rw ? (CKF_SERIAL_SESSION | CKF_RW_SESSION) : (CKF_SERIAL_SESSION),
-                                      NULL, NULL,
-                                      &hsession);
+  rv = mod->method->C_OpenSession(slot->id,
+                                  rw ? (CKF_SERIAL_SESSION | CKF_RW_SESSION) : (CKF_SERIAL_SESSION),
+                                  NULL, NULL,
+                                  &hsession);
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
@@ -64,13 +66,15 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_closeNative)
   (JNIEnv *env, jclass jsession, jlong mh, jlong shandle, jlong hsession)
 {
+  int rv;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
 
-  int rv = mod->method->C_CloseSession(hsession);
+  rv = mod->method->C_CloseSession(hsession);
   if (rv != CKR_OK)
     {
       fprintf(stderr,"pkcs11_slot_close_session: C_CloseSession for PKCS11 slot %d(%s) failed.",
@@ -86,21 +90,22 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_loginNative)
   (JNIEnv *env, jobject jsession, jlong mh, jlong shandle, jlong hsession, jint type, jbyteArray jpin)
 {
+  int rv;
+  CK_UTF8CHAR_PTR pin=0;
+  CK_ULONG pin_len=0;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
-
-  CK_UTF8CHAR_PTR pin=0;
-  CK_ULONG pin_len=0;
 
   if (jpin)
     {
       allocaCArrayFromJByteArray(pin,pin_len,env,jpin);
     }
 
-  int rv = mod->method->C_Login(hsession,type,pin,pin_len);
+  rv = mod->method->C_Login(hsession,type,pin,pin_len);
   if (rv != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
@@ -118,13 +123,15 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_logoutNative)
   (JNIEnv *env, jobject jsession, jlong mh, jlong shandle, jlong hsession)
 {
+  int rv;
+  pkcs11_slot_t *slot;
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
   if (!mod) return;
 
-  pkcs11_slot_t *slot = pkcs11_slot_from_jhandle(env,shandle);
+  slot = pkcs11_slot_from_jhandle(env,shandle);
   if (!slot) return;
 
-  int rv = mod->method->C_Logout(hsession);
+  rv = mod->method->C_Logout(hsession);
   if (rv != CKR_OK)
     {
       fprintf(stderr,"PKCS11Session.logoutNative: C_Logout for PKCS11 slot %d(%s) failed (%s).",

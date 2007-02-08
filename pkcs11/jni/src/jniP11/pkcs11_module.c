@@ -104,9 +104,10 @@ static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 
 static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
 {
+  pthread_mutex_t *mutex;
   if (ppMutex == NULL) return CKR_ARGUMENTS_BAD;
 
-  pthread_mutex_t *mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+  mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 
   if (mutex == NULL) return CKR_HOST_MEMORY;
 
@@ -123,9 +124,9 @@ static CK_RV pkcs11_create_mutex(CK_VOID_PTR_PTR ppMutex)
 
 static CK_RV pkcs11_destroy_mutex(CK_VOID_PTR pMutex)
 {
-  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
-
   pthread_mutex_t *mutex = (pthread_mutex_t *)pMutex;
+
+  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   pthread_mutex_destroy(mutex);
   free(mutex);
@@ -135,9 +136,9 @@ static CK_RV pkcs11_destroy_mutex(CK_VOID_PTR pMutex)
 
 static CK_RV pkcs11_lock_mutex(CK_VOID_PTR pMutex)
 {
-  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
-
   pthread_mutex_t * mutex = (pthread_mutex_t *)pMutex;
+
+  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   if (pthread_mutex_lock(mutex))
     return CKR_GENERAL_ERROR;
@@ -147,9 +148,9 @@ static CK_RV pkcs11_lock_mutex(CK_VOID_PTR pMutex)
 
 static CK_RV pkcs11_unlock_mutex(CK_VOID_PTR pMutex)
 {
-  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
-
   pthread_mutex_t *mutex = (pthread_mutex_t *)pMutex;
+
+  if (pMutex == NULL) return CKR_ARGUMENTS_BAD;
 
   if (pthread_mutex_unlock(mutex))
     return CKR_GENERAL_ERROR;
@@ -173,7 +174,16 @@ static CK_C_INITIALIZE_ARGS pkcs11_init_args =
 pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
 {
   int rv;
+  jclass sc;
   CK_RV (*c_get_function_list)(CK_FUNCTION_LIST_PTR_PTR);
+  jsize sz;
+#ifdef WIN32
+  jmethodID toCharArrayId;
+  jcharArray ucs2;
+#else
+  jmethodID getBytesId;
+  jbyteArray filename8;
+#endif
 
   pkcs11_module_t *mod = (pkcs11_module_t *) malloc(sizeof(pkcs11_module_t));
 
@@ -188,20 +198,20 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
   mod->name = 0;
   mod->handle = 0;
 
-  jclass sc = (*env)->FindClass(env,"java/lang/String");
+  sc = (*env)->FindClass(env,"java/lang/String");
 
   if (!sc) goto failed;
 
 #ifdef WIN32
-  jmethodID toCharArrayId = (*env)->GetMethodID(env,sc,"toCharArray","()[C");
+  toCharArrayId = (*env)->GetMethodID(env,sc,"toCharArray","()[C");
 
   if (!toCharArrayId) goto failed;
   	
-  jcharArray ucs2 = (*env)->CallObjectMethod(env,filename,toCharArrayId);
+  ucs2 = (*env)->CallObjectMethod(env,filename,toCharArrayId);
  
   if (!ucs2) goto failed;
  
-  jsize sz = (*env)->GetArrayLength(env,ucs2);
+  sz = (*env)->GetArrayLength(env,ucs2);
   mod->name = (wchar_t *)malloc(2*(sz+1));
 
   if (!mod->name) 
@@ -229,15 +239,15 @@ pkcs11_module_t *new_pkcs11_module(JNIEnv *env, jstring filename)
       return 0;
     }
 
-  jmethodID getBytesId = (*env)->GetMethodID(env,sc,"getBytes","()[B");
+  getBytesId = (*env)->GetMethodID(env,sc,"getBytes","()[B");
 
   if (!getBytesId) goto failed;
   	
-  jbyteArray filename8 = (*env)->CallObjectMethod(env,filename,getBytesId);
+  filename8 = (*env)->CallObjectMethod(env,filename,getBytesId);
  
   if (!filename8) goto failed;
 
-  jsize sz = (*env)->GetArrayLength(env,filename8);
+  sz = (*env)->GetArrayLength(env,filename8);
   mod->name = (char*)malloc(sz+1);
 
   if (!mod->name) 
@@ -352,7 +362,7 @@ pkcs11_module_t *pkcs11_module_from_jhandle(JNIEnv *env, jlong handle)
   if (!mod || mod->_magic != PKCS11_MODULE_MAGIC)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
-                         "Invalid PKCS 11 module handle %p.",mod);
+                         "Invalid PKCS 11 module handle %p.",(void*)mod);
       return 0;
     }
   
