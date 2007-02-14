@@ -43,6 +43,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs11.PKCS11EventCallback;
 
 /**
@@ -52,6 +54,8 @@ import org.opensc.pkcs11.PKCS11EventCallback;
  */
 public class PINEntry implements CallbackHandler
 {
+    private static Log log = LogFactory.getLog(PINEntry.class);
+    
 	private Label label;
 	private Label prompt;
 	private PINListener listener;
@@ -228,14 +232,17 @@ public class PINEntry implements CallbackHandler
 			{
 				PasswordCallback pwCb = (PasswordCallback)callback;
 				
+                log.info("Starting PIN entry...");
 				char pin[] = this.getPIN(pwCb.getPrompt());
 				
 				pwCb.setPassword(pin);
+                log.info("PIN has successfully been entered.");
 			}
 			else if (callback instanceof PKCS11EventCallback)
 			{
 				PKCS11EventCallback evCb = (PKCS11EventCallback)callback;
 				
+                log.info("Received event ["+evCb+"].");
 				this.label.setText(evCb.toString());
 			}
 			else
