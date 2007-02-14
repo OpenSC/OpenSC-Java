@@ -44,37 +44,37 @@ public class PKCS11Key extends PKCS11Object implements Key
 	private int keyBits;
 	
 	/* key types as defined by pkcs11t.h */
-	static final int CKK_RSA            = 0x00000000;
-	static final int CKK_DSA            = 0x00000001;
-	static final int CKK_DH             = 0x00000002;
+	public static final int CKK_RSA            = 0x00000000;
+    public static final int CKK_DSA            = 0x00000001;
+    public static final int CKK_DH             = 0x00000002;
 
 	/* CKK_ECDSA and CKK_KEA are new for v2.0 */
 	/* CKK_ECDSA is deprecated in v2.11, CKK_EC is preferred. */
-	static final int CKK_ECDSA          = 0x00000003;
-	static final int CKK_EC             = 0x00000003;
-	static final int CKK_X9_42_DH       = 0x00000004;
-	static final int CKK_KEA            = 0x00000005;
+    public static final int CKK_ECDSA          = 0x00000003;
+    public static final int CKK_EC             = 0x00000003;
+    public static final int CKK_X9_42_DH       = 0x00000004;
+    public static final int CKK_KEA            = 0x00000005;
 
-	static final int CKK_GENERIC_SECRET = 0x00000010;
-	static final int CKK_RC2            = 0x00000011;
-	static final int CKK_RC4            = 0x00000012;
-	static final int CKK_DES            = 0x00000013;
-	static final int CKK_DES2           = 0x00000014;
-	static final int CKK_DES3           = 0x00000015;
+    public static final int CKK_GENERIC_SECRET = 0x00000010;
+    public static final int CKK_RC2            = 0x00000011;
+    public static final int CKK_RC4            = 0x00000012;
+    public static final int CKK_DES            = 0x00000013;
+    public static final int CKK_DES2           = 0x00000014;
+    public static final int CKK_DES3           = 0x00000015;
 
 	/* all these key types are new for v2.0 */
-	static final int CKK_CAST           = 0x00000016;
-	static final int CKK_CAST3          = 0x00000017;
+    public static final int CKK_CAST           = 0x00000016;
+    public static final int CKK_CAST3          = 0x00000017;
 	/* CKK_CAST5 is deprecated in v2.11, CKK_CAST128 is preferred. */
-	static final int CKK_CAST5          = 0x00000018;
-	static final int CKK_CAST128        = 0x00000018;
-	static final int CKK_RC5            = 0x00000019;
-	static final int CKK_IDEA           = 0x0000001A;
-	static final int CKK_SKIPJACK       = 0x0000001B;
-	static final int CKK_BATON          = 0x0000001C;
-	static final int CKK_JUNIPER        = 0x0000001D;
-	static final int CKK_CDMF           = 0x0000001E;
-	static final int CKK_AES            = 0x0000001F;
+    public static final int CKK_CAST5          = 0x00000018;
+    public static final int CKK_CAST128        = 0x00000018;
+    public static final int CKK_RC5            = 0x00000019;
+    public static final int CKK_IDEA           = 0x0000001A;
+    public static final int CKK_SKIPJACK       = 0x0000001B;
+    public static final int CKK_BATON          = 0x0000001C;
+    public static final int CKK_JUNIPER        = 0x0000001D;
+    public static final int CKK_CDMF           = 0x0000001E;
+    public static final int CKK_AES            = 0x0000001F;
 
 	/**
 	 * @param session The session to which this key belongs.
@@ -142,7 +142,7 @@ public class PKCS11Key extends PKCS11Object implements Key
 	 */
 	public byte[] getEncoded()
 	{
-		throw new SecurityException("Cannot get encoded verion of cryptographic key on hardware device.");
+		throw new SecurityException("Cannot get encoded version of a cryptographic key resident on a hardware token.");
 	}
 
 }

@@ -74,10 +74,10 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 	/*
 	 * PKCS11 Class constants used for enumeration imported from pkcs11t.h
 	 */
-	static protected final int CKO_CERTIFICATE   =    0x00000001;
-	static protected final int CKO_PUBLIC_KEY    =    0x00000002;
-	static protected final int CKO_PRIVATE_KEY   =    0x00000003;
-	static protected final int CKO_SECRET_KEY    =    0x00000004;
+	static public final int CKO_CERTIFICATE   =    0x00000001;
+	static public final int CKO_PUBLIC_KEY    =    0x00000002;
+	static public final int CKO_PRIVATE_KEY   =    0x00000003;
+	static public final int CKO_SECRET_KEY    =    0x00000004;
 	
 	/* internal native interface */
     private static native long[] enumObjectsNative(long pvh, long slot_handle, long hsession, PKCS11Attribute[] attrs) throws PKCS11Exception;
