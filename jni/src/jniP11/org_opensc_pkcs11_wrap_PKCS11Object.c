@@ -289,7 +289,8 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAtt
 {
   int rv;
   CK_ATTRIBUTE templ;
-  CK_ULONG ret;
+  /* default return value */
+  CK_ULONG ret=~((CK_ULONG)0);
   pkcs11_slot_t *slot;
 
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
@@ -325,7 +326,7 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBool
 {
   int rv;
   CK_ATTRIBUTE templ;
-  CK_BBOOL ret;
+  CK_BBOOL ret = 0;
   pkcs11_slot_t *slot;
 
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
