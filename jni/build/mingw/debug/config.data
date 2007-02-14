@@ -19,4 +19,4 @@ ac PKCS11_CFLAGS=
 ac PKCS11_LDFLAGS=
 ac PKCS11_LIBS=-lkernel32
 ac prefix=/c/Programme/ev-i
-ac JNI_CFLAGS=-I/c/Programme/java/jdk1.5.0_10/include -I/c/Programme/java/jdk1.5.0_10/include/win32
+ac JNI_CFLAGS=-I$(subst \,/,$(JAVA_HOME)/include) -I$(subst \,/,$(JAVA_HOME))/include/win32
