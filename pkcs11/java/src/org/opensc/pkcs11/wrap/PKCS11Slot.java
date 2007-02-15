@@ -195,7 +195,7 @@ public class PKCS11Slot extends DestroyableHolder
 	/**
 	 * @return The manufacturer of the slot.
 	 */
-	public String getManufaturer() throws PKCS11Exception
+	public String getManufacturer() throws PKCS11Exception
 	{
 		try
 		{
