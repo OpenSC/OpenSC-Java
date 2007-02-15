@@ -233,11 +233,12 @@ public class BaseTest extends PKCS11ProviderTestCase
 			PKCS11Slot slot = iter.next();
 			
 			System.out.println("ID = "+slot.getId());
-			System.out.println("tokenPresent = "+slot.isTokenPresent());
+            System.out.println("tokenLabel = "+slot.getTokenLabel());
+            System.out.println("tokenPresent = "+slot.isTokenPresent());
 			System.out.println("hardwareDevice = "+slot.isHardwareDevice());
 			System.out.println("removableDevice = "+slot.isRemovableDevice());
 			System.out.println("description = "+slot.getDescription());
-			System.out.println("manufacturer = "+slot.getManufaturer());
+			System.out.println("manufacturer = "+slot.getManufacturer());
 			System.out.println("hardwareVersion = "+slot.getHardwareVersion());
 			System.out.println("firmwareVersion = "+slot.getFirmwareVersion());
 			
