@@ -211,6 +211,14 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       return 0;
     }
 
+  if (templ.ulValueLen == ~((CK_ULONG)0))
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_FUNCTION_FAILED,
+                          "C_GetAttributeValue returned ulValueLen -1 for attribute %u but returned CKR_OK. The underlying PKCS#11 module seems to be broken.",
+                          (unsigned)att);
+      return 0;
+    }
+
   templ.pValue = alloca(templ.ulValueLen);
 
   rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
@@ -223,6 +231,14 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       return 0;
     }
   
+  if (templ.ulValueLen == ~((CK_ULONG)0))
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_FUNCTION_FAILED,
+                          "C_GetAttributeValue returned ulValueLen -1 for attribute %u but returned CKR_OK. The underlying PKCS#11 module seems to be broken.",
+                          (unsigned)att);
+      return 0;
+    }
+
   ret = (*env)->NewByteArray(env,templ.ulValueLen);
   (*env)->SetByteArrayRegion(env,ret,0,templ.ulValueLen,(jbyte*)templ.pValue);
   
@@ -262,6 +278,13 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_get
       return 0;
     }
 
+  if (templ.ulValueLen == ~((CK_ULONG)0))
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_FUNCTION_FAILED,
+                          "C_GetAttributeValue returned ulValueLen -1 for attribute CKA_ALLOWED_MECHANISMS but returned CKR_OK. The underlying PKCS#11 module seems to be broken.");
+      return 0;
+    }
+
   templ.pValue = alloca(templ.ulValueLen);
 
   rv = mod->method->C_GetAttributeValue(hsession,ohandle,&templ,1);
@@ -270,6 +293,13 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_get
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
                           "C_GetAttributeValue failed for attribute CKA_ALLOWED_MECHANISMS.");
+      return 0;
+    }
+
+  if (templ.ulValueLen == ~((CK_ULONG)0))
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_FUNCTION_FAILED,
+                          "C_GetAttributeValue returned ulValueLen -1 for attribute CKA_ALLOWED_MECHANISMS but returned CKR_OK. The underlying PKCS#11 module seems to be broken.");
       return 0;
     }
 
@@ -313,6 +343,14 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAtt
       return 0;
     }
 
+  if (templ.ulValueLen != sizeof(CK_ULONG))
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_FUNCTION_FAILED,
+                          "C_GetAttributeValue returned ulValueLen==%lu, which is not equal to sizeof(CK_ULONG) for attribute %u of type CK_ULONG but returned CKR_OK. The underlying PKCS#11 module seems to be broken.",
+                          (unsigned long)templ.ulValueLen,(unsigned)att);
+      return 0;
+    }
+
   return ret;
 }
 
@@ -346,6 +384,14 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBool
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
                           "C_GetAttributeValue failed for attribute %u.",
                           (unsigned)att);
+      return 0;
+    }
+
+  if (templ.ulValueLen != sizeof(CK_BBOOL))
+    {
+      jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",CKR_FUNCTION_FAILED,
+                          "C_GetAttributeValue returned ulValueLen==%lu, which is not equal to sizeof(CK_BBOOL) for attribute %u of type CK_BBOOL but returned CKR_OK. The underlying PKCS#11 module seems to be broken.",
+                          (unsigned long)templ.ulValueLen,(unsigned)att);
       return 0;
     }
 
