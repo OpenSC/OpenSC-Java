@@ -341,7 +341,7 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMe
  * Method:    getTokenlabelNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenlabelNative)
+jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenLabelNative)
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
