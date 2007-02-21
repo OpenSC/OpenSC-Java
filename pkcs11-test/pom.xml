@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opensc</groupId>
   <artifactId>pkcs11-test</artifactId>
-  <version>0.2.0-svn</version>
+  <version>0.3.0-svn</version>
   <description>Test programs for the opensc PKCS#11 provider.</description>
   
   <build>
