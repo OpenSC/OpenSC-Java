@@ -30,7 +30,7 @@ the project you must supply the command line argument
 -Djava.library.path=<opensc-java-root>/target/lib
 
 to the java virtual machine in order to locate the jni
-plugin libopensc-PKCS11-0.2.so resp. opensc-PKCS11-0.2.dll
+plugin libopensc-PKCS11-0.3.so resp. opensc-PKCS11-0.3.dll
 
 Maven integration
 ------------------
@@ -105,7 +105,7 @@ project, you should add the following to your pom.xml file
     <dependency>
       <groupId>org.opensc</groupId>
       <artifactId>opensc-PKCS11</artifactId>
-      <version>0.2.0</version>
+      <version>0.3.0</version>
     </dependency>
     ...
   </dependencies>
