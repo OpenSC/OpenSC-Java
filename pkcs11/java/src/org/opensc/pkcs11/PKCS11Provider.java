@@ -62,7 +62,7 @@ public class PKCS11Provider extends Provider implements DestroyableParent
 	private static final long serialVersionUID = -2568219416560640437L;
 
 	/* This value has to correspond to the value of version in build.xml */
-	private static final double version = 0.2;
+	private static final double version = 0.3;
 	/* This value has to correspond to the value of patchlevel in build.xml */
 	private static final double patchlevel = 0;
 	

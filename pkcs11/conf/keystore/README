@@ -27,6 +27,7 @@ the following manner:
         <org.opensc.pkcs11.alias>opensc-pkcs11-cert</org.opensc.pkcs11.alias>
         <org.opensc.pkcs11.keypass>xxxxxxxxxxx</org.opensc.pkcs11.keypass>
         <org.opensc.pkcs11.storepass>xxxxxxxxxxx</org.opensc.pkcs11.storepass>
+        <org.opensc.pkcs11.keystore>path_of_opensc-pkcs11_keystore</org.opensc.pkcs11.keystore>
       </properties>
     </profile>
   </profiles>

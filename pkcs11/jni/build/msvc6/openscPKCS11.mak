@@ -5,18 +5,18 @@ CFG=openscPKCS11 - Win32 Debug
 !ENDIF 
 
 !IF "$(CFG)" != "openscPKCS11 - Win32 Release" && "$(CFG)" != "openscPKCS11 - Win32 Debug"
-!MESSAGE UngÅltige Konfiguration "$(CFG)" angegeben.
-!MESSAGE Sie kînnen beim AusfÅhren von NMAKE eine Konfiguration angeben
+!MESSAGE UngÔøΩltige Konfiguration "$(CFG)" angegeben.
+!MESSAGE Sie kÔøΩnnen beim AusfÔøΩhren von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
 !MESSAGE NMAKE /f "openscPKCS11.mak" CFG="openscPKCS11 - Win32 Debug"
 !MESSAGE 
-!MESSAGE FÅr die Konfiguration stehen zur Auswahl:
+!MESSAGE FÔøΩr die Konfiguration stehen zur Auswahl:
 !MESSAGE 
 !MESSAGE "openscPKCS11 - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "openscPKCS11 - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
-!ERROR Eine ungÅltige Konfiguration wurde angegeben.
+!ERROR Eine ungÔøΩltige Konfiguration wurde angegeben.
 !ENDIF 
 
 !IF "$(OS)" == "Windows_NT"
@@ -33,7 +33,7 @@ INTDIR=.\Release
 OutDir=.\Release
 # End Custom Macros
 
-ALL : "$(OUTDIR)\opensc-PKCS11-0.2.dll"
+ALL : "$(OUTDIR)\opensc-PKCS11-0.3.dll"
 
 
 CLEAN :
@@ -49,9 +49,9 @@ CLEAN :
 	-@erase "$(INTDIR)\pkcs11_module.obj"
 	-@erase "$(INTDIR)\pkcs11_slot.obj"
 	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.dll"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.exp"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.lib"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.dll"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.exp"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.lib"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -115,7 +115,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\openscPKCS11.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\opensc-PKCS11-0.2.pdb" /machine:I386 /out:"$(OUTDIR)\opensc-PKCS11-0.2.dll" /implib:"$(OUTDIR)\opensc-PKCS11-0.2.lib" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\opensc-PKCS11-0.3.pdb" /machine:I386 /out:"$(OUTDIR)\opensc-PKCS11-0.3.dll" /implib:"$(OUTDIR)\opensc-PKCS11-0.3.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\jnix.obj" \
 	"$(INTDIR)\org_opensc_pkcs11_PKCS11Provider.obj" \
@@ -129,7 +129,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\pkcs11_module.obj" \
 	"$(INTDIR)\pkcs11_slot.obj"
 
-"$(OUTDIR)\opensc-PKCS11-0.2.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\opensc-PKCS11-0.3.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -142,7 +142,7 @@ INTDIR=.\Debug
 OutDir=.\Debug
 # End Custom Macros
 
-ALL : "$(OUTDIR)\opensc-PKCS11-0.2.dll"
+ALL : "$(OUTDIR)\opensc-PKCS11-0.3.dll"
 
 
 CLEAN :
@@ -159,10 +159,10 @@ CLEAN :
 	-@erase "$(INTDIR)\pkcs11_slot.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.dll"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.exp"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.lib"
-	-@erase "$(OUTDIR)\opensc-PKCS11-0.2.pdb"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.dll"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.exp"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.lib"
+	-@erase "$(OUTDIR)\opensc-PKCS11-0.3.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -226,7 +226,7 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\openscPKCS11.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\opensc-PKCS11-0.2.pdb" /debug /machine:I386 /out:"$(OUTDIR)\opensc-PKCS11-0.2.dll" /implib:"$(OUTDIR)\opensc-PKCS11-0.2.lib" /pdbtype:sept 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"$(OUTDIR)\opensc-PKCS11-0.3.pdb" /debug /machine:I386 /out:"$(OUTDIR)\opensc-PKCS11-0.3.dll" /implib:"$(OUTDIR)\opensc-PKCS11-0.3.lib" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\jnix.obj" \
 	"$(INTDIR)\org_opensc_pkcs11_PKCS11Provider.obj" \
@@ -240,7 +240,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\pkcs11_module.obj" \
 	"$(INTDIR)\pkcs11_slot.obj"
 
-"$(OUTDIR)\opensc-PKCS11-0.2.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\opensc-PKCS11-0.3.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<

@@ -3,7 +3,7 @@ top_srcdir = @top_srcdir@
 
 # The API version.
 # This value has to correspond to the value of version in build.xml
-VERSION=0.2
+VERSION=0.3
 
 # Where does the installation go ?
 PREFIX=@prefix@
