@@ -13,14 +13,16 @@
     <jni.libPrefix>lib</jni.libPrefix>
     <jni.libExtension>so</jni.libExtension>
     <jni.targetDir>target</jni.targetDir>
-	  <jni.build.dir>jni/build/unix/release</jni.build.dir>
+    <jni.build.dir>jni/build/unix/release</jni.build.dir>
+    <org.opensc.pkcs11.distRepoId>clazzes-repository</org.opensc.pkcs11.distRepoId>
+    <org.opensc.pkcs11.distRepoURL>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</org.opensc.pkcs11.distRepoURL>
    </properties>
   <version>0.2.0-svn</version>
   
   <distributionManagement>
     <repository>
-      <id>clazzes-repository</id>
-      <url>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</url>
+      <id>${org.opensc.pkcs11.distRepoId}</id>
+      <url>${org.opensc.pkcs11.distRepoURL}</url>
     </repository>
   </distributionManagement>
    <build>
