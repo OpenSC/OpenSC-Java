@@ -85,7 +85,7 @@ jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumera
   if (rv  != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
-                          "C_GetSlotList failed for module %s.",
+                          "C_GetSlotList failed for module " PKCS11_MOD_NAME_FMT ".",
                           mod->name);
       return 0;
     }
@@ -97,7 +97,7 @@ jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumera
   if (rv  != CKR_OK)
     {
       jnixThrowExceptionI(env,"org/opensc/pkcs11/wrap/PKCS11Exception",rv,
-                          "C_GetSlotList failed for module %s.",mod->name);
+                          "C_GetSlotList failed for module " PKCS11_MOD_NAME_FMT ".",mod->name);
       return 0;
     }
   
