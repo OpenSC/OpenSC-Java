@@ -80,6 +80,11 @@
       <name>Clazzes.org repository.</name>
       <url>http://maven.clazzes.org</url>
     </repository>
+    <repository>
+      <id>opensc-java-repo</id>
+      <name>opensc-java repository.</name>
+      <url>http://www.opensc-project.org/files/opensc-java/maven</url>
+    </repository>
    </repositories>
    
    <pluginRepositories>
