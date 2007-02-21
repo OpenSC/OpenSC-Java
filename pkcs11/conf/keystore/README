@@ -8,9 +8,31 @@ you must get hold of the keystore, which provides the code signing
 certificate for the OpenSC project.
 
 Most likely, you should have gained SVN write access to the OpenSC
-repositories by contactin the opensc-devel mailing lists and by
+repositories by contacting the opensc-devel mailing lists and by
 actively contributing code to the OpenSC project.
 
 If you have SVN write access, you might ask Andreas Jellinghaus for
 providing you the follwing two files, which comprise the OpenSC
 keystore: opensc-pkcs11.keystore, opensc-pks11.txt
+
+Additionally you have to set up sour ~/.m2/settings.xml file in
+the following manner:
+
+<settings>
+  <localRepository>/home/wglas/.m2/repository</localRepository>
+  <profiles>
+    <profile>
+      <id>opensc-pkcs11-sign</id>
+      <properties>
+        <org.opensc.pkcs11.alias>opensc-pkcs11-cert</org.opensc.pkcs11.alias>
+        <org.opensc.pkcs11.keypass>xxxxxxxxxxx</org.opensc.pkcs11.keypass>
+        <org.opensc.pkcs11.storepass>xxxxxxxxxxx</org.opensc.pkcs11.storepass>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>opensc-pkcs11-sign</activeProfile>
+  </activeProfiles>
+</settings>
+
+The passphrases are of course secret ;-)
