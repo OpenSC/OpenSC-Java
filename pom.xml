@@ -17,7 +17,7 @@
     <org.opensc.pkcs11.distRepoId>clazzes-repository</org.opensc.pkcs11.distRepoId>
     <org.opensc.pkcs11.distRepoURL>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</org.opensc.pkcs11.distRepoURL>
    </properties>
-  <version>0.2.0-svn</version>
+  <version>0.2.0</version>
   
   <distributionManagement>
     <repository>
@@ -176,7 +176,7 @@
               <alias>${org.opensc.pkcs11.alias}</alias>
               <keypass>${org.opensc.pkcs11.keypass}</keypass>
               <storepass>${org.opensc.pkcs11.storepass}</storepass>
-              <keystore>${basedir}/conf/keystore/opensc-pkcs11.keystore</keystore>
+              <keystore>${org.opensc.pkcs11.keystore}</keystore>
             </configuration>
            </execution>
           </executions>
