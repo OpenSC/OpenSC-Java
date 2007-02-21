@@ -128,8 +128,11 @@ you can check out from
 
   http://www.opensc-project.org/svn/opensc-java/trunk/pkcs11-test/
 
-This is necessary, because the jar-file of the cryptographic provide needs to
+This is necessary, because the jar-file of the cryptographic provider needs to
 be signed and hence cannot be easily tested from within the same maven project.
+
+Please also consider the fil conf/keystore/README, if you like to sign the
+generated jar-file.
 
 Credits
 -------
