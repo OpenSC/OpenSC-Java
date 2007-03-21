@@ -161,6 +161,21 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
     }
     
     /**
+     * Just a small wrapper around the native function. Finds all objects in a session.
+     * @param session The session for which to enumerate the objects.
+     * @return The object handles of the retrieved objects,
+     *         which have to be passed to the constructor.
+     * @throws PKCS11Exception Upon errors of the underlying PKCS#11 module.
+     */
+    protected static long[] enumRawObjects(PKCS11Session session) throws PKCS11Exception
+    {
+        PKCS11Attribute attrs[] = new PKCS11Attribute[0];
+        
+        return enumObjectsNative(session.getPvh(),session.getSlotHandle(),session.getHandle(),
+                                 attrs);
+    }
+    
+    /**
      * Just a small wrapper around the native function.
      * @param session The session for which to find an object.
      * @param pkcs11_cls The object class to be seeked.
@@ -212,14 +227,32 @@ public class PKCS11Object extends DestroyableChild implements PKCS11SessionChild
 		this.hsession = session.getHandle();
 		this.handle = handle;
 		
+        // TODO code should move to derived class, as not all objects habe CKA_ID and CKA_LABEL
 		try
 		{
             this.id = new PKCS11Id(getRawAttribute(PKCS11Attribute.CKA_ID));
-			
+        }
+        catch (PKCS11Exception pe) {
+            if (pe.getErrorCode() == PKCS11Exception.CKR_ATTRIBUTE_TYPE_INVALID) {
+                this.id = null;
+            } else {
+                throw pe;
+            }
+        }
+
+        try {
 			byte[] utf8_label = getRawAttribute(PKCS11Attribute.CKA_LABEL);
 			this.label = new String(utf8_label,"UTF-8");
 			
-		} catch (UnsupportedEncodingException e)
+		} 
+        catch (PKCS11Exception pe) {
+            if (pe.getErrorCode() == PKCS11Exception.CKR_ATTRIBUTE_TYPE_INVALID) {
+                this.label = null;
+            } else {
+                throw pe;
+            }
+        }
+        catch (UnsupportedEncodingException e)
 		{
 			throw new PKCS11Exception("Invalid encoding:",e);
 		}
