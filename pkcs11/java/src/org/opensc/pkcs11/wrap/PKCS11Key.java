@@ -87,7 +87,13 @@ public class PKCS11Key extends PKCS11Object implements Key
 	{
 		super(session, handle);
 		this.keyType = super.getULongAttribute(PKCS11Attribute.CKA_KEY_TYPE);
-		this.keyBits = super.getULongAttribute(PKCS11Attribute.CKA_MODULUS_BITS);
+        // TODO move keyBits to corresponding RSA public key class
+        this.keyBits = 0;
+        try {
+            this.keyBits = super.getULongAttribute(PKCS11Attribute.CKA_MODULUS_BITS);
+        }
+        catch(PKCS11Exception e) {
+        }
 	}
 	
 	/**
