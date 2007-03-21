@@ -29,6 +29,166 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    signInitNative
+ * Signature: (JJJJI[B)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_signInitNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jint, jbyteArray);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    signUpdateNative
+ * Signature: (JJJ[BII)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_signUpdateNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    signUpdateByteNative
+ * Signature: (JJJB)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_signUpdateByteNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyte);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    signFinalNative
+ * Signature: (JJJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_signFinalNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    signNative
+ * Signature: (JJJ[BII)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_signNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    verifyInitNative
+ * Signature: (JJJJI[B)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_verifyInitNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jint, jbyteArray);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    verifyUpdateNative
+ * Signature: (JJJ[BII)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_verifyUpdateNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    verifyUpdateByteNative
+ * Signature: (JJJB)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_verifyUpdateByteNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyte);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    verifyFinalNative
+ * Signature: (JJJ[B)Z
+ */
+JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_verifyFinalNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    verifyNative
+ * Signature: (JJJ[BII[B)Z
+ */
+JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_verifyNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint, jbyteArray);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    encryptInitNative
+ * Signature: (JJJJI[B)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_encryptInitNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jint, jbyteArray);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    encryptUpdateNative
+ * Signature: (JJJ[BII)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_encryptUpdateNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    encryptUpdateOffNative
+ * Signature: (JJJ[BII[BI)I
+ */
+JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_encryptUpdateOffNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint, jbyteArray, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    encryptFinalNative
+ * Signature: (JJJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_encryptFinalNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    encryptNative
+ * Signature: (JJJ[BII)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_encryptNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    decryptInitNative
+ * Signature: (JJJJI[B)V
+ */
+JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_decryptInitNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jint, jbyteArray);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    decryptUpdateNative
+ * Signature: (JJJ[BII)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_decryptUpdateNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    decryptUpdateOffNative
+ * Signature: (JJJ[BII[BI)I
+ */
+JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_decryptUpdateOffNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint, jbyteArray, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    decryptFinalNative
+ * Signature: (JJJ)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_decryptFinalNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
+ * Method:    decryptNative
+ * Signature: (JJJ[BII)[B
+ */
+JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_decryptNative)
+  (JNIEnv *, jclass, jlong, jlong, jlong, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_opensc_pkcs11_wrap_PKCS11Session
  * Method:    loginNative
  * Signature: (JJJI[B)V
  */
