@@ -17,7 +17,7 @@
     <org.opensc.pkcs11.distRepoId>clazzes-repository</org.opensc.pkcs11.distRepoId>
     <org.opensc.pkcs11.distRepoURL>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</org.opensc.pkcs11.distRepoURL>
    </properties>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   
   <distributionManagement>
     <repository>

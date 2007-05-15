@@ -122,11 +122,14 @@ public class PKCS11Attribute
     private static final int BIG_ENDIAN    = 1;
     
     private static int endianness;
+    private static int dataModel;
     
     static {
         endianness =
             "little".equalsIgnoreCase(System.getProperty("sun.cpu.endian")) ?
             LITTLE_ENDIAN : BIG_ENDIAN;
+        
+        dataModel = Integer.valueOf(System.getProperty("sun.arch.data.model"));
     }
  
     private int kind;
@@ -165,7 +168,7 @@ public class PKCS11Attribute
     public PKCS11Attribute(int kind, int dword)
     {
         this.kind = kind;
-        this.data = new byte[4];
+        this.data = new byte[dataModel == 64 ? 8 : 4];
         
         if (endianness == LITTLE_ENDIAN)
         {
@@ -173,8 +176,28 @@ public class PKCS11Attribute
             this.data[1] = (byte)(dword >> 8);
             this.data[2] = (byte)(dword >> 16);
             this.data[3] = (byte)(dword >> 24);
+            
+            if (dataModel == 64)
+            {
+                this.data[4] = 0;
+                this.data[5] = 0;
+                this.data[6] = 0;
+                this.data[7] = 0;
+            }
+           	
         }
-        else
+        else if (dataModel == 64)
+        {
+            this.data[0] = 0;
+            this.data[1] = 0;
+            this.data[2] = 0;
+            this.data[3] = 0;
+            this.data[4] = (byte)(dword >> 24);
+            this.data[5] = (byte)(dword >> 16);
+            this.data[6] = (byte)(dword >> 8);
+            this.data[7] = (byte)(dword);
+        }
+       else
         {
             this.data[0] = (byte)(dword >> 24);
             this.data[1] = (byte)(dword >> 16);

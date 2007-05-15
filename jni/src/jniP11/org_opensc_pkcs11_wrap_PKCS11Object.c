@@ -27,6 +27,8 @@
 
 #define ENUM_HANDLES_BLOCK_SZ 32
 
+// #define DEBUG_PKCS11_OBJECT_ENUM
+
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Object
  * Method:    enumObjectsNative
@@ -68,6 +70,11 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
   ulAttributeCount = (*env)->GetArrayLength(env,attrs);
   pAttributes = alloca(ulAttributeCount * sizeof(CK_ATTRIBUTE));
 
+#ifdef DEBUG_PKCS11_OBJECT_ENUM
+  fprintf(stderr,"enumObjectsNative: ulAttributeCount=%lu.\n",ulAttributeCount);
+  fprintf(stderr,"enumObjectsNative: sizeof(CK_ATTRIBUTE_TYPE)=%lu.\n",sizeof(CK_ATTRIBUTE_TYPE));
+#endif
+
   for (i=0;i<ulAttributeCount;++i)
     {
       jbyteArray data;
@@ -79,6 +86,15 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       data = (jbyteArray)(*env)->CallObjectMethod(env,jattr,getDataID);
 
       allocaCArrayFromJByteArray(pAttributes[i].pValue,pAttributes[i].ulValueLen,env,data);
+
+#ifdef DEBUG_PKCS11_OBJECT_ENUM
+	  fprintf(stderr,"enumObjectsNative: att[%lu]: type=%lu,len=%lu,data=",i,pAttributes[i].type,pAttributes[i].ulValueLen);
+	  CK_ULONG iii;
+	  for (iii=0;iii<pAttributes[i].ulValueLen;++iii)
+	    fprintf(stderr," %2.2x",(unsigned)((unsigned char*)pAttributes[i].pValue)[iii]);
+	  fprintf(stderr,"\n");
+#endif
+
     }
 
   ret_obj_ids_sz = ENUM_HANDLES_BLOCK_SZ;
@@ -115,10 +131,17 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
       goto failed;
     }
 
+#ifdef DEBUG_PKCS11_OBJECT_ENUM
+  fprintf(stderr,"enumObjectsNative: count=%lu.\n",count);
+#endif
+
   for (i=0; i<count ;++i)
     {
       jlong id = (jlong)obj_ids[i];
       ret_obj_ids[nobjs] = id;
+#ifdef DEBUG_PKCS11_OBJECT_ENUM
+      fprintf(stderr,"enumObjectsNative: ret_obj_ids[%d]=%lu,%lld.\n",nobjs,obj_ids[i],(long long)ret_obj_ids[nobjs]);
+#endif
       ++nobjs;
     }
 
@@ -149,10 +172,17 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
           goto failed;
         }
 
+#ifdef DEBUG_PKCS11_OBJECT_ENUM
+  fprintf(stderr,"enumObjectsNative: count=%lu.\n",count);
+#endif
+
       for (i=0; i<count ;++i)
         {
           jlong id = (jlong)obj_ids[i];
           ret_obj_ids[nobjs] = id;
+#ifdef DEBUG_PKCS11_OBJECT_ENUM
+          fprintf(stderr,"enumObjectsNative: ret_obj_ids[%d]=%lu,%lld.\n",nobjs,obj_ids[i],(long long)ret_obj_ids[nobjs]);
+#endif
           ++nobjs;
         }
     }
