@@ -17,7 +17,7 @@
     <org.opensc.pkcs11.distRepoId>clazzes-repository</org.opensc.pkcs11.distRepoId>
     <org.opensc.pkcs11.distRepoURL>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</org.opensc.pkcs11.distRepoURL>
    </properties>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
   
   <distributionManagement>
     <repository>
@@ -194,6 +194,24 @@
        <jni.libPrefix></jni.libPrefix>
        <jni.libExtension>dll</jni.libExtension>
 	     <jni.build.dir>jni/build/mingw/release</jni.build.dir>
+      </properties>
+    </profile>
+    <profile>
+      <id>jni-i386-env</id>
+      <activation>
+       <os><arch>i386</arch></os>
+      </activation>
+      <properties>
+        <jni.classifier>${os.name}-x86</jni.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>jni-amd64-env</id>
+      <activation>
+       <os><arch>amd64</arch></os>
+      </activation>
+      <properties>
+        <jni.classifier>${os.name}-x86_64</jni.classifier>
       </properties>
     </profile>
     <profile>
