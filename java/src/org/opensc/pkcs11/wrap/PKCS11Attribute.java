@@ -125,11 +125,21 @@ public class PKCS11Attribute
     private static int dataModel;
     
     static {
+        String ep = System.getProperty("sun.cpu.endian");
+
+        if (ep == null)
+            ep = System.getProperty("com.ibm.cpu.endian");
+
         endianness =
-            "little".equalsIgnoreCase(System.getProperty("sun.cpu.endian")) ?
+            "little".equalsIgnoreCase(ep) ?
             LITTLE_ENDIAN : BIG_ENDIAN;
         
-        dataModel = Integer.valueOf(System.getProperty("sun.arch.data.model"));
+        String dmp = System.getProperty("sun.arch.data.model");
+
+        if (dmp == null)
+            dmp = System.getProperty("com.ibm.vm.bitmode");
+
+        dataModel = Integer.valueOf(dmp);
     }
  
     private int kind;

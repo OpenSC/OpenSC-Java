@@ -27,6 +27,7 @@ package org.opensc.pkcs11.wrap;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -36,8 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
-
-import sun.security.util.BigInt;
 
 /**
  * This class manages X509 certificates stored on the card.
@@ -52,7 +51,7 @@ public class PKCS11Certificate extends PKCS11Object
 
     private X500Principal subject;
 	private X500Principal issuer;
-	private BigInt serial;
+	private BigInteger serial;
 	
 	/**
 	 * @param session The session to which we are associated.
@@ -72,7 +71,7 @@ public class PKCS11Certificate extends PKCS11Object
 		this.issuer = new X500Principal(raw_issuer); 
 		
 		byte[] raw_serial = getRawAttribute(PKCS11Attribute.CKA_SERIAL_NUMBER);
-		this.serial = new BigInt(raw_serial);
+		this.serial = new BigInteger(raw_serial);
 	}
 
 	/**
@@ -176,7 +175,7 @@ public class PKCS11Certificate extends PKCS11Object
 	/**
 	 * @return Returns the serial, which is the value of the CKA_SERIAL_NUMBER attribute.
 	 */
-	public BigInt getSerial()
+	public BigInteger getSerial()
 	{
 		return this.serial;
 	}
