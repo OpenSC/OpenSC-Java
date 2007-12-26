@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.opensc</groupId>
+  <artifactId>pkcs15</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <description>Tools for handling Siemens' CardOS Smart Cards</description>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+     <dependency>
+      <groupId>org.clazzes</groupId>
+      <artifactId>util</artifactId>
+        <version>0.4.1</version>
+     </dependency>
+     <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+        <version>1.2.13</version>
+     </dependency>
+     <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+        <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov</artifactId>
+      <version>jdk15-136</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+      <scope>test</scope>
+    </dependency>
+   </dependencies>
+  <repositories>
+    <repository>
+      <id>clazzes.org-repository</id>
+      <name>clazzes.org repository</name> 
+      <url>http://maven.clazzes.org</url>
+    </repository>
+   </repositories>
+</project>
