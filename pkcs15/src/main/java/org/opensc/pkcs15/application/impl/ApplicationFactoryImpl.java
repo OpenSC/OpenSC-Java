@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OutputStream;
-import org.bouncycastle.asn1.DERNull;
 import org.clazzes.util.lang.Util;
 import org.opensc.pkcs15.AIDs;
 import org.opensc.pkcs15.application.Application;
@@ -126,7 +125,8 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
     protected void writeApplications(Token token, ISO7816Applications apps) throws IOException
     {
         token.selectMF();
-        if (token.selectEF(DIR_PATH) == null)
+        
+        if (token.selectEF(DIR_PATH) == null) {
             token.createEF(DIR_PATH,
                     new EFAclImpl(TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,
@@ -138,7 +138,10 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
                             TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS
                             ));
-  
+           
+            token.selectEF(DIR_PATH);
+        }
+        
         OutputStream os = token.writeEFData();
         
         ASN1OutputStream aos = new ASN1OutputStream(os);
@@ -147,7 +150,8 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
             for (ISO7816ApplicationTemplate template : apps.getApplications())
                 aos.writeObject(template.toASN1Object());
             
-        aos.writeObject(DERNull.INSTANCE);
+        aos.write(0);
+        aos.write(0);
         aos.close();
         
     }

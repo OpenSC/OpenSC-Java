@@ -31,6 +31,7 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.DERApplicationSpecific;
 import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DERTags;
 
 /**
  * An entry in an ISO7816 application directory. in the following format:
@@ -152,7 +153,7 @@ public class ISO7816ApplicationTemplate extends ASN1Encodable {
             if (this.discretionaryData != null)
                 aos.writeObject(new DERApplicationSpecific(DISCRETIONARY_DATA_TAG_NO,this.discretionaryData));
             
-            return new DERApplicationSpecific(1,bos.toByteArray());
+            return new DERApplicationSpecific(1 | DERTags.CONSTRUCTED,bos.toByteArray());
         
         } catch(IOException e)
         {

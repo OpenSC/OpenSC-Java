@@ -77,6 +77,9 @@ public class SoftwareToken implements Token {
         this.mfFile = new File(this.directory,MF_PATH_STRING);
         this.currentFile = this.mfFile;
         this.currentPath = MF_PATH;
+        
+        if (!this.mfFile.exists())
+            this.mfFile.mkdir();
     }
 
     /* (non-Javadoc)

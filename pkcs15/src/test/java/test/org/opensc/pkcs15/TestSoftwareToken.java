@@ -22,6 +22,7 @@ public class TestSoftwareToken extends TestCase {
     private static ApplicationFactory applicationFactory = ApplicationFactory.newInstance();
     
     private File tokenDir;
+    private File tokenDir2;
     
     static void rmDirForce(File dir)
     {
@@ -44,6 +45,11 @@ public class TestSoftwareToken extends TestCase {
         File targetDir = new File("target");
         targetDir.mkdir();
 
+        this.tokenDir2 = new File(targetDir,"test-create");
+        if (this.tokenDir2.exists())
+            rmDirForce(this.tokenDir2);
+        this.tokenDir2.mkdir();
+        
         this.tokenDir = new File(targetDir,"test-ca");
         if (this.tokenDir.exists())
             rmDirForce(this.tokenDir);
@@ -75,6 +81,21 @@ public class TestSoftwareToken extends TestCase {
     public void testApplicationFactory() throws IOException
     {
         Token token = tokenFactory.newSoftwareToken(this.tokenDir);
+        List<Application> apps = applicationFactory.listApplications(token);
+        
+        assertNotNull(apps);
+        assertEquals(1,apps.size());
+        assertEquals(AIDs.PKCS15_AID,apps.get(0).getAID());
+        
+    }
+    
+    public void testApplicationCreation() throws IOException
+    {
+        Token token = tokenFactory.newSoftwareToken(this.tokenDir2);
+        Application app = applicationFactory.createApplication(token,AIDs.PKCS15_AID);
+        
+        assertNotNull(app);
+        
         List<Application> apps = applicationFactory.listApplications(token);
         
         assertNotNull(apps);
