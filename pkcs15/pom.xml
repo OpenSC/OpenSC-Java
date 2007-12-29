@@ -16,6 +16,26 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+           <id>pkg-sources</id>
+           <goals><goal>jar</goal></goals>
+           <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/TestHardwareToken.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

@@ -35,6 +35,7 @@ import org.opensc.pkcs15.token.DFAcl;
 import org.opensc.pkcs15.token.EF;
 import org.opensc.pkcs15.token.EFAcl;
 import org.opensc.pkcs15.token.MF;
+import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFile;
 import org.opensc.pkcs15.token.TokenFileAcl;
@@ -46,8 +47,6 @@ import org.opensc.pkcs15.token.TokenFileAcl;
 public class SoftwareToken implements Token {
 
     private static final String MF_PATH_STRING = "3F00";
-    private static final byte[] MF_PATH = new byte[] { 0x3F, 0x00 };
-    
     private File directory;
     private File currentFile;
     private File mfFile;
@@ -58,16 +57,6 @@ public class SoftwareToken implements Token {
         return new File (file,String.format(Locale.US,"%04X",relPath));
     }
     
-    private static byte[] appendToPath(final byte [] path, final int relPath)
-    {
-        byte[] efPath = new byte[path.length+2];
-        
-        System.arraycopy(path,0,efPath,0,path.length);
-        efPath[path.length] = (byte)(relPath >> 8);
-        efPath[path.length+1] = (byte)relPath;
-        return efPath;
-    }
-    
     /**
      * @param directory
      */
@@ -76,7 +65,7 @@ public class SoftwareToken implements Token {
         this.directory = directory;
         this.mfFile = new File(this.directory,MF_PATH_STRING);
         this.currentFile = this.mfFile;
-        this.currentPath = MF_PATH;
+        this.currentPath = PathHelper.MF_PATH;
         
         if (!this.mfFile.exists())
             this.mfFile.mkdir();
@@ -101,9 +90,9 @@ public class SoftwareToken implements Token {
         if (!file.createNewFile())
             throw new IOException("Cannot create file ["+file.getCanonicalPath()+"].");
         
-        byte[] efPath = appendToPath(this.currentPath,path);
+        byte[] efPath = PathHelper.appendToPath(this.currentPath,path);
         
-        return new EF(efPath,acl);
+        return new EF(efPath,file.length(),acl);
     }
 
     /* (non-Javadoc)
@@ -117,9 +106,9 @@ public class SoftwareToken implements Token {
         if (!file.mkdir())
             throw new IOException("Cannot create directory ["+file.getCanonicalPath()+"].");
         
-        byte[] dfPath = appendToPath(this.currentPath,path);
+        byte[] dfPath = PathHelper.appendToPath(this.currentPath,path);
         
-        return new DF(dfPath,acl);
+        return new DF(dfPath,file.length(),acl);
     }
 
     /* (non-Javadoc)
@@ -134,6 +123,7 @@ public class SoftwareToken implements Token {
         
         if (this.currentFile.equals(this.mfFile))
             return new MF(this.currentPath,
+                    this.currentFile.length(),
                     TokenFileAcl.AC_ALWAYS,
                     w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
                     w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
@@ -147,6 +137,7 @@ public class SoftwareToken implements Token {
         
         if (this.currentFile.isDirectory())
             return new DF(this.currentPath,
+                    this.currentFile.length(),
                     TokenFileAcl.AC_ALWAYS,
                     w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
                     w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
@@ -157,6 +148,7 @@ public class SoftwareToken implements Token {
                     w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER);
         
         return new EF(this.currentPath,
+                this.currentFile.length(),
                 r ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
                 w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
                 w ? TokenFileAcl.AC_ALWAYS : TokenFileAcl.AC_NEVER,
@@ -189,7 +181,7 @@ public class SoftwareToken implements Token {
         if (!file.exists()) return null;
         
         this.currentFile = file;
-        this.currentPath = appendToPath(this.currentPath,path);
+        this.currentPath = PathHelper.appendToPath(this.currentPath,path);
         
         return this.getCurrentFile();
     }
@@ -209,7 +201,24 @@ public class SoftwareToken implements Token {
             throw new IOException("File ["+file.getCanonicalPath()+"] is not a directory.");
         
         this.currentFile = file;
-        this.currentPath = appendToPath(this.currentPath,path);
+        this.currentPath = PathHelper.appendToPath(this.currentPath,path);
+        
+        return (DF)this.getCurrentFile();
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#selectParentDF()
+     */
+    @Override
+    public DF selectParentDF() throws IOException {
+        
+        File file = this.currentFile.getParentFile();
+        
+        if (!file.isDirectory())
+            throw new IOException("File ["+file.getCanonicalPath()+"] is not a directory.");
+        
+        this.currentFile = file;
+        this.currentPath = PathHelper.truncatePath(this.currentPath);
         
         return (DF)this.getCurrentFile();
     }
@@ -229,7 +238,7 @@ public class SoftwareToken implements Token {
             throw new IOException("File ["+file.getCanonicalPath()+"] is not an oridinary file.");
         
         this.currentFile = file;
-        this.currentPath = appendToPath(this.currentPath,path);
+        this.currentPath = PathHelper.appendToPath(this.currentPath,path);
         
         return (EF)this.getCurrentFile();
     }
@@ -241,7 +250,7 @@ public class SoftwareToken implements Token {
     public MF selectMF() throws IOException {
         
         this.currentFile = this.mfFile;
-        this.currentPath = MF_PATH;
+        this.currentPath = PathHelper.MF_PATH;
         return (MF)this.getCurrentFile();
     }
 

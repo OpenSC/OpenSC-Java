@@ -37,26 +37,27 @@ public class MF extends DF implements MFAcl {
      * @param acLifeCycle
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      * @param acCreate
      * @param acExecute
      * @param acAllocate
      */
-    public MF(byte[] path, int acLifeCycle, int acUpdate, int acAppend,
-            int acActivate, int acDeactivate, int acDelete, int acAdmin,
+    public MF(byte[] path, long size, int acLifeCycle, int acUpdate, int acAppend,
+            int acDeactivate, int acActivate, int acDelete, int acAdmin,
             int acCreate, int acExecute, int acAllocate) {
-        super(path, acLifeCycle, acUpdate, acAppend, acActivate, acDeactivate, acDelete,
+        super(path, size,
+                acLifeCycle, acUpdate, acAppend, acDeactivate, acActivate, acDelete,
                 acAdmin,acCreate);
         this.acExecute = acExecute;
         this.acAllocate = acAllocate;
     }
     
-    public MF(byte[] path, MFAcl acl)
+    public MF(byte[] path, long size, MFAcl acl)
     {
-        super(path,acl);
+        super(path,size,acl);
         this.acExecute = acl.getAcExecute();
         this.acAllocate = acl.getAcAllocate();
     }

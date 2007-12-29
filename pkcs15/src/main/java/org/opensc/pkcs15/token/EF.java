@@ -38,24 +38,25 @@ public class EF extends TokenFile implements EFAcl {
      * @param acRead
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      */
-    public EF(byte[] path, int acRead, int acUpdate, int acAppend,
-            int acActivate, int acDeactivate, int acDelete, int acAdmin,
+    public EF(byte[] path, long size,
+            int acRead, int acUpdate, int acAppend,
+            int acDeactivate, int acActivate, int acDelete, int acAdmin,
             int acIncrease, int acDecrease) {
-        super(path, acUpdate, acAppend, acActivate, acDeactivate, acDelete,
+        super(path, size, acUpdate, acAppend, acDeactivate, acActivate, acDelete,
                 acAdmin);
         this.acRead = acRead;
         this.acIncrease = acIncrease;
         this.acDecrease = acDecrease;
     }
     
-    public EF(byte[] path, EFAcl acl)
+    public EF(byte[] path, long size, EFAcl acl)
     {
-        super(path,acl);
+        super(path,size,acl);
         this.acRead = acl.getAcRead();
         this.acIncrease = acl.getAcIncrease();
         this.acDecrease = acl.getAcDecrease();

@@ -39,15 +39,15 @@ public class DFAclImpl extends TokenFileAclImpl implements DFAcl {
      * @param acLifeCycle
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      * @param acCreate
      */
     public DFAclImpl(int acLifeCycle, int acUpdate, int acAppend,
-            int acActivate, int acDeactivate, int acDelete, int acAdmin, int acCreate) {
-        super(acUpdate, acAppend, acActivate, acDeactivate, acDelete,
+            int acDeactivate, int acActivate, int acDelete, int acAdmin, int acCreate) {
+        super(acUpdate, acAppend, acDeactivate, acActivate, acDelete,
                 acAdmin);
         this.acLifeCycle = acLifeCycle;
         this.acCreate = acCreate;

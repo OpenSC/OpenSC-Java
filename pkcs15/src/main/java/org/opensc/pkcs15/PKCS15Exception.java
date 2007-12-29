@@ -24,6 +24,8 @@ package org.opensc.pkcs15;
 
 import java.io.IOException;
 
+import javax.smartcardio.CardException;
+
 /**
  * @author wglas
  *
@@ -81,16 +83,18 @@ public class PKCS15Exception extends IOException {
     public static final int ERROR_TECHNICAL_ERROR               = 0x6F00;
     public static final int ERROR_CHECKSUM                      = 0x6F81;
     public static final int ERROR_XRAM_OVERFLOW                 = 0x6F82;
-    public static final int ERROR_TRANACTION_NOT_SUPPORTED      = 0x6F83;
+    public static final int ERROR_TRANSACTION_NOT_SUPPORTE      = 0x6F83;
     public static final int ERROR_PROTECTION_FAULT              = 0x6F84;
     public static final int ERROR_PK_API_FAULT                  = 0x6F85;
     public static final int ERROR_KEY_NOT_FOUND                 = 0x6F86;
     public static final int ERROR_HARDWARE_MANIPULATION_DETECTED= 0x6F87;
-    public static final int ERROR_TARNSACTION_BUFFER_OVERFLOW   = 0x6F88;
+    public static final int ERROR_TRANSACTION_BUFFER_OVERFLOW   = 0x6F88;
     public static final int ERROR_ASSERTION_FAILED              = 0x6FFF;
     
     public static final int ERROR_INCREASE_DECREASE_EXCEEDED    = 0x9850;
 
+    public static final int ERROR_TRANSPORT_ERROR = 0xFFFF;
+    
     private final int errorCode;
 
     /**
@@ -127,6 +131,18 @@ public class PKCS15Exception extends IOException {
     public PKCS15Exception(Throwable cause, int errorCode) {
         super(cause);
         this.errorCode = errorCode;
+    }
+
+    /**
+     * Translate a CardException in to a PKCS15Excetion by setting the
+     * error code to {@link #ERROR_TRANSPORT_ERROR}.
+     * 
+     * @param msg The error message.
+     * @param cause The card exception raised by the JAVA smartcard API.
+     */
+    public PKCS15Exception(String msg, CardException cause) {
+        super(msg,cause);
+        this.errorCode = ERROR_TRANSPORT_ERROR;
     }
 
     /**

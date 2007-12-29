@@ -37,23 +37,25 @@ public class DF extends TokenFile implements DFAcl {
      * @param acLifeCycle
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      * @param acCreate
      */
-    public DF(byte[] path, int acLifeCycle, int acUpdate, int acAppend,
-            int acActivate, int acDeactivate, int acDelete, int acAdmin, int acCreate) {
-        super(path, acUpdate, acAppend, acActivate, acDeactivate, acDelete,
-                acAdmin);
+    public DF(byte[] path, long size,
+            int acLifeCycle, int acUpdate, int acAppend,
+            int acDeactivate, int acActivate, int acDelete, int acAdmin, int acCreate) {
+        super(path, size,
+                acUpdate, acAppend, acDeactivate, 
+                acActivate, acDelete, acAdmin);
         this.acLifeCycle = acLifeCycle;
         this.acCreate = acCreate;
     }
     
-    public DF(byte[] path, DFAcl acl)
+    public DF(byte[] path, long size, DFAcl acl)
     {
-        super(path,acl);
+        super(path,size,acl);
         this.acLifeCycle = acl.getAcLifeCycle();
         this.acCreate = acl.getAcCreate();
     }

@@ -29,10 +29,11 @@ package org.opensc.pkcs15.token;
 public abstract class TokenFile implements TokenFileAcl {
 
     private final byte[] path;
+    private final long size;
     private final int acUpdate;
     private final int acAppend;
-    private final int acActivate;
     private final int acDeactivate;
+    private final int acActivate;
     private final int acDelete;
     private final int acAdmin;
     
@@ -45,25 +46,28 @@ public abstract class TokenFile implements TokenFileAcl {
      * @param acDelete
      * @param acAdmin
      */
-    public TokenFile(byte[] path, int acUpdate, int acAppend, int acActivate,
-            int acDeactivate, int acDelete, int acAdmin) {
+    public TokenFile(byte[] path, long size,
+            int acUpdate, int acAppend, int acDeactivate,
+            int acActivate, int acDelete, int acAdmin) {
         super();
         this.path = path;
+        this.size = size;
         this.acUpdate = acUpdate;
         this.acAppend = acAppend;
-        this.acActivate = acActivate;
         this.acDeactivate = acDeactivate;
+        this.acActivate = acActivate;
         this.acDelete = acDelete;
         this.acAdmin = acAdmin;
     }
 
-    public TokenFile(byte[] path, TokenFileAcl acl)
+    public TokenFile(byte[] path, long size, TokenFileAcl acl)
     {
         this.path = path;
+        this.size = size;
         this.acUpdate = acl.getAcUpdate();
         this.acAppend = acl.getAcAppend();
-        this.acActivate = acl.getAcActivate();
         this.acDeactivate = acl.getAcDeactivate();
+        this.acActivate = acl.getAcActivate();
         this.acDelete = acl.getAcDelete();
         this.acAdmin = acl.getAcAdmin();        
     }
@@ -80,6 +84,13 @@ public abstract class TokenFile implements TokenFileAcl {
         return this.path;
     }
 
+
+    /**
+     * @return the size
+     */
+    public long getSize() {
+        return this.size;
+    }
 
     /* (non-Javadoc)
      * @see org.opensc.pkcs15.token.TokenFileAcl#getAcUpdate()

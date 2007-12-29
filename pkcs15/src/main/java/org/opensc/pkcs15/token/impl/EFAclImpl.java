@@ -40,15 +40,15 @@ public class EFAclImpl extends TokenFileAclImpl implements EFAcl {
      * @param acRead
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      */
     public EFAclImpl(int acRead, int acUpdate, int acAppend,
-            int acActivate, int acDeactivate, int acDelete, int acAdmin,
+            int acDeactivate, int acActivate, int acDelete, int acAdmin,
             int acIncrease, int acDecrease) {
-        super(acUpdate, acAppend, acActivate, acDeactivate, acDelete,
+        super(acUpdate, acAppend, acDeactivate, acActivate, acDelete,
                 acAdmin);
         this.acRead = acRead;
         this.acIncrease = acIncrease;

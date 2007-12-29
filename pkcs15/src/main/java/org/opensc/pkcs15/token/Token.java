@@ -38,6 +38,8 @@ public interface Token {
     
     TokenFile select(int path) throws IOException;
     
+    DF selectParentDF() throws IOException;
+    
     DF selectDF(int path) throws IOException;
     
     EF selectEF(int path) throws IOException;

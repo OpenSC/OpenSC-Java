@@ -32,26 +32,26 @@ public abstract class TokenFileAclImpl implements TokenFileAcl {
 
     private final int acUpdate;
     private final int acAppend;
-    private final int acActivate;
     private final int acDeactivate;
+    private final int acActivate;
     private final int acDelete;
     private final int acAdmin;
     
     /**
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      */
-    public TokenFileAclImpl(int acUpdate, int acAppend, int acActivate,
-            int acDeactivate, int acDelete, int acAdmin) {
+    public TokenFileAclImpl(int acUpdate, int acAppend, int acDeactivate,
+            int acActivate, int acDelete, int acAdmin) {
         super();
         this.acUpdate = acUpdate;
         this.acAppend = acAppend;
-        this.acActivate = acActivate;
         this.acDeactivate = acDeactivate;
+        this.acActivate = acActivate;
         this.acDelete = acDelete;
         this.acAdmin = acAdmin;
     }
@@ -60,8 +60,8 @@ public abstract class TokenFileAclImpl implements TokenFileAcl {
     {
         this.acUpdate = acl.getAcUpdate();
         this.acAppend = acl.getAcAppend();
-        this.acActivate = acl.getAcActivate();
         this.acDeactivate = acl.getAcDeactivate();
+        this.acActivate = acl.getAcActivate();
         this.acDelete = acl.getAcDelete();
         this.acAdmin = acl.getAcAdmin();        
     }

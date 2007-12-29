@@ -39,8 +39,8 @@ public class MFAclImpl extends DFAclImpl implements MFAcl {
      * @param acLifeCycle
      * @param acUpdate
      * @param acAppend
-     * @param acActivate
      * @param acDeactivate
+     * @param acActivate
      * @param acDelete
      * @param acAdmin
      * @param acCreate
@@ -48,9 +48,9 @@ public class MFAclImpl extends DFAclImpl implements MFAcl {
      * @param acAllocate
      */
     public MFAclImpl(int acLifeCycle, int acUpdate, int acAppend,
-            int acActivate, int acDeactivate, int acDelete, int acAdmin,
+            int acDeactivate, int acActivate, int acDelete, int acAdmin,
             int acCreate, int acExecute, int acAllocate) {
-        super(acLifeCycle, acUpdate, acAppend, acActivate, acDeactivate, acDelete,
+        super(acLifeCycle, acUpdate, acAppend, acDeactivate, acActivate, acDelete,
                 acAdmin,acCreate);
         this.acExecute = acExecute;
         this.acAllocate = acAllocate;
