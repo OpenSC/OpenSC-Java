@@ -70,11 +70,17 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
                     throw new IllegalArgumentException("The refernce ["+this.reference+"] could not be resolved.");
             }
                 
-            // Implement the marker interface ReferenceProxy.
+            // Implement the marker interface ReferenceProxy#resolveEntity().
             if (method.getParameterTypes().length == 0 &&
                     method.getName().equals("resolveEntity"))
                 return this.resolvedEntity;
             
+            // Implement the marker interface ReferenceProxy#updateEntity().
+            if (method.getParameterTypes().length == 0 &&
+                    method.getName().equals("updateEntity")) {
+                this.directory.updateEntity(this.reference,this.resolvedEntity);
+            }
+                
             return method.invoke(this.resolvedEntity,args);
         }
     }
@@ -104,7 +110,6 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
         Proxy.newProxyInstance(ReferenceProxyFactory.class.getClassLoader(),
                 this.interfaces,
                 new DirectoryInvocationHandler<ReferenceType,EntityType>(reference,directory));
-        
     }
     
     /**

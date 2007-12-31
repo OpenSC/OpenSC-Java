@@ -41,9 +41,10 @@ public interface Directory<ReferenceType extends DEREncodable, EntityType extend
     EntityType resolveReference(ReferenceType ref, EntityType t);
     
     /**
+     * @param ref The reference to store to.
      * @param entity A new entity to be registered.
      * @return A reference to the registered entity
      */
-    ReferenceType registerEntity(EntityType entity);
+    void updateEntity(ReferenceType ref, EntityType entity);
     
 }

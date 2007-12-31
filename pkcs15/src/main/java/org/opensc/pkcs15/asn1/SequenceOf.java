@@ -16,28 +16,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 29.12.2007
+ * Created: 31.12.2007
  * 
  ***********************************************************/
 
 package org.opensc.pkcs15.asn1;
 
+import java.util.List;
+
 import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * A marker interface for explicitly resolving the referenced entity.
+ * An ASN.1 SEQUENCE OF, which may be read from an InputStream in
+ * or to decode referenced <code>PathOrObjects</code> instances.
  * 
  * @author wglas
+ *
+ * @param <EntityType>
  */
-public interface ReferenceProxy<EntityType extends DEREncodable> {
+public interface SequenceOf<EntityType extends DEREncodable> extends DEREncodable {
 
     /**
-     * @return The delegate, which is hidden by this proxy.
+     * @return the sequence
      */
-    public EntityType resolveEntity();
+    public List<EntityType> getSequence();
 
     /**
-     * Update the underlying entity.
+     * @param sequence the sequence to set
      */
-    public void updateEntity();
+    public void setSequence(List<EntityType> sequence);
+
+    /**
+     * @param e The element to add to the internal sequence.
+     */
+    public void addEntity(EntityType e);
+
 }

@@ -22,22 +22,29 @@
 
 package org.opensc.pkcs15.asn1;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * A marker interface for explicitly resolving the referenced entity.
+ * A directory for resolving references, as e.g. implemented by
+ * TokenInfo.
  * 
  * @author wglas
  */
-public interface ReferenceProxy<EntityType extends DEREncodable> {
+public interface StreamResolver<ReferenceType extends DEREncodable> {
 
     /**
-     * @return The delegate, which is hidden by this proxy.
+     * @param ref The reference to resolve.
+     * @return An InputStream which reads from the resolved entity. 
      */
-    public EntityType resolveEntity();
-
+    InputStream readReference(ReferenceType ref);
+    
     /**
-     * Update the underlying entity.
+     * @param ref The reference to store to.
+      * @return An OutputStream which writes to the resolved entity.
      */
-    public void updateEntity();
+    OutputStream writeReference(ReferenceType ref);
+    
 }
