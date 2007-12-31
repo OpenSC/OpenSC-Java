@@ -56,7 +56,7 @@ public class StreamResolverDirectory<ReferenceType extends DEREncodable, EntityT
      * @see org.opensc.pkcs15.asn1.Directory#resolveReference(org.bouncycastle.asn1.DEREncodable, org.bouncycastle.asn1.DEREncodable)
      */
     @Override
-    public EntityType resolveReference(ReferenceType ref, EntityType t) {
+    public EntityType resolveReference(ReferenceType ref) {
        
         try {
             

@@ -16,33 +16,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 29.12.2007
+ * Created: 30.12.2007
  * 
  ***********************************************************/
 
 package org.opensc.pkcs15.asn1;
 
+import java.security.interfaces.RSAPublicKey;
+
 import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * A directory for resolving references, as e.g. implemented by
- * TokenInfo.
+ * This interface is implemented by RSAPublicKeyObject instances
+ * and proxies. 
  * 
  * @author wglas
  */
-public interface Directory<ReferenceType extends DEREncodable, EntityType extends DEREncodable> {
-
-    /**
-     * @param ref The reference to resolve.
-     * @return The resolved entity or null, of the reference could not be resolved. 
-     */
-    EntityType resolveReference(ReferenceType ref);
-    
-    /**
-     * @param ref The reference to store to.
-     * @param entity A new entity to be registered.
-     * @return A reference to the registered entity
-     */
-    void updateEntity(ReferenceType ref, EntityType entity);
-    
+public interface RSAPublicKeyObject extends RSAPublicKey, DEREncodable {
 }

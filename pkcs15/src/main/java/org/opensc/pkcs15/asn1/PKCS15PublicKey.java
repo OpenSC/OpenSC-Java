@@ -16,33 +16,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 29.12.2007
+ * Created: 31.12.2007
  * 
  ***********************************************************/
 
 package org.opensc.pkcs15.asn1;
 
-import org.bouncycastle.asn1.DEREncodable;
-
-/**
- * A directory for resolving references, as e.g. implemented by
- * TokenInfo.
- * 
- * @author wglas
- */
-public interface Directory<ReferenceType extends DEREncodable, EntityType extends DEREncodable> {
+public interface PKCS15PublicKey extends PKCS15Key {
 
     /**
-     * @param ref The reference to resolve.
-     * @return The resolved entity or null, of the reference could not be resolved. 
+     * @return the commonPublicKeyAttributes
      */
-    EntityType resolveReference(ReferenceType ref);
-    
+    public CommonPublicKeyAttributes getCommonPublicKeyAttributes();
+
     /**
-     * @param ref The reference to store to.
-     * @param entity A new entity to be registered.
-     * @return A reference to the registered entity
+     * @param commonPublicKeyAttributes the commonPublicKeyAttributes to set
      */
-    void updateEntity(ReferenceType ref, EntityType entity);
-    
+    public void setCommonPublicKeyAttributes(
+            CommonPublicKeyAttributes commonPublicKeyAttributes);
+
 }

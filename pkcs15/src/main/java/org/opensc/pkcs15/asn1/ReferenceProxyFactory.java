@@ -64,7 +64,7 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
                     throw new IllegalArgumentException("Try to resolve a proxy with directory specified.");
                 
                 this.resolvedEntity =
-                    this.directory.resolveReference(this.reference,this.resolvedEntity);
+                    this.directory.resolveReference(this.reference);
              
                 if (this.resolvedEntity == null)
                     throw new IllegalArgumentException("The refernce ["+this.reference+"] could not be resolved.");

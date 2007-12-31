@@ -35,12 +35,12 @@ import org.bouncycastle.asn1.DERTaggedObject;
 
 /**
  * <PRE>
- * privateRSAKey PrivateKeyObject {PrivateRSAKeyAttributes}
+ * publicRSAKey PublicKeyObject {PublicRSAKeyAttributes}
  * </PRE>
  * 
  * <PRE> 
- * PrivateKeyObject {KeyAttributes} ::= PKCS15Object {
- *       CommonKeyAttributes, CommonPrivateKeyAttributes, KeyAttributes}
+ * PublicKeyObject {KeyAttributes} ::= PKCS15Object {
+ *       CommonKeyAttributes, CommonPublicKeyAttributes, KeyAttributes}
  * </PRE>
  * 
  * <PRE> 
@@ -55,31 +55,31 @@ import org.bouncycastle.asn1.DERTaggedObject;
  * @author wglas
  *
  */
-public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateKey {
+public class PKCS15RSAPublicKey extends ASN1Encodable implements PKCS15PublicKey {
     
     private CommonObjectAttributes commonObjectAttributes;
     private CommonKeyAttributes commonKeyAttributes;
-    private CommonPrivateKeyAttributes commonPrivateKeyAttributes;
-    private PrivateRSAKeyAttributes privateRSAKeyAttributes;
+    private CommonPublicKeyAttributes commonPublicKeyAttributes;
+    private PublicRSAKeyAttributes publicRSAKeyAttributes;
     
     /**
      * Default constructor.
      */
-    public PKCS15RSAPrivateKey() {
+    public PKCS15RSAPublicKey() {
     }
     
     /**
      * @param obj The ASN.1 object to decode.
-     * @param keyKirectory The directory used to resolve referenced private key objects.
+     * @param keyKirectory The directory used to resolve referenced public key objects.
      * @param infoDirectory The directory used to resolve RSAKeyInfos.
-     * @return An instance of CommonPrivateKeyAttributes.
+     * @return An instance of PKCS15RSAPublicKey.
      */
-    public static PKCS15PrivateKey getInstance (Object obj,
-            Directory<Path, RSAPrivateKeyObject> keyKirectory,
+    public static PKCS15PublicKey getInstance (Object obj,
+            Directory<Path, RSAPublicKeyObject> keyKirectory,
             Directory<DERInteger, RSAKeyInfo> infoDirectory)
     {
-        if (obj instanceof PKCS15RSAPrivateKey)
-            return (PKCS15PrivateKey)obj;
+        if (obj instanceof PKCS15RSAPublicKey)
+            return (PKCS15PublicKey)obj;
             
         if (obj instanceof ASN1Sequence) 
         {
@@ -87,42 +87,42 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateK
             
             Enumeration<Object> objs = seq.getObjects();
             
-            PKCS15RSAPrivateKey ret = new PKCS15RSAPrivateKey();
+            PKCS15RSAPublicKey ret = new PKCS15RSAPublicKey();
          
             if (!objs.hasMoreElements())
-                throw new IllegalArgumentException("Missing commonObjectAttributes member in PrivateRSAKey SEQUENCE.");
+                throw new IllegalArgumentException("Missing commonObjectAttributes member in PublicRSAKey SEQUENCE.");
 
             ret.setCommonObjectAttributes(CommonObjectAttributes.getInstance(objs.nextElement()));
             
             if (!objs.hasMoreElements())
-                throw new IllegalArgumentException("Missing commonKeyAttributes member in PrivateRSAKey SEQUENCE.");
+                throw new IllegalArgumentException("Missing commonKeyAttributes member in PublicRSAKey SEQUENCE.");
 
             ret.setCommonKeyAttributes(CommonKeyAttributes.getInstance(objs.nextElement()));
             
             if (!objs.hasMoreElements())
-                throw new IllegalArgumentException("Missing commonPrivateKeyAttributes member in PrivateRSAKey SEQUENCE.");
+                throw new IllegalArgumentException("Missing commonPublicKeyAttributes member in PublicRSAKey SEQUENCE.");
 
             ASN1TaggedObject to = ASN1TaggedObject.getInstance(objs.nextElement());
             
             if (to.getTagNo() == 0) {
                 
-                ret.setCommonPrivateKeyAttributes(CommonPrivateKeyAttributes.getInstance(objs.nextElement()));
+                ret.setCommonPublicKeyAttributes(CommonPublicKeyAttributes.getInstance(objs.nextElement()));
                 
                 if (!objs.hasMoreElements())
-                    throw new IllegalArgumentException("Missing privateRSAKeyAttributes member in PrivateRSAKey SEQUENCE.");
+                    throw new IllegalArgumentException("Missing publicRSAKeyAttributes member in PublicRSAKey SEQUENCE.");
    
                 to = ASN1TaggedObject.getInstance(objs.nextElement());
             }
             
             if (to.getTagNo() != 1)
-                throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in PrivateRSAKey SEQUENCE.");
+                throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in PublicRSAKey SEQUENCE.");
             
-            ret.setPrivateRSAKeyAttributes(PrivateRSAKeyAttributes.getInstance(to.getDERObject(),keyKirectory,infoDirectory));
+            ret.setPublicRSAKeyAttributes(PublicRSAKeyAttributes.getInstance(to.getDERObject(),keyKirectory,infoDirectory));
                
             return ret;
         }
         
-        throw new IllegalArgumentException("PrivateRSAKey must be encoded as an ASN.1 SEQUENCE.");
+        throw new IllegalArgumentException("PublicRSAKey must be encoded as an ASN.1 SEQUENCE.");
     }
 
     
@@ -140,18 +140,18 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateK
         if (this.commonKeyAttributes != null)
             v.add(this.commonKeyAttributes);
 
-        if (this.commonPrivateKeyAttributes != null)
-            v.add(new DERTaggedObject(0,this.commonPrivateKeyAttributes));
+        if (this.commonPublicKeyAttributes != null)
+            v.add(new DERTaggedObject(0,this.commonPublicKeyAttributes));
 
-        if (this.privateRSAKeyAttributes != null)
-            v.add(new DERTaggedObject(1,this.privateRSAKeyAttributes));
+        if (this.publicRSAKeyAttributes != null)
+            v.add(new DERTaggedObject(1,this.publicRSAKeyAttributes));
 
         return new DERSequence(v);
     }
 
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.PKCS15PrivateKey#getCommonObjectAttributes()
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#getCommonObjectAttributes()
      */
     public CommonObjectAttributes getCommonObjectAttributes() {
         return this.commonObjectAttributes;
@@ -159,7 +159,7 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateK
 
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.PKCS15PrivateKey#setCommonObjectAttributes(org.opensc.pkcs15.asn1.CommonObjectAttributes)
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#setCommonObjectAttributes(org.opensc.pkcs15.asn1.CommonObjectAttributes)
      */
     public void setCommonObjectAttributes(
             CommonObjectAttributes commonObjectAttributes) {
@@ -168,7 +168,7 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateK
 
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.PKCS15PrivateKey#getCommonKeyAttributes()
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#getCommonKeyAttributes()
      */
     public CommonKeyAttributes getCommonKeyAttributes() {
         return this.commonKeyAttributes;
@@ -176,7 +176,7 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateK
 
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.PKCS15PrivateKey#setCommonKeyAttributes(org.opensc.pkcs15.asn1.CommonKeyAttributes)
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#setCommonKeyAttributes(org.opensc.pkcs15.asn1.CommonKeyAttributes)
      */
     public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes) {
         this.commonKeyAttributes = commonKeyAttributes;
@@ -184,39 +184,36 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable implements PKCS15PrivateK
 
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.PKCS15PrivateKey#getCommonPrivateKeyAttributes()
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#getCommonPublicKeyAttributes()
      */
-    public CommonPrivateKeyAttributes getCommonPrivateKeyAttributes() {
-        return this.commonPrivateKeyAttributes;
+    public CommonPublicKeyAttributes getCommonPublicKeyAttributes() {
+        return this.commonPublicKeyAttributes;
     }
 
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.PKCS15PrivateKey#setCommonPrivateKeyAttributes(org.opensc.pkcs15.asn1.CommonPrivateKeyAttributes)
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#setCommonPublicKeyAttributes(org.opensc.pkcs15.asn1.CommonPublicKeyAttributes)
      */
-    public void setCommonPrivateKeyAttributes(
-            CommonPrivateKeyAttributes commonPrivateKeyAttributes) {
-        this.commonPrivateKeyAttributes = commonPrivateKeyAttributes;
+    public void setCommonPublicKeyAttributes(
+            CommonPublicKeyAttributes commonPublicKeyAttributes) {
+        this.commonPublicKeyAttributes = commonPublicKeyAttributes;
     }
 
 
     /**
-     * @return the privateRSAKeyAttributes
+     * @return the publicRSAKeyAttributes
      */
-    public PrivateRSAKeyAttributes getPrivateRSAKeyAttributes() {
-        return this.privateRSAKeyAttributes;
+    public PublicRSAKeyAttributes getPublicRSAKeyAttributes() {
+        return this.publicRSAKeyAttributes;
     }
 
 
     /**
-     * @param privateRSAKeyAttributes the privateRSAKeyAttributes to set
+     * @param publicRSAKeyAttributes the publicRSAKeyAttributes to set
      */
-    public void setPrivateRSAKeyAttributes(
-            PrivateRSAKeyAttributes privateRSAKeyAttributes) {
-        this.privateRSAKeyAttributes = privateRSAKeyAttributes;
+    public void setPublicRSAKeyAttributes(
+            PublicRSAKeyAttributes publicRSAKeyAttributes) {
+        this.publicRSAKeyAttributes = publicRSAKeyAttributes;
     }
-
-    
-    
 
 }

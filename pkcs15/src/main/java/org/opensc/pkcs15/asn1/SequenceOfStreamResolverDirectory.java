@@ -57,7 +57,7 @@ implements Directory<ReferenceType, SequenceOf<EntityType>> {
      * @see org.opensc.pkcs15.asn1.Directory#resolveReference(org.bouncycastle.asn1.DEREncodable, org.bouncycastle.asn1.DEREncodable)
      */
     @Override
-    public SequenceOf<EntityType> resolveReference(ReferenceType ref, SequenceOf<EntityType> t) {
+    public SequenceOf<EntityType> resolveReference(ReferenceType ref) {
        
         try {
             
