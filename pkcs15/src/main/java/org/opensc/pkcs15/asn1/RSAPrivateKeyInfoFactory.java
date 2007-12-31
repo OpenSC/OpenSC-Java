@@ -26,7 +26,6 @@ import java.util.Enumeration;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERNull;
 
 /**
  * A factory which instantiates KeyInfo instances as used by RSA private keys. 
@@ -51,19 +50,20 @@ import org.bouncycastle.asn1.DERNull;
  */
 public abstract class RSAPrivateKeyInfoFactory {
 
-    private static ReferenceProxyFactory<DERInteger,KeyInfo<DERNull, Operations>>
-    proxyFactory = new ReferenceProxyFactory<DERInteger,KeyInfo<DERNull, Operations>>(KeyInfo.class);
+    private static ReferenceProxyFactory<DERInteger,RSAKeyInfo>
+    proxyFactory =
+        new ReferenceProxyFactory<DERInteger,RSAKeyInfo>(RSAKeyInfo.class);
     
     /**
      * @param obj ASN.1 object to be decoded.
      * @param directory A directory for resolving integer references.
      * @return A KeyInfo object suitable for RSA Private keys.
      */
-    static public KeyInfo<DERNull, Operations> getInstance(Object obj,
-            Directory<DERInteger,KeyInfo<DERNull, Operations>> directory)
+    static public RSAKeyInfo getInstance(Object obj,
+            Directory<DERInteger,RSAKeyInfo> directory)
     {
-        if (obj instanceof KeyInfo) {
-            return (KeyInfo<DERNull, Operations>) obj;
+        if (obj instanceof RSAKeyInfo) {
+            return (RSAKeyInfo) obj;
         }
         
         if (obj instanceof DERInteger) {
@@ -91,7 +91,7 @@ public abstract class RSAPrivateKeyInfoFactory {
             ops = Operations.getInstance(o);
         }
         
-        return new KeyInfoImpl<DERNull, Operations>(DERNull.INSTANCE,ops);
+        return new RSAKeyInfoImpl(ops);
     }
     
 }

@@ -35,35 +35,35 @@ import org.bouncycastle.asn1.x509.X509Name;
 
 /**
  * <PRE>
- * CommonPrivateKeyAttributes ::= SEQUENCE {
+ * CommonPublicKeyAttributes ::= SEQUENCE {
  *      subjectName Name OPTIONAL,
- *      keyIdentifiers [0] SEQUENCE OF CredentialIdentifier {{KeyIdentifiers}} OPTIONAL,
- *      ... -- For future extensions
+ *      ...,
+ *      trustedUsage [0] Usage OPTIONAL
  *      }
  * </PRE>
  * 
  * @author wglas
  */
-public class CommonPrivateKeyAttributes extends ASN1Encodable {
+public class CommonPublicKeyAttributes extends ASN1Encodable {
 
     private X509Name subjectName;
-    private KeyIdentifiers keyIdentifiers;
+    private Usage trustedUsage;
     
     /**
      * Default constructor.
      */
-    public CommonPrivateKeyAttributes() {
+    public CommonPublicKeyAttributes() {
         super();
     }
 
     /**
      * @param obj The ASN.1 object to decode.
-     * @return An instance of CommonPrivateKeyAttributes.
+     * @return An instance of CommonPublicKeyAttributes.
      */
-    public static CommonPrivateKeyAttributes getInstance (Object obj)
+    public static CommonPublicKeyAttributes getInstance (Object obj)
     {
-        if (obj instanceof CommonPrivateKeyAttributes)
-            return (CommonPrivateKeyAttributes)obj;
+        if (obj instanceof CommonPublicKeyAttributes)
+            return (CommonPublicKeyAttributes)obj;
             
         if (obj instanceof ASN1Sequence) 
         {
@@ -71,7 +71,7 @@ public class CommonPrivateKeyAttributes extends ASN1Encodable {
             
             Enumeration<Object> objs = seq.getObjects();
             
-            CommonPrivateKeyAttributes ret = new CommonPrivateKeyAttributes();
+            CommonPublicKeyAttributes ret = new CommonPublicKeyAttributes();
             
             while (objs.hasMoreElements()) {
                 
@@ -84,18 +84,18 @@ public class CommonPrivateKeyAttributes extends ASN1Encodable {
                     ASN1TaggedObject to = (ASN1TaggedObject)o;
                     
                     if (to.getTagNo() != 0)
-                        throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of CommonPrivateKeyAttributes ASN.1 SEQUENCE.");
+                        throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of CommonPublicKeyAttributes ASN.1 SEQUENCE.");
                     
-                    ret.setKeyIdentifiers(KeyIdentifiers.getInstance(to.getObject()));
+                    ret.setTrustedUsage(Usage.getInstance(to.getObject()));
                         
                 } else
-                    throw new IllegalArgumentException("Invalid member ["+o+"] in CommonPrivateKeyAttributes ASN.1 SEQUENCE.");
+                    throw new IllegalArgumentException("Invalid member ["+o+"] in CommonPublicKeyAttributes ASN.1 SEQUENCE.");
             }
                
             return ret;
         }
         
-        throw new IllegalArgumentException("CommonPrivateKeyAttributes must be encoded as an ASN.1 SEQUENCE.");
+        throw new IllegalArgumentException("CommonPublicKeyAttributes must be encoded as an ASN.1 SEQUENCE.");
     }
     
     /* (non-Javadoc)
@@ -109,8 +109,8 @@ public class CommonPrivateKeyAttributes extends ASN1Encodable {
         if (this.subjectName != null)
             v.add(this.subjectName);
         
-        if (this.keyIdentifiers != null)
-            v.add(new DERTaggedObject(0,this.keyIdentifiers));
+        if (this.trustedUsage != null)
+            v.add(new DERTaggedObject(0,this.trustedUsage));
 
         return new DERSequence(v);
     }
@@ -130,17 +130,17 @@ public class CommonPrivateKeyAttributes extends ASN1Encodable {
     }
 
     /**
-     * @return the keyIdentifiers
+     * @return the trustedUsage
      */
-    public KeyIdentifiers getKeyIdentifiers() {
-        return this.keyIdentifiers;
+    public Usage getTrustedUsage() {
+        return this.trustedUsage;
     }
 
     /**
-     * @param keyIdentifiers the keyIdentifiers to set
+     * @param trustedUsage the trustedUsage to set
      */
-    public void setKeyIdentifiers(KeyIdentifiers keyIdentifiers) {
-        this.keyIdentifiers = keyIdentifiers;
+    public void setTrustedUsage(Usage trustedUsage) {
+        this.trustedUsage = trustedUsage;
     }
 
 }

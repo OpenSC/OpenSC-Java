@@ -29,7 +29,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 
@@ -49,7 +48,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
 
     private RSAPrivateKeyObject value;
     private BigInteger modulusLength;
-    private KeyInfo<DERNull, Operations> keyInfo;
+    private RSAKeyInfo keyInfo;
     
     /**
      * Default constructor.
@@ -66,7 +65,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
      */
     public static PrivateRSAKeyAttributes getInstance (Object obj,
             Directory<Path, RSAPrivateKeyObject> keyKirectory,
-            Directory<DERInteger, KeyInfo<DERNull, Operations>> infoDirectory)
+            Directory<DERInteger, RSAKeyInfo> infoDirectory)
     {
         if (obj instanceof PrivateRSAKeyAttributes)
             return (PrivateRSAKeyAttributes)obj;
@@ -151,14 +150,14 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
     /**
      * @return the keyInfo
      */
-    public KeyInfo<DERNull, Operations> getKeyInfo() {
+    public RSAKeyInfo getKeyInfo() {
         return this.keyInfo;
     }
 
     /**
      * @param keyInfo the keyInfo to set
      */
-    public void setKeyInfo(KeyInfo<DERNull, Operations> keyInfo) {
+    public void setKeyInfo(RSAKeyInfo keyInfo) {
         this.keyInfo = keyInfo;
     }
 

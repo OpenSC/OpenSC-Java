@@ -29,7 +29,6 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -72,12 +71,12 @@ public class PKCS15RSAPrivateKey extends ASN1Encodable {
     /**
      * @param obj The ASN.1 object to decode.
      * @param keyKirectory The directory used to resolve referenced private key objects.
-     * @param infoDirectory The directory used to resolve KeyInfos.
+     * @param infoDirectory The directory used to resolve RSAKeyInfos.
      * @return An instance of CommonPrivateKeyAttributes.
      */
     public static PKCS15RSAPrivateKey getInstance (Object obj,
             Directory<Path, RSAPrivateKeyObject> keyKirectory,
-            Directory<DERInteger, KeyInfo<DERNull, Operations>> infoDirectory)
+            Directory<DERInteger, RSAKeyInfo> infoDirectory)
     {
         if (obj instanceof PKCS15RSAPrivateKey)
             return (PKCS15RSAPrivateKey)obj;
