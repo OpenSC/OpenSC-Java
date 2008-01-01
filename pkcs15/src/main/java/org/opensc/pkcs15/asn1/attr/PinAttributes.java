@@ -37,6 +37,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.opensc.pkcs15.asn1.basic.PinFlags;
 import org.opensc.pkcs15.asn1.basic.PinType;
+import org.opensc.pkcs15.asn1.helper.IntegerHelper;
 import org.opensc.pkcs15.asn1.ref.Path;
 
 /**
@@ -98,9 +99,9 @@ public class PinAttributes extends ASN1Encodable {
             o = objs.nextElement();
             ret.setPinType(PinType.getInstance(o));
             o = objs.nextElement();
-            ret.setMinLength(DERInteger.getInstance(o).getValue().intValue());
+            ret.setMinLength(IntegerHelper.intValue(DERInteger.getInstance(o).getValue()));
             o = objs.nextElement();
-            ret.setStoredLength(DERInteger.getInstance(o).getValue().intValue());
+            ret.setStoredLength(IntegerHelper.intValue(DERInteger.getInstance(o).getValue()));
             
             if (!objs.hasMoreElements()) return ret;
             
@@ -108,7 +109,7 @@ public class PinAttributes extends ASN1Encodable {
             
             if (o instanceof DERInteger) {
                 
-                ret.setMaxLength(DERInteger.getInstance(o).getValue().intValue());
+                ret.setMaxLength(IntegerHelper.toInteger(DERInteger.getInstance(o).getValue()));
                 
                 if (!objs.hasMoreElements()) return ret;
                 o = objs.nextElement();
@@ -121,7 +122,7 @@ public class PinAttributes extends ASN1Encodable {
                if (to.getTagNo() != 0)
                    throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of PinAttributes ASN.1 SEQUENCE.");
                
-                ret.setPinReference(DERInteger.getInstance(to.getDERObject()).getValue().intValue());
+                ret.setPinReference(IntegerHelper.intValue(DERInteger.getInstance(to.getDERObject()).getValue()));
                 
                 if (!objs.hasMoreElements()) return ret;
                 o = objs.nextElement();
@@ -160,23 +161,6 @@ public class PinAttributes extends ASN1Encodable {
         
         ASN1EncodableVector v = new ASN1EncodableVector();
 
-        /**
-         * <PRE>
-         * PinAttributes ::= SEQUENCE {
-         *          pinFlags           PinFlags,
-         *          pinType PinType,
-         *          minLength          INTEGER (pkcs15-lb-minPinLength..pkcs15-ub-minPinLength),
-         *          storedLength INTEGER (0..pkcs15-ub-storedPinLength),
-         *          maxLength          INTEGER OPTIONAL,
-         *          pinReference [0] Reference DEFAULT 0,
-         *          padChar            OCTET STRING (SIZE(1)) OPTIONAL,
-         *          lastPinChange GeneralizedTime OPTIONAL,
-         *          path               Path OPTIONAL,
-         *          ... -- For future extensions
-         *          }
-         * </PRE>
-         */
-        
         if (this.pinFlags != null)
             v.add(this.pinFlags);
         

@@ -22,7 +22,6 @@
 
 package org.opensc.pkcs15.asn1.ref;
 
-import java.math.BigInteger;
 import java.util.Enumeration;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -35,6 +34,7 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.opensc.pkcs15.asn1.helper.IntegerHelper;
 
 /**
  * <PRE>
@@ -52,8 +52,8 @@ import org.bouncycastle.asn1.DERTaggedObject;
 public class Path extends ASN1Encodable {
 
     private byte [] path;
-    private BigInteger index;
-    private BigInteger length;
+    private Integer index;
+    private Integer length;
     
     /**
      * Default constructor.
@@ -86,7 +86,7 @@ public class Path extends ASN1Encodable {
         
         if (objs.hasMoreElements())
         {
-            ret.setIndex(DERInteger.getInstance(objs.nextElement()).getValue());
+            ret.setIndex(IntegerHelper.toInteger(DERInteger.getInstance(objs.nextElement()).getValue()));
             
             if (!objs.hasMoreElements())
                 throw new IllegalArgumentException("Missing length member after index in PKCS#15 path object.");
@@ -96,7 +96,7 @@ public class Path extends ASN1Encodable {
             if (to.getTagNo() != 0)
                 throw new IllegalArgumentException("Illegal tag ["+to.getTagNo()+"] for length member in PKCS#15 path object.");
             
-            ret.setLength(DERInteger.getInstance(to.getObject()).getValue());
+            ret.setLength(IntegerHelper.toInteger(DERInteger.getInstance(to.getObject()).getValue()));
         }
         
         return ret;
@@ -111,9 +111,9 @@ public class Path extends ASN1Encodable {
 
         v.add(new DEROctetString(this.path));
         if (this.index != null)
-            v.add(new DERInteger(this.index));
+            v.add(new DERInteger(this.index.intValue()));
         if (this.length != null)
-            v.add(new DERTaggedObject(0,new DERInteger(this.length)));
+            v.add(new DERTaggedObject(0,new DERInteger(this.length.intValue())));
 
         return new DERSequence(v);
    }
@@ -135,28 +135,28 @@ public class Path extends ASN1Encodable {
     /**
      * @return the index
      */
-    public BigInteger getIndex() {
+    public Integer getIndex() {
         return this.index;
     }
 
     /**
      * @param index the index to set
      */
-    public void setIndex(BigInteger index) {
+    public void setIndex(Integer index) {
         this.index = index;
     }
 
     /**
      * @return the length
      */
-    public BigInteger getLength() {
+    public Integer getLength() {
         return this.length;
     }
 
     /**
      * @param length the length to set
      */
-    public void setLength(BigInteger length) {
+    public void setLength(Integer length) {
         this.length = length;
     }
 

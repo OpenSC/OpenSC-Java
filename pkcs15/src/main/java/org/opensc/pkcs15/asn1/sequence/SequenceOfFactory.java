@@ -51,7 +51,7 @@ public class SequenceOfFactory<EntityType extends DEREncodable> {
      *              a factory class,
      *              if EntityType is an interface.
      */
-    public SequenceOfFactory(Class<Object> clazz) {
+    public SequenceOfFactory(Class<?> clazz) {
         this.instanceFactory = new InstanceFactory<EntityType>(clazz);
     }
     
@@ -88,6 +88,8 @@ public class SequenceOfFactory<EntityType extends DEREncodable> {
     
     
     /**
+     * Read an sequence from an InputStream and close the stream after reading.
+     * 
      * @param is The InputStream to read from.
      * @return The SequenceOf instance, which is the concatenation of all objects in
      *         the given InputStream.
@@ -111,6 +113,7 @@ public class SequenceOfFactory<EntityType extends DEREncodable> {
             
             ret.addEntity(this.instanceFactory.getInstance(obj));
         }
+        is.close();
         return ret;
     }
         

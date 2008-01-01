@@ -22,6 +22,7 @@
 
 package org.opensc.pkcs15.asn1.proxy;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -38,13 +39,14 @@ public interface StreamResolver<ReferenceType extends DEREncodable> {
     /**
      * @param ref The reference to resolve.
      * @return An InputStream which reads from the resolved entity. 
+     * @throws IOException 
      */
-    InputStream readReference(ReferenceType ref);
+    InputStream readReference(ReferenceType ref) throws IOException;
     
     /**
      * @param ref The reference to store to.
       * @return An OutputStream which writes to the resolved entity.
      */
-    OutputStream writeReference(ReferenceType ref);
+    OutputStream writeReference(ReferenceType ref) throws IOException;
     
 }

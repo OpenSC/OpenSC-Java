@@ -59,15 +59,13 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
     /**
      * Construct a factory for ASN.1 ObjectValues.
      * 
-     * @param clazz The class of the EntityType interface, which is implemented by direct
-     *              objects and proxies to indirect references.  
-     * @param implClazz The class of the implementation of interface, which is instantiated
-     *              by direct objects.  
+     * @param clazz The class of the EntityType, which is instantiated during
+     *              sequence creation.  
      */
     @SuppressWarnings("unchecked")
-    public PathOrObjectsFactory(Class<EntityType> clazz, Class<Object> implClazz)
+    public PathOrObjectsFactory(Class<EntityType> clazz)
     {
-        this.sequenceOfFactory = new SequenceOfFactory<EntityType>(implClazz);
+        this.sequenceOfFactory = new SequenceOfFactory<EntityType>(clazz);
         this.pathProxyFactory = new ReferenceProxyFactory<Path,SequenceOf>(SequenceOf.class);
         this.entityName = this.pathProxyFactory.getEntityInterface().getSimpleName();
     }
