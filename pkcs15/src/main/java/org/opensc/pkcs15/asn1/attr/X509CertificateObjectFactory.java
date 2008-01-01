@@ -22,8 +22,6 @@
 
 package org.opensc.pkcs15.asn1.attr;
 
-import org.opensc.pkcs15.asn1.Context;
-import org.opensc.pkcs15.asn1.ContextHolder;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.ObjectValueFactory;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -34,36 +32,19 @@ import org.opensc.pkcs15.asn1.ref.Path;
  * 
  * @author wglas
  */
-public abstract class RSAPrivateKeyObjectFactory {
+public abstract class X509CertificateObjectFactory {
     
-    private static ObjectValueFactory<RSAPrivateKeyObject> factory
-    = new ObjectValueFactory<RSAPrivateKeyObject>(RSAPrivateKeyObject.class,RSAPrivateKeyObjectImpl.class);
-
-    /**
-     * This method implements the static getInstance factory pattern by
-     * using the thread-local context stored in {@link ContextHolder}. 
-     * 
-     * @param obj ASN.1 object to be decoded.
-     * @return A KeyInfo object suitable for RSA Private keys.
-     */
-    static public RSAPrivateKeyObject getInstance(Object obj)
-    {
-        Context context = ContextHolder.getContext();
-        
-        Directory<Path, RSAPrivateKeyObject> directory =
-            context == null ? null : context.getRSAPrivateKeyDirectory();
-        
-        return getInstance(obj,directory);
-    }
+    private static ObjectValueFactory<X509CertificateObject> factory
+    = new ObjectValueFactory<X509CertificateObject>(X509CertificateObject.class,X509CertificateObjectImpl.class);
 
     /**
      * @param obj An ASN.1 object to resolve.
      * @param directory The directory used to resolve path references.
-     * @return An RSAPrivateKeyObjectImpl instance or a RSAPrivateKeyObject proxy
+     * @return An X509CertificateObjectImpl instance or a X509CertificateObject proxy
      *         depending on the type of the ReferencedValue. 
      */
-    public static RSAPrivateKeyObject getInstance(Object obj,
-            Directory<Path,RSAPrivateKeyObject> directory) {
+    public static X509CertificateObject getInstance(Object obj,
+            Directory<Path,X509CertificateObject> directory) {
        
         return factory.getInstance(obj, directory);
     }
