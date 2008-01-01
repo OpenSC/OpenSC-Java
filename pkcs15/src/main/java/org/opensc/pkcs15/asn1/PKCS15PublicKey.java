@@ -22,19 +22,61 @@
 
 package org.opensc.pkcs15.asn1;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonPublicKeyAttributes;
 
-public interface PKCS15PublicKey extends PKCS15Key {
+public abstract class PKCS15PublicKey extends ASN1Encodable implements PKCS15Key {
+
+    private CommonObjectAttributes commonObjectAttributes;
+    private CommonKeyAttributes commonKeyAttributes;
+    private CommonPublicKeyAttributes commonPublicKeyAttributes;
+
+    protected PKCS15PublicKey() {
+    }
+
+    /**
+     * @return the commonObjectAttributes
+     */
+    public CommonObjectAttributes getCommonObjectAttributes() {
+        return this.commonObjectAttributes;
+    }
+
+    /**
+     * @param commonObjectAttributes the commonObjectAttributes to set
+     */
+    public void setCommonObjectAttributes(
+            CommonObjectAttributes commonObjectAttributes) {
+        this.commonObjectAttributes = commonObjectAttributes;
+    }
+
+    /**
+     * @return the commonKeyAttributes
+     */
+    public CommonKeyAttributes getCommonKeyAttributes() {
+        return this.commonKeyAttributes;
+    }
+
+    /**
+     * @param commonKeyAttributes the commonKeyAttributes to set
+     */
+    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes) {
+        this.commonKeyAttributes = commonKeyAttributes;
+    }
 
     /**
      * @return the commonPublicKeyAttributes
      */
-    public CommonPublicKeyAttributes getCommonPublicKeyAttributes();
+    public CommonPublicKeyAttributes getCommonPublicKeyAttributes() {
+        return this.commonPublicKeyAttributes;
+    }
 
     /**
      * @param commonPublicKeyAttributes the commonPublicKeyAttributes to set
      */
     public void setCommonPublicKeyAttributes(
-            CommonPublicKeyAttributes commonPublicKeyAttributes);
-
+            CommonPublicKeyAttributes commonPublicKeyAttributes) {
+        this.commonPublicKeyAttributes = commonPublicKeyAttributes;
+    }
 }
