@@ -20,24 +20,35 @@
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
+package org.opensc.pkcs15.asn1.sequence;
 
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import java.util.List;
+
+import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * This interface is implemented by all private and public key objects.
+ * An ASN.1 SEQUENCE OF, which may be read from an InputStream in
+ * or to decode referenced <code>PathOrObjects</code> instances.
  * 
  * @author wglas
+ *
+ * @param <EntityType>
  */
-public interface PKCS15Key extends PKCS15Object {
+public interface SequenceOf<EntityType extends DEREncodable> extends DEREncodable {
 
     /**
-     * @return the commonKeyAttributes
+     * @return the sequence
      */
-    public CommonKeyAttributes getCommonKeyAttributes();
+    public List<EntityType> getSequence();
 
     /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
+     * @param sequence the sequence to set
      */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+    public void setSequence(List<EntityType> sequence);
+
+    /**
+     * @param e The element to add to the internal sequence.
+     */
+    public void addEntity(EntityType e);
+
 }

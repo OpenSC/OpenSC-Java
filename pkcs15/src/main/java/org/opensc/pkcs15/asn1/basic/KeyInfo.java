@@ -16,28 +16,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 31.12.2007
+ * Created: 29.12.2007
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
+package org.opensc.pkcs15.asn1.basic;
 
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import org.bouncycastle.asn1.DEREncodable;
+
 
 /**
- * This interface is implemented by all private and public key objects.
+ * <PRE>
+ * KeyInfo {ParameterType, OperationsType} ::= CHOICE {
+ *      reference           Reference,
+ *      paramsAndOps        SEQUENCE {
+ *          parameters            ParameterType,
+ *          supportedOperations OperationsType OPTIONAL
+ *             }
+ *      }
+ * </PRE>
  * 
  * @author wglas
+ *
  */
-public interface PKCS15Key extends PKCS15Object {
+public interface KeyInfo<ParameterType extends DEREncodable,
+                         OperationsType extends DEREncodable> extends DEREncodable {
 
-    /**
-     * @return the commonKeyAttributes
-     */
-    public CommonKeyAttributes getCommonKeyAttributes();
-
-    /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
-     */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+    ParameterType getParameters();
+    
+    void setParameters(ParameterType parameters);
+    
+    OperationsType getSupportedOperations();
+    
+    void setSupportedOperations(OperationsType supportedOperations);
 }

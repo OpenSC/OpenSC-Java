@@ -22,6 +22,8 @@
 
 package org.opensc.pkcs15.asn1;
 
+import org.opensc.pkcs15.asn1.attr.CommonPublicKeyAttributes;
+
 public interface PKCS15PublicKey extends PKCS15Key {
 
     /**

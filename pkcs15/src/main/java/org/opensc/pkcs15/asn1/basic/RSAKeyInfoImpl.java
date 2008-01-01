@@ -20,24 +20,30 @@
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
+package org.opensc.pkcs15.asn1.basic;
 
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import org.bouncycastle.asn1.DERNull;
 
 /**
- * This interface is implemented by all private and public key objects.
+ * An implementation of RSAKeyInfo.
  * 
  * @author wglas
  */
-public interface PKCS15Key extends PKCS15Object {
+public class RSAKeyInfoImpl extends KeyInfoImpl<DERNull, Operations> implements RSAKeyInfo {
 
     /**
-     * @return the commonKeyAttributes
+     * 
      */
-    public CommonKeyAttributes getCommonKeyAttributes();
+    public RSAKeyInfoImpl() {
+        super(DERNull.INSTANCE,null);
+    }
 
     /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
+     * @param parameters
+     * @param supportedOperations
      */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+    public RSAKeyInfoImpl(Operations supportedOperations) {
+        super(DERNull.INSTANCE, supportedOperations);
+    }
+
 }

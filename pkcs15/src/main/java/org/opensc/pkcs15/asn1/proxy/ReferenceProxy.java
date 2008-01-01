@@ -16,28 +16,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 31.12.2007
+ * Created: 29.12.2007
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
+package org.opensc.pkcs15.asn1.proxy;
 
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * This interface is implemented by all private and public key objects.
+ * A marker interface for explicitly resolving the referenced entity.
  * 
  * @author wglas
  */
-public interface PKCS15Key extends PKCS15Object {
+public interface ReferenceProxy<EntityType extends DEREncodable> {
 
     /**
-     * @return the commonKeyAttributes
+     * @return The delegate, which is hidden by this proxy.
      */
-    public CommonKeyAttributes getCommonKeyAttributes();
+    public EntityType resolveEntity();
 
     /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
+     * Update the underlying entity.
      */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+    public void updateEntity();
 }

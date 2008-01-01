@@ -20,24 +20,15 @@
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
-
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+package org.opensc.pkcs15.asn1.basic;
+import org.bouncycastle.asn1.DERNull;
 
 /**
- * This interface is implemented by all private and public key objects.
+ * <PRE>
+ * KeyInfo {NULL, PublicKeyOperations} 
+ * </PRE>
  * 
  * @author wglas
  */
-public interface PKCS15Key extends PKCS15Object {
-
-    /**
-     * @return the commonKeyAttributes
-     */
-    public CommonKeyAttributes getCommonKeyAttributes();
-
-    /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
-     */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+public interface RSAKeyInfo extends KeyInfo<DERNull, Operations> {
 }

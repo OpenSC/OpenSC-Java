@@ -22,6 +22,8 @@
 
 package org.opensc.pkcs15.asn1;
 
+import org.opensc.pkcs15.asn1.attr.CommonPrivateKeyAttributes;
+
 /**
  * This interface is implemented by all private key objects.
  * 

@@ -32,6 +32,14 @@ import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
+import org.opensc.pkcs15.asn1.attr.CommonPublicKeyAttributes;
+import org.opensc.pkcs15.asn1.attr.PublicRSAKeyAttributes;
+import org.opensc.pkcs15.asn1.attr.RSAPublicKeyObject;
+import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
+import org.opensc.pkcs15.asn1.proxy.Directory;
+import org.opensc.pkcs15.asn1.ref.Path;
 
 /**
  * <PRE>

@@ -23,6 +23,7 @@
 package org.opensc.pkcs15.asn1;
 
 import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
 
 /**
  * This interface is implemented by all toplevel ASN.1 objects.

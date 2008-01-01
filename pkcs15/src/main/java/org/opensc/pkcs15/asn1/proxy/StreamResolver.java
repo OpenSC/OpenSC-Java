@@ -16,28 +16,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 31.12.2007
+ * Created: 29.12.2007
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
+package org.opensc.pkcs15.asn1.proxy;
 
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * This interface is implemented by all private and public key objects.
+ * A directory for resolving references, as e.g. implemented by
+ * TokenInfo.
  * 
  * @author wglas
  */
-public interface PKCS15Key extends PKCS15Object {
+public interface StreamResolver<ReferenceType extends DEREncodable> {
 
     /**
-     * @return the commonKeyAttributes
+     * @param ref The reference to resolve.
+     * @return An InputStream which reads from the resolved entity. 
      */
-    public CommonKeyAttributes getCommonKeyAttributes();
-
+    InputStream readReference(ReferenceType ref);
+    
     /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
+     * @param ref The reference to store to.
+      * @return An OutputStream which writes to the resolved entity.
      */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+    OutputStream writeReference(ReferenceType ref);
+    
 }

@@ -20,24 +20,35 @@
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1;
+package org.opensc.pkcs15.asn1.ref;
 
-import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
+import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.proxy.InstanceFactory;
+import org.opensc.pkcs15.asn1.proxy.StreamResolverDirectory;
 
 /**
- * This interface is implemented by all private and public key objects.
+ * This directory resolves URLs.
  * 
  * @author wglas
  */
-public interface PKCS15Key extends PKCS15Object {
+public class URLDirectory<EntityType extends DEREncodable>
+extends StreamResolverDirectory<URL,EntityType> {
 
     /**
-     * @return the commonKeyAttributes
+     * @param clazz The ASN.1 class which is instantiated. Note,
+     *              that this might be the class of an actual implementation,
+     *              if EntityType is an interface.
      */
-    public CommonKeyAttributes getCommonKeyAttributes();
-
+    public URLDirectory(Class<? extends EntityType> clazz) {
+        
+        super(new URLStreamResolver(),clazz);
+    }
+    
     /**
-     * @param commonKeyAttributes the commonKeyAttributes to set
+     * @param instanceFactory The factory for ASN.1 instances.
      */
-    public void setCommonKeyAttributes(CommonKeyAttributes commonKeyAttributes);
+    public URLDirectory(InstanceFactory<EntityType> instanceFactory) {
+        
+        super(new URLStreamResolver(),instanceFactory);
+    }
 }
