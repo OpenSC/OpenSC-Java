@@ -78,7 +78,7 @@ public class ObjectValueFactory<EntityType extends DEREncodable> {
      * @param implClazz The class of the implementation of interface, which is instantiated
      *              by direct objects.  
      */
-    public ObjectValueFactory(Class<EntityType> clazz, Class<? extends EntityType> implClazz)
+    public ObjectValueFactory(Class<EntityType> clazz, Class<?> implClazz)
     {
         this.pathProxyFactory = new ReferenceProxyFactory<Path,EntityType>(clazz);
         this.urlProxyFactory = new ReferenceProxyFactory<URL,EntityType>(clazz);

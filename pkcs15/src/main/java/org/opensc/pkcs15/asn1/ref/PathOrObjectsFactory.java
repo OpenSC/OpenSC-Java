@@ -63,7 +63,7 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
      *              by direct objects.  
      */
     @SuppressWarnings("unchecked")
-    public PathOrObjectsFactory(Class<EntityType> clazz, Class<? extends EntityType> implClazz)
+    public PathOrObjectsFactory(Class<EntityType> clazz, Class<Object> implClazz)
     {
         this.sequenceOfFactory = new SequenceOfFactory<EntityType>(implClazz);
         this.pathProxyFactory = new ReferenceProxyFactory<Path,SequenceOf>(SequenceOf.class);

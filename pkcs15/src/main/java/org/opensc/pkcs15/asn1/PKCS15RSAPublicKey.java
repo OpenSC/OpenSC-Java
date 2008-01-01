@@ -77,6 +77,26 @@ public class PKCS15RSAPublicKey extends ASN1Encodable implements PKCS15PublicKey
     }
     
     /**
+     * This method implements the static getInstance factory pattern by
+     * using the thread-local context stored in {@link ContextHolder}. 
+     * 
+     * @param obj ASN.1 object to be decoded.
+     * @return A PKCS15PublicKey object suitable for RSA Private keys.
+     */
+    static public PKCS15PublicKey getInstance(Object obj)
+    {
+        Context context = ContextHolder.getContext();
+        
+        Directory<DERInteger,RSAKeyInfo> infoDirectory =
+            context == null ? null : context.getRSAKeyInfoDirectory();
+        
+        Directory<Path, RSAPublicKeyObject> keyKirectory =
+            context == null ? null : context.getRSAPublicKeyDirectory();
+        
+        return getInstance(obj,keyKirectory,infoDirectory);
+    }
+
+    /**
      * @param obj The ASN.1 object to decode.
      * @param keyKirectory The directory used to resolve referenced public key objects.
      * @param infoDirectory The directory used to resolve RSAKeyInfos.

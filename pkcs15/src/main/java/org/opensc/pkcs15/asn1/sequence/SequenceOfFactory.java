@@ -47,10 +47,11 @@ public class SequenceOfFactory<EntityType extends DEREncodable> {
     
     /**
      * @param clazz The ASN.1 class which is instantiated. Note,
-     *              that this might be the class of an actual implementation,
+     *              that this might be the class of an actual implementation or
+     *              a factory class,
      *              if EntityType is an interface.
      */
-    public SequenceOfFactory(Class<? extends EntityType> clazz) {
+    public SequenceOfFactory(Class<Object> clazz) {
         this.instanceFactory = new InstanceFactory<EntityType>(clazz);
     }
     

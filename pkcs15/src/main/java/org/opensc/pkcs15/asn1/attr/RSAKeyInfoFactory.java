@@ -26,6 +26,8 @@ import java.util.Enumeration;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInteger;
+import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.ContextHolder;
 import org.opensc.pkcs15.asn1.basic.Operations;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfoImpl;
@@ -53,12 +55,29 @@ import org.opensc.pkcs15.asn1.proxy.ReferenceProxyFactory;
  *
  * @author wglas
  */
-public abstract class RSAPrivateKeyInfoFactory {
+public abstract class RSAKeyInfoFactory {
 
     private static ReferenceProxyFactory<DERInteger,RSAKeyInfo>
     proxyFactory =
         new ReferenceProxyFactory<DERInteger,RSAKeyInfo>(RSAKeyInfo.class);
     
+    /**
+     * This method implements the static getInstance factory pattern by
+     * using the thread-local context stored in {@link ContextHolder}. 
+     * 
+     * @param obj ASN.1 object to be decoded.
+     * @return A KeyInfo object suitable for RSA Private keys.
+     */
+    static public RSAKeyInfo getInstance(Object obj)
+    {
+        Context context = ContextHolder.getContext();
+        
+        Directory<DERInteger,RSAKeyInfo> directory =
+            context == null ? null : context.getRSAKeyInfoDirectory();
+        
+        return getInstance(obj,directory);
+    }
+            
     /**
      * @param obj ASN.1 object to be decoded.
      * @param directory A directory for resolving integer references.

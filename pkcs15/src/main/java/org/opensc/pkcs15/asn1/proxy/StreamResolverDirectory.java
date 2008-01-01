@@ -39,7 +39,7 @@ public class StreamResolverDirectory<ReferenceType extends DEREncodable, EntityT
     private final InstanceFactory<EntityType> instanceFactory;
     
     public StreamResolverDirectory(StreamResolver<ReferenceType> streamResolver,
-            Class<? extends EntityType> clazz) {
+            Class<?> clazz) {
         
         this.streamResolver = streamResolver;
         this.instanceFactory = new InstanceFactory<EntityType>(clazz);

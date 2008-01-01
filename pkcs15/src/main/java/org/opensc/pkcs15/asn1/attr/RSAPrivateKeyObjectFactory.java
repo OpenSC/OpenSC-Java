@@ -22,6 +22,10 @@
 
 package org.opensc.pkcs15.asn1.attr;
 
+import org.bouncycastle.asn1.DERInteger;
+import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.ContextHolder;
+import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.ObjectValueFactory;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -36,6 +40,23 @@ public abstract class RSAPrivateKeyObjectFactory {
     
     private static ObjectValueFactory<RSAPrivateKeyObject> factory
     = new ObjectValueFactory<RSAPrivateKeyObject>(RSAPrivateKeyObject.class,RSAPrivateKeyObjectImpl.class);
+
+    /**
+     * This method implements the static getInstance factory pattern by
+     * using the thread-local context stored in {@link ContextHolder}. 
+     * 
+     * @param obj ASN.1 object to be decoded.
+     * @return A KeyInfo object suitable for RSA Private keys.
+     */
+    static public RSAPrivateKeyObject getInstance(Object obj)
+    {
+        Context context = ContextHolder.getContext();
+        
+        Directory<Path, RSAPrivateKeyObject> directory =
+            context == null ? null : context.getRSAPrivateKeyDirectory();
+        
+        return getInstance(obj,directory);
+    }
 
     /**
      * @param obj An ASN.1 object to resolve.

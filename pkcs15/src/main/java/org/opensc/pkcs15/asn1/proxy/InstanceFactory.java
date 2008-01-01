@@ -26,6 +26,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.ContextHolder;
+
 /**
  * This class helps to instantiate ASN1 class by their
  * <code>static getInstance(Object)</code> method.  
@@ -34,15 +37,15 @@ import java.lang.reflect.Modifier;
  */
 public class InstanceFactory<T> {
 
-    private final Class<? extends T> clazz;
+    private final Class<?> clazz;
     private final Method getInstanceMethod;
     
     /**
-     * @param clazz The ASN.1 class which is instantiated. Note,
-     *              that this might be the class of an actual implementation,
-     *              if T is an interface.
+     * @param clazz The ASN.1 class on which the static <code>getInstace(Object)</code> method is
+     *              is invoked. Note, that this might be the class of an actual implementation
+     *              or a factory class, if T is an interface.
      */
-    public InstanceFactory (Class<? extends T> clazz)
+    public InstanceFactory (Class<?> clazz)
     {
         this.clazz = clazz;
      
@@ -52,7 +55,7 @@ public class InstanceFactory<T> {
             if (!Modifier.isStatic(this.getInstanceMethod .getModifiers()) ||
                     !Modifier.isPublic(this.getInstanceMethod .getModifiers()) )
                 throw new IllegalArgumentException("Method ["+clazz.getName()+".getInstance(Object)] is not static public.");
-
+            
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Class ["+clazz.getName()+"] has no static getInstance(Object) method.",e);
         }
@@ -80,11 +83,26 @@ public class InstanceFactory<T> {
         }
     }
 
+    /**
+     * @param obj An ASN.1 object.
+     * @return A parsed instance of type T.
+     */
+    public T getInstance(Object obj, Context context)
+    {
+        ContextHolder.setContext(context);
+        
+        try
+        {
+            return this.getInstance(obj);
+        } finally {
+            ContextHolder.removeContext();
+        }
+    }
 
     /**
      * @return the clazz
      */
-    public Class<? extends T> getClazz() {
+    public Class<?> getClazz() {
         return this.clazz;
     }
 

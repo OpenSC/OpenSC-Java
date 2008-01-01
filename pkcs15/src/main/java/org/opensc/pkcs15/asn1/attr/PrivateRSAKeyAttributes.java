@@ -31,6 +31,8 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
+import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.ContextHolder;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -58,6 +60,26 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
      */
     public PrivateRSAKeyAttributes() {
         super();
+    }
+    
+    /**
+     * This method implements the static getInstance factory pattern by
+     * using the thread-local context stored in {@link ContextHolder}. 
+     * 
+     * @param obj ASN.1 object to be decoded.
+     * @return A KeyInfo object suitable for RSA Private keys.
+     */
+    static public PrivateRSAKeyAttributes getInstance(Object obj)
+    {
+        Context context = ContextHolder.getContext();
+        
+        Directory<DERInteger,RSAKeyInfo> infoDirectory =
+            context == null ? null : context.getRSAKeyInfoDirectory();
+        
+        Directory<Path, RSAPrivateKeyObject> keyKirectory =
+            context == null ? null : context.getRSAPrivateKeyDirectory();
+        
+        return getInstance(obj,keyKirectory,infoDirectory);
     }
 
     /**
@@ -93,7 +115,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
             
             if (objs.hasMoreElements()) {
                 
-                ret.setKeyInfo(RSAPrivateKeyInfoFactory.getInstance(objs.nextElement(),infoDirectory));
+                ret.setKeyInfo(RSAKeyInfoFactory.getInstance(objs.nextElement(),infoDirectory));
             }
                
             return ret;

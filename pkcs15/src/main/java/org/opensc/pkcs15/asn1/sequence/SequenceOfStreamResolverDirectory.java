@@ -42,7 +42,7 @@ implements Directory<ReferenceType, SequenceOf<EntityType>> {
     private final SequenceOfFactory<EntityType> sequenceOfFactory;
     
     public SequenceOfStreamResolverDirectory(StreamResolver<ReferenceType> streamResolver,
-            Class<? extends EntityType> clazz) {
+            Class<Object> clazz) {
         
         this.streamResolver = streamResolver;
         this.sequenceOfFactory = new SequenceOfFactory<EntityType>(clazz);

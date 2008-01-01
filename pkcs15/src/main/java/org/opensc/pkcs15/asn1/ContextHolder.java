@@ -16,39 +16,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 31.12.2007
+ * Created: 01.01.2008
  * 
  ***********************************************************/
 
-package org.opensc.pkcs15.asn1.ref;
-
-import org.bouncycastle.asn1.DEREncodable;
-import org.opensc.pkcs15.asn1.proxy.InstanceFactory;
-import org.opensc.pkcs15.asn1.proxy.StreamResolverDirectory;
+package org.opensc.pkcs15.asn1;
 
 /**
- * This directory resolves URLs.
+ * The static thread-local context registry.
  * 
  * @author wglas
  */
-public class URLDirectory<EntityType extends DEREncodable>
-extends StreamResolverDirectory<URL,EntityType> {
+public abstract class ContextHolder {
 
+    private static final ThreadLocal<Context> holder = new ThreadLocal<Context>();
+    
     /**
-     * @param clazz The ASN.1 class which is instantiated. Note,
-     *              that this might be the class of an actual implementation,
-     *              if EntityType is an interface.
+     * @param context Register the given context for this thread.
      */
-    public URLDirectory(Class<?> clazz) {
-        
-        super(new URLStreamResolver(),clazz);
+    public static void setContext(Context context)
+    {
+        holder.set(context);
     }
     
     /**
-     * @param instanceFactory The factory for ASN.1 instances.
+     * Remove the context from this thread.
      */
-    public URLDirectory(InstanceFactory<EntityType> instanceFactory) {
-        
-        super(new URLStreamResolver(),instanceFactory);
+    public static void removeContext()
+    {
+        holder.remove();
     }
+    
+    /**
+     * @return The thread-local context registered using {@link #setContext(Context)}.
+     */
+    public static Context getContext()
+    {
+        return holder.get();
+    }    
 }
