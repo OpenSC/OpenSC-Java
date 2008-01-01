@@ -25,6 +25,8 @@ package org.opensc.pkcs15.asn1.ref;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.ContextHolder;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.proxy.ReferenceProxyFactory;
 import org.opensc.pkcs15.asn1.proxy.StreamResolver;
@@ -116,5 +118,23 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
        }
        
         throw new IllegalArgumentException("PathOrObjects{"+this.entityName+"} must be encoded as an ASN.1 SEQUENCE or ASN.1 tagged object.");
+    }
+    
+    /**
+     * Implement the getInstance factory pattern by using the context registered
+     * by {@link ContextHolder}.
+     * 
+     * @param obj An ASN.1 object to resolve.
+     * @return An instance or a proxy depending on the type of the ReferencedValue. 
+     */
+    @SuppressWarnings("unchecked")
+    public SequenceOf<EntityType> getInstance(Object obj) {
+
+        Context context = ContextHolder.getContext();
+        
+        StreamResolver<Path> pathResolver =
+            context == null ? null : context.getPathResolver();
+        
+        return this.getInstance(obj,pathResolver);
     }
 }
