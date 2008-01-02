@@ -97,7 +97,7 @@ public class URLWithDigest extends URL {
             if (to.getTagNo()!=3)
                 throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in URL.");
  
-            ASN1Sequence seq = ASN1Sequence.getInstance(to.getDERObject());
+            ASN1Sequence seq = ASN1Sequence.getInstance(to.getObject());
             
             Enumeration<Object> objs = seq.getObjects();
             

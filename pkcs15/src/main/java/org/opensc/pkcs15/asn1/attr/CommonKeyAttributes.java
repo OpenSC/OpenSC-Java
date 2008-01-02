@@ -115,7 +115,7 @@ public class CommonKeyAttributes extends ASN1Encodable {
                     if (to.getTagNo() != 0)
                         throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of CommonKeyAttributes ASN.1 SEQUENCE.");
                     
-                    ret.setEndDate(DERGeneralizedTime.getInstance(to.getDERObject()));
+                    ret.setEndDate(DERGeneralizedTime.getInstance(to.getObject()));
                         
                 } else
                     throw new IllegalArgumentException("Invalid member ["+o+"] in CommonKeyAttributes ASN.1 SEQUENCE.");

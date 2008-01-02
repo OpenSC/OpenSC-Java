@@ -130,7 +130,7 @@ public class PKCS15RSAPublicKey extends PKCS15PublicKey {
             
             if (to.getTagNo() == 0) {
                 
-                ret.setCommonPublicKeyAttributes(CommonPublicKeyAttributes.getInstance(objs.nextElement()));
+                ret.setCommonPublicKeyAttributes(CommonPublicKeyAttributes.getInstance(to.getObject()));
                 
                 if (!objs.hasMoreElements())
                     throw new IllegalArgumentException("Missing publicRSAKeyAttributes member in PublicRSAKey SEQUENCE.");
@@ -141,7 +141,7 @@ public class PKCS15RSAPublicKey extends PKCS15PublicKey {
             if (to.getTagNo() != 1)
                 throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in PublicRSAKey SEQUENCE.");
             
-            ret.setPublicRSAKeyAttributes(PublicRSAKeyAttributes.getInstance(to.getDERObject(),keyKirectory,infoDirectory));
+            ret.setPublicRSAKeyAttributes(PublicRSAKeyAttributes.getInstance(to.getObject(),keyKirectory,infoDirectory));
                
             return ret;
         }

@@ -29,13 +29,13 @@ import java.io.OutputStream;
 
 import org.bouncycastle.asn1.DERInteger;
 import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.attr.RSAKeyInfoFactory;
 import org.opensc.pkcs15.asn1.attr.RSAPrivateKeyObject;
 import org.opensc.pkcs15.asn1.attr.RSAPublicKeyChoice;
 import org.opensc.pkcs15.asn1.attr.RSAPublicKeyObject;
 import org.opensc.pkcs15.asn1.attr.X509CertificateObject;
 import org.opensc.pkcs15.asn1.attr.X509CertificateObjectImpl;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfoImpl;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.proxy.StreamResolver;
 import org.opensc.pkcs15.asn1.proxy.StreamResolverDirectory;
@@ -106,7 +106,7 @@ public class TokenContext implements Context {
     @Override
     public Directory<DERInteger, RSAKeyInfo> getRSAKeyInfoDirectory() {
         
-        throw new UnsupportedOperationException("Resolving RSAKeyInfo via TokenInfo is unsupported.");
+        return null;
     }
 
     /* (non-Javadoc)
@@ -115,7 +115,7 @@ public class TokenContext implements Context {
     @Override
     public Directory<Path, RSAPrivateKeyObject> getRSAPrivateKeyDirectory() {
         
-        return new StreamResolverDirectory<Path, RSAPrivateKeyObject>(this.streamResolver,RSAKeyInfoImpl.class);
+        return new StreamResolverDirectory<Path, RSAPrivateKeyObject>(this.streamResolver,RSAKeyInfoFactory.class);
     }
 
     /* (non-Javadoc)
@@ -140,7 +140,7 @@ public class TokenContext implements Context {
      * @return the token
      */
     public Token getToken() {
-        return token;
+        return this.token;
     }
 
 }

@@ -34,7 +34,6 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.opensc.pkcs15.asn1.ref.PathOrObjectsFactory;
 import org.opensc.pkcs15.asn1.sequence.SequenceOf;
-import org.opensc.pkcs15.asn1.sequence.SequenceOfFactory;
 
 /**
  * This is the ASN.1 mapping of the EF(ODF) file, which serves as
@@ -123,29 +122,29 @@ public class PKCS15Objects {
                 switch (to.getTagNo())
                 {
                 case 0:
-                    ret.setPrivateKeys(privateKeysFactory.getInstance(to.getDERObject()));
+                    ret.setPrivateKeys(privateKeysFactory.getInstance(to.getObject()));
                     break;
                 case 1:
-                    ret.setPublicKeys(publicKeysFactory.getInstance(to.getDERObject()));
+                    ret.setPublicKeys(publicKeysFactory.getInstance(to.getObject()));
                     break;
                 case 2:
-                    ret.setTrustedPublicKeys(publicKeysFactory.getInstance(to.getDERObject()));
+                    ret.setTrustedPublicKeys(publicKeysFactory.getInstance(to.getObject()));
                     break;
                 case 3:
                     throw new IllegalArgumentException("SecretKeys are not supported yet.");
                 case 4:
-                    ret.setCertificates(certificatesFactory.getInstance(to.getDERObject()));
+                    ret.setCertificates(certificatesFactory.getInstance(to.getObject()));
                     break;
                 case 5:
-                    ret.setTrustedCertificates(certificatesFactory.getInstance(to.getDERObject()));
+                    ret.setTrustedCertificates(certificatesFactory.getInstance(to.getObject()));
                     break;
                 case 6:
-                    ret.setUsefulCertificates(certificatesFactory.getInstance(to.getDERObject()));
+                    ret.setUsefulCertificates(certificatesFactory.getInstance(to.getObject()));
                     break;
                 case 7:
                     throw new IllegalArgumentException("DataObjects are not supported yet.");
                 case 8:
-                    ret.setAuthObjects(authObjectsFactory.getInstance(to.getDERObject()));
+                    ret.setAuthObjects(authObjectsFactory.getInstance(to.getObject()));
                     break;
                     
                 default:

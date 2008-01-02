@@ -84,4 +84,30 @@ public class PinType extends ASN1Encodable {
         this.value = value;
     }
         
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        switch (this.value) {
+        
+        case bcd:
+            return "bcd";
+            
+        case asciiNumeric:
+            return "ascii-numeric";
+            
+        case utf8:
+            return "utf8";
+        
+        case halfNibbleBcd:
+            return "half-nibble-bcd";
+            
+        case iso9564_1:
+            return "iso9564-1";
+            
+        default:
+            return "<invalid PinType "+this.value+">";
+        }
+    }
 }

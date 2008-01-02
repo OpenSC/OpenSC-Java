@@ -103,7 +103,7 @@ public class PKCS15PinAuthenticationObject extends PKCS15AuthenticationObject {
             if (to.getTagNo() != 1)
                 throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in PinAuthenticationObject SEQUENCE.");
             
-            ret.setPinAttributes(PinAttributes.getInstance(to.getDERObject()));
+            ret.setPinAttributes(PinAttributes.getInstance(to.getObject()));
                
             return ret;
         }

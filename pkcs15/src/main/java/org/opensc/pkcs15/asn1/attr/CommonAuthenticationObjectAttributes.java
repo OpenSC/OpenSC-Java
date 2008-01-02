@@ -28,7 +28,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 
@@ -74,7 +73,7 @@ public class CommonAuthenticationObjectAttributes extends ASN1Encodable {
                 
                 Object o = objs.nextElement();
                 
-                if (o instanceof DERInteger) {
+                if (o instanceof ASN1OctetString) {
                     ret.setIdentifier(ASN1OctetString.getInstance(o));
                 } else
                     throw new IllegalArgumentException("Invalid member ["+o+"] in CommonAuthenticationObjectAttributes ASN.1 SEQUENCE.");

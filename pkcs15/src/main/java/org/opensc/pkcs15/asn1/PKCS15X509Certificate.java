@@ -124,7 +124,7 @@ public class PKCS15X509Certificate extends PKCS15Certificate {
             if (to.getTagNo() != 1)
                 throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in X509Certificate SEQUENCE.");
             
-            ret.setX509CertificateAttributes(X509CertificateAttributes.getInstance(to.getDERObject(),keyKirectory));
+            ret.setX509CertificateAttributes(X509CertificateAttributes.getInstance(to.getObject(),keyKirectory));
                
             return ret;
         }

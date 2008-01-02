@@ -181,13 +181,19 @@ public abstract class PathHelper {
     {
         TokenFile current = token.getCurrentFile();
         
+        if (current == null) {
+            current = token.selectMF();
+        } 
+        
         // find common trunk.
         int l = commonTrunkLength(current.getPath(),path);
-                
+          
+        if (l <2)
+            throw new IOException("The path ["+formatPath(path)+"] is not a subpath of the MF.");
+        
         // chdir up.
         while (current.getPath().length > l)
             current = token.selectParentDF();
-        
         
         // chdir down.
         while (current.getPath().length < path.length)
@@ -210,9 +216,16 @@ public abstract class PathHelper {
     {
         TokenFile current = token.getCurrentFile();
         
+        if (current == null) {
+            current = token.selectMF();
+        }
+        
         // find common trunk.
         int l = commonTrunkLength(current.getPath(),path);
         
+        if (l <2)
+            throw new IOException("The path ["+formatPath(path)+"] is not a subpath of the MF.");
+
         if (l==path.length) {
             
             if (current instanceof EF)
@@ -224,7 +237,6 @@ public abstract class PathHelper {
         // chdir up.
         while (current.getPath().length > l)
             current = token.selectParentDF();
-        
         
         // chdir down.
         while (current.getPath().length < path.length-2)
@@ -247,9 +259,16 @@ public abstract class PathHelper {
     {
         TokenFile current = token.getCurrentFile();
         
+        if (current == null) {
+            current = token.selectMF();
+        }
+
         // find common trunk.
         int l = commonTrunkLength(current.getPath(),path);
         
+        if (l <2)
+            throw new IOException("The path ["+formatPath(path)+"] is not a subpath of the MF.");
+
         if (l==path.length) {
             
             if (current instanceof DF)

@@ -122,7 +122,7 @@ public class PinAttributes extends ASN1Encodable {
                if (to.getTagNo() != 0)
                    throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of PinAttributes ASN.1 SEQUENCE.");
                
-                ret.setPinReference(IntegerHelper.intValue(DERInteger.getInstance(to.getDERObject()).getValue()));
+                ret.setPinReference(IntegerHelper.intValue(DERInteger.getInstance(to.getObject()).getValue()));
                 
                 if (!objs.hasMoreElements()) return ret;
                 o = objs.nextElement();

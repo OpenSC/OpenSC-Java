@@ -24,7 +24,6 @@ package org.opensc.pkcs15.asn1;
 
 import java.util.Enumeration;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
@@ -131,7 +130,7 @@ public class PKCS15RSAPrivateKey extends PKCS15PrivateKey {
             
             if (to.getTagNo() == 0) {
                 
-                ret.setCommonPrivateKeyAttributes(CommonPrivateKeyAttributes.getInstance(objs.nextElement()));
+                ret.setCommonPrivateKeyAttributes(CommonPrivateKeyAttributes.getInstance(to.getObject()));
                 
                 if (!objs.hasMoreElements())
                     throw new IllegalArgumentException("Missing privateRSAKeyAttributes member in PrivateRSAKey SEQUENCE.");
@@ -142,7 +141,7 @@ public class PKCS15RSAPrivateKey extends PKCS15PrivateKey {
             if (to.getTagNo() != 1)
                 throw new IllegalArgumentException("Invalid tag ["+to.getTagNo()+"] in PrivateRSAKey SEQUENCE.");
             
-            ret.setPrivateRSAKeyAttributes(PrivateRSAKeyAttributes.getInstance(to.getDERObject(),keyKirectory,infoDirectory));
+            ret.setPrivateRSAKeyAttributes(PrivateRSAKeyAttributes.getInstance(to.getObject(),keyKirectory,infoDirectory));
                
             return ret;
         }

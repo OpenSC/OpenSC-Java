@@ -123,7 +123,7 @@ public class X509CertificateAttributes extends ASN1Encodable {
                     throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of X509CertificateAttributes ASN.1 SEQUENCE.");
                 
                 
-                ret.setIssuer(X509Name.getInstance(to.getDERObject()));
+                ret.setIssuer(X509Name.getInstance(to.getObject()));
             
                 if (!objs.hasMoreElements()) return ret;
                 o = objs.nextElement();

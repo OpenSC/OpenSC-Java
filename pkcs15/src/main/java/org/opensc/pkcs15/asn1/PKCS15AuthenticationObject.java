@@ -57,7 +57,7 @@ public abstract class PKCS15AuthenticationObject extends ASN1Encodable implement
             return (PKCS15AuthenticationObject)obj;
         
         if (obj instanceof ASN1Sequence) {
-           // return PKCS15PinAuthenticationObject.getInstance(obj);
+           return PKCS15PinAuthenticationObject.getInstance(obj);
         }
             
         if (obj instanceof ASN1TaggedObject) {

@@ -23,10 +23,26 @@
 package org.opensc.pkcs15.asn1;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonPublicKeyAttributes;
 
+/**
+ * <PRE>
+ * PublicKeyType ::= CHOICE {
+ *        publicRSAKey PublicKeyObject {PublicRSAKeyAttributes},
+ *        publicECKey           [0] PublicKeyObject {PublicECKeyAttributes},
+ *        publicDHKey           [1] PublicKeyObject {PublicDHKeyAttributes},
+ *        publicDSAKey [2] PublicKeyObject {PublicDSAKeyAttributes},
+ *        publicKEAKey [3] PublicKeyObject {PublicKEAKeyAttributes},
+ *        ... -- For future extensions
+ *        }
+ * </PRE>
+ * 
+ * @author wglas
+ */
 public abstract class PKCS15PublicKey extends ASN1Encodable implements PKCS15Key {
 
     private CommonObjectAttributes commonObjectAttributes;
@@ -34,6 +50,38 @@ public abstract class PKCS15PublicKey extends ASN1Encodable implements PKCS15Key
     private CommonPublicKeyAttributes commonPublicKeyAttributes;
 
     protected PKCS15PublicKey() {
+    }
+
+    public static PKCS15PublicKey getInstance(Object obj) {
+        
+        if (obj instanceof PKCS15PublicKey)
+            return (PKCS15PublicKey)obj;
+        
+        if (obj instanceof ASN1Sequence) {
+            return PKCS15RSAPublicKey.getInstance(obj);
+        }
+            
+        if (obj instanceof ASN1TaggedObject) {
+            
+            ASN1TaggedObject to = (ASN1TaggedObject)obj;
+            
+            switch (to.getTagNo()) {
+            case 0:
+                throw new IllegalArgumentException("PublicECKey is not supported.");
+            case 1:
+                throw new IllegalArgumentException("PublicDHKey is not supported.");
+            case 2:
+                throw new IllegalArgumentException("PublicDSAKey is not supported.");
+            case 3:
+                throw new IllegalArgumentException("PublicKEAKey is not supported.");
+                 
+            default:
+                throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in PublicKey ASN.1 SEQUENCE.");
+            }
+            
+        }
+        
+        throw new IllegalArgumentException("PublicKey must be encoded as An ASN.1 SEQUENCE or TAGGED OBJECT.");
     }
 
     /**

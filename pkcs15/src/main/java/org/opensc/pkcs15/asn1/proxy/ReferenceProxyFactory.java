@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.Context;
+import org.opensc.pkcs15.asn1.ContextHolder;
 
 /**
  * A static factory for referenced entities.
@@ -38,14 +40,21 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
     private static class DirectoryInvocationHandler<ReferenceType extends DEREncodable,EntityType extends DEREncodable>
     implements InvocationHandler
     {
-        private Directory<ReferenceType,EntityType> directory;
+        private final ReferenceType reference;
+        private final String entityName;
+        private final Directory<ReferenceType,EntityType> directory;
+        private final Context context;
         private EntityType resolvedEntity;
-        private ReferenceType reference;
         
-        DirectoryInvocationHandler(ReferenceType reference, Directory<ReferenceType,EntityType> directory)
+        DirectoryInvocationHandler(ReferenceType reference, String entityName,
+                Directory<ReferenceType,EntityType> directory)
         {
             this.reference = reference;
+            this.entityName = entityName;
             this.directory = directory;
+            // save the context, because proxy dereference might be undertaken
+            // at a later moment.
+            this.context = ContextHolder.getContext();
             this.resolvedEntity = null;
         }
         
@@ -58,16 +67,40 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
                     method.getName().equals("getDERObject"))
                 return this.reference.getDERObject();
             
+            if (method.getParameterTypes().length == 0 &&
+                    method.getName().equals("toString")) {
+                
+                return "Reference{"+this.entityName+"}["+this.reference+"]";
+            }
+
             if (this.resolvedEntity == null) {
                 
                 if (this.directory == null)
                     throw new IllegalArgumentException("Try to resolve a proxy with directory specified.");
                 
-                this.resolvedEntity =
-                    this.directory.resolveReference(this.reference);
-             
+                Context oldContext = null;
+                
+                if (this.context != null) {
+                    
+                    oldContext = ContextHolder.getContext();
+                    ContextHolder.setContext(this.context);
+                }
+                
+                try {
+                    this.resolvedEntity =
+                        this.directory.resolveReference(this.reference);
+                }
+                finally {
+                    
+                    if (this.context != null) {
+                        ContextHolder.removeContext();
+                        if (oldContext != null)
+                            ContextHolder.setContext(oldContext);
+                    }
+                }
+                
                 if (this.resolvedEntity == null)
-                    throw new IllegalArgumentException("The refernce ["+this.reference+"] could not be resolved.");
+                    throw new IllegalArgumentException("The reference ["+this.reference+"] could not be resolved.");
             }
                 
             // Implement the marker interface ReferenceProxy#resolveEntity().
@@ -109,7 +142,8 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
         return (EntityType)
         Proxy.newProxyInstance(ReferenceProxyFactory.class.getClassLoader(),
                 this.interfaces,
-                new DirectoryInvocationHandler<ReferenceType,EntityType>(reference,directory));
+                new DirectoryInvocationHandler<ReferenceType,EntityType>(reference,
+                        this.entityInterface.getSimpleName(),directory));
     }
     
     /**

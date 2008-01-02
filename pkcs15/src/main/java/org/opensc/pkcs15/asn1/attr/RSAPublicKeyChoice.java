@@ -93,7 +93,7 @@ public class RSAPublicKeyChoice implements RSAPublicKeyObject {
             if (to.getTagNo() != 1)
                 throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in RSAPublicKeyChoice.");
                 
-            return new RSAPublicKeyChoice(SubjectPublicKeyInfo.getInstance(to.getDERObject()));
+            return new RSAPublicKeyChoice(SubjectPublicKeyInfo.getInstance(to.getObject()));
         }
         
         throw new IllegalArgumentException("Invalid RSAPublicKeyChoice.");

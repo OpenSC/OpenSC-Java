@@ -100,7 +100,7 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
             
             case 0:
                 // Choice 3: direct
-                return this.sequenceOfFactory.getInstance(to.getDERObject());
+                return this.sequenceOfFactory.getInstance(to.getObject());
                 
             case 1:
                 // Choice 4: indirect-protected

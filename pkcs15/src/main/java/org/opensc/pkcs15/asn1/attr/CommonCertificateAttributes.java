@@ -105,16 +105,16 @@ public class CommonCertificateAttributes extends ASN1Encodable {
                     switch (to.getTagNo())
                     {
                     case 0:
-                        ret.setCertHash(OOBCertHash.getInstance(to.getDERObject()));
+                        ret.setCertHash(OOBCertHash.getInstance(to.getObject()));
                         break;
                     case 1:
-                        ret.setTrustedUsage(Usage.getInstance(to.getDERObject()));
+                        ret.setTrustedUsage(Usage.getInstance(to.getObject()));
                         break;
                     case 2:
-                        ret.setIdentifiers(KeyIdentifiers.getInstance(to.getDERObject()));
+                        ret.setIdentifiers(KeyIdentifiers.getInstance(to.getObject()));
                         break;
                     case 3:
-                        ret.setImplicitTrust(DERBoolean.getInstance(to.getDERObject()).isTrue());
+                        ret.setImplicitTrust(DERBoolean.getInstance(to.getObject()).isTrue());
                         break;
                         
                     default:

@@ -101,8 +101,8 @@ public class PinFlags extends DERBitString {
         
         DERBitString bs = DERBitString.getInstance(obj);
         
-        if (bs.getBytes() == null || bs.getBytes().length < 2)
-            throw new IllegalArgumentException("PinFlags BIT STRING must conatin at least 12 bits.");
+        if (bs.getBytes() == null || bs.getBytes().length < 1)
+            throw new IllegalArgumentException("PinFlags BIT STRING must conatin at least 8 bits.");
             
         return new PinFlags(bs);
     }
