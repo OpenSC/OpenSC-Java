@@ -260,6 +260,9 @@ public class SoftwareToken implements Token {
     @Override
     public OutputStream writeEFData() throws IOException {
         
+        if (!this.currentFile.delete())
+            throw new IOException("Cannot delete EF ["+this.currentFile+"] before writing.");
+        
         return new FileOutputStream(this.currentFile);
     }
 

@@ -60,7 +60,7 @@ public class CommonKeyAttributes extends ASN1Encodable {
 
     private ASN1OctetString iD;
     private KeyUsageFlags usage;
-    private boolean nativeFlag;
+    private Boolean nativeFlag;
     private KeyAccessFlags accessFlags;
     private BigInteger keyReference;
     private DERGeneralizedTime startDate;
@@ -71,7 +71,6 @@ public class CommonKeyAttributes extends ASN1Encodable {
      */
     public CommonKeyAttributes() {
         super();
-        this.nativeFlag = true;
     }
 
     /**
@@ -141,7 +140,8 @@ public class CommonKeyAttributes extends ASN1Encodable {
         if (this.usage != null)
             v.add(this.usage);
         
-        v.add(new DERBoolean(this.nativeFlag));
+        if (this.nativeFlag != null)
+            v.add(new DERBoolean(this.nativeFlag));
         
         if (this.accessFlags != null)
             v.add(this.accessFlags);
@@ -189,14 +189,14 @@ public class CommonKeyAttributes extends ASN1Encodable {
     /**
      * @return the nativeFlag
      */
-    public boolean isNativeFlag() {
+    public Boolean getNativeFlag() {
         return this.nativeFlag;
     }
 
     /**
      * @param nativeFlag the nativeFlag to set
      */
-    public void setNativeFlag(boolean nativeFlag) {
+    public void setNativeFlag(Boolean nativeFlag) {
         this.nativeFlag = nativeFlag;
     }
 

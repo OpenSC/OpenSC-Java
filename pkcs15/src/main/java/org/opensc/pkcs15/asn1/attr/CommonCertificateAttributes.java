@@ -57,12 +57,12 @@ import org.opensc.pkcs15.asn1.basic.Usage;
 public class CommonCertificateAttributes extends ASN1Encodable {
 
     private ASN1OctetString iD;
-    private boolean authority;
+    private Boolean authority;
     private KeyIdentifier identifier;
     private OOBCertHash certHash;
     private Usage trustedUsage;
     private KeyIdentifiers identifiers;
-    private boolean implicitTrust;
+    private Boolean implicitTrust;
     
     /**
      * Default constructor.
@@ -142,7 +142,8 @@ public class CommonCertificateAttributes extends ASN1Encodable {
         if (this.iD != null)
             v.add(this.iD);
         
-        v.add(new DERBoolean(this.authority));
+        if (this.authority != null)
+            v.add(new DERBoolean(this.authority));
         
         if (this.identifier != null)
             v.add(this.identifier);
@@ -156,7 +157,8 @@ public class CommonCertificateAttributes extends ASN1Encodable {
         if (this.identifiers != null)
             v.add(new DERTaggedObject(2,this.identifiers));
         
-        v.add(new DERTaggedObject(3,new DERBoolean(this.implicitTrust)));
+        if (this.implicitTrust != null)
+            v.add(new DERTaggedObject(3,new DERBoolean(this.implicitTrust)));
         
         return new DERSequence(v);
     }
@@ -176,16 +178,9 @@ public class CommonCertificateAttributes extends ASN1Encodable {
     }
 
     /**
-     * @return the authority
-     */
-    public boolean isAuthority() {
-        return this.authority;
-    }
-
-    /**
      * @param authority the authority to set
      */
-    public void setAuthority(boolean authority) {
+    public void setAuthority(Boolean authority) {
         this.authority = authority;
     }
 
@@ -246,16 +241,24 @@ public class CommonCertificateAttributes extends ASN1Encodable {
     }
 
     /**
-     * @return the implicitTrust
+     * @param implicitTrust the implicitTrust to set
      */
-    public boolean isImplicitTrust() {
-        return this.implicitTrust;
+    public void setImplicitTrust(Boolean implicitTrust) {
+        this.implicitTrust = implicitTrust;
     }
 
     /**
-     * @param implicitTrust the implicitTrust to set
+     * @return the authority
      */
-    public void setImplicitTrust(boolean implicitTrust) {
-        this.implicitTrust = implicitTrust;
+    public Boolean getAuthority() {
+        return this.authority;
     }
+
+    /**
+     * @return the implicitTrust
+     */
+    public Boolean getImplicitTrust() {
+        return this.implicitTrust;
+    }
+
 }

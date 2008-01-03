@@ -65,7 +65,7 @@ public class PinAttributes extends ASN1Encodable {
     private int minLength;
     private int storedLength;
     private Integer maxLength;
-    private int pinReference;
+    private Integer pinReference;
     private Byte padChar;
     private DERGeneralizedTime lastPinChange;
     private Path path;
@@ -80,6 +80,10 @@ public class PinAttributes extends ASN1Encodable {
     /**
      * @param obj The ASN.1 object to decode.
      * @return An instance of CommonObjectAttributes.
+     */
+    /**
+     * @param obj
+     * @return
      */
     public static PinAttributes getInstance (Object obj)
     {
@@ -122,10 +126,10 @@ public class PinAttributes extends ASN1Encodable {
                if (to.getTagNo() != 0)
                    throw new IllegalArgumentException("Invalid member tag ["+to.getTagNo()+"] in member of PinAttributes ASN.1 SEQUENCE.");
                
-                ret.setPinReference(IntegerHelper.intValue(DERInteger.getInstance(to.getObject()).getValue()));
+               ret.setPinReference(IntegerHelper.toInteger(DERInteger.getInstance(to.getObject()).getValue()));
                 
-                if (!objs.hasMoreElements()) return ret;
-                o = objs.nextElement();
+               if (!objs.hasMoreElements()) return ret;
+               o = objs.nextElement();
            }
                
             
@@ -172,7 +176,8 @@ public class PinAttributes extends ASN1Encodable {
         if (this.maxLength != null)
             v.add(new DERInteger(this.maxLength.intValue()));
         
-        v.add(new DERTaggedObject(0,new DERInteger(this.pinReference)));
+        if (this.pinReference != null)
+            v.add(new DERTaggedObject(0,new DERInteger(this.pinReference)));
        
         if (this.padChar != null)
             v.add(new DEROctetString(new byte[] {this.padChar.byteValue()}));
@@ -259,14 +264,14 @@ public class PinAttributes extends ASN1Encodable {
     /**
      * @return the pinReference
      */
-    public int getPinReference() {
+    public Integer getPinReference() {
         return this.pinReference;
     }
 
     /**
      * @param pinReference the pinReference to set
      */
-    public void setPinReference(int pinReference) {
+    public void setPinReference(Integer pinReference) {
         this.pinReference = pinReference;
     }
 

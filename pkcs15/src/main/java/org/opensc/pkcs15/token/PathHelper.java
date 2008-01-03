@@ -226,7 +226,7 @@ public abstract class PathHelper {
         if (l <2)
             throw new IOException("The path ["+formatPath(path)+"] is not a subpath of the MF.");
 
-        if (l==path.length) {
+        if (l==path.length && l == current.getPath().length) {
             
             if (current instanceof EF)
                 return (EF)current;
@@ -244,7 +244,7 @@ public abstract class PathHelper {
             current = token.select(idAt(path,current.getPath().length));
         }
             
-        return token.selectEF(idAt(path,current.getPath().length));
+        return token.selectEF(idAt(path,path.length-2));
     }
     
     /**
@@ -269,7 +269,7 @@ public abstract class PathHelper {
         if (l <2)
             throw new IOException("The path ["+formatPath(path)+"] is not a subpath of the MF.");
 
-        if (l==path.length) {
+        if (l==path.length && l == current.getPath().length) {
             
             if (current instanceof DF)
                 return (DF)current;
@@ -288,6 +288,6 @@ public abstract class PathHelper {
             current = token.select(idAt(path,current.getPath().length));
         }
             
-        return token.selectDF(idAt(path,current.getPath().length));
+        return token.selectDF(idAt(path,path.length-2));
     }
 }

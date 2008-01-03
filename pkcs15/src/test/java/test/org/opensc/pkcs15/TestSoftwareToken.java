@@ -1,6 +1,8 @@
 package test.org.opensc.pkcs15;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.cert.CertificateParsingException;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +26,7 @@ import org.opensc.pkcs15.asn1.PKCS15PrivateKey;
 import org.opensc.pkcs15.asn1.PKCS15PublicKey;
 import org.opensc.pkcs15.asn1.PKCS15RSAPublicKey;
 import org.opensc.pkcs15.asn1.PKCS15X509Certificate;
+import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
 import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenContext;
@@ -55,6 +59,11 @@ public class TestSoftwareToken extends TestCase {
         dir.delete();
     }
 
+    private ZipInputStream getTestZip() {
+        return new ZipInputStream(TestSoftwareToken.class.getClassLoader().
+                getResourceAsStream("test/org/opensc/pkcs15/test-ca.zip"));
+    }
+    
     protected void setUp() throws Exception {
         File targetDir = new File("target");
         targetDir.mkdir();
@@ -69,9 +78,7 @@ public class TestSoftwareToken extends TestCase {
             rmDirForce(this.tokenDir);
         this.tokenDir.mkdir();
         
-        ZipInputStream zis =
-            new ZipInputStream(TestSoftwareToken.class.getClassLoader().
-                    getResourceAsStream("test/org/opensc/pkcs15/test-ca.zip"));
+        ZipInputStream zis = this.getTestZip();           
         
         ZipEntry ze;
         
@@ -92,6 +99,38 @@ public class TestSoftwareToken extends TestCase {
         zis.close();
     }
 
+    private void checkEquality(File baseDir) throws FileNotFoundException, IOException
+    {
+        ZipInputStream zis = this.getTestZip();           
+        
+        ZipEntry ze;
+        
+        while ((ze = zis.getNextEntry()) != null)
+        {
+            File file = new File(baseDir.getAbsoluteFile(),ze.getName());
+            if (ze.isDirectory()) continue;
+            
+            log.info("checking entry ["+ze.getName()+"].");
+            
+            FileInputStream fis = new FileInputStream(file);
+            
+            int i = 0;
+            int b1,b2;
+            
+            while ((b1 = zis.read()) != -1 && (b2 = fis.read()) != -1)
+            {
+                if (b1 != b2)
+                    throw new AssertionFailedError("Byte ["+i+"] of EF ["+file+"] differs expected:[0x"+
+                            Integer.toHexString(b1)+"], actual:[0x"+Integer.toHexString(b2)+"].");
+                
+                ++i;
+            }
+            fis.close();
+        }
+        
+        zis.close();
+    }
+    
     public void testApplicationFactory() throws IOException
     {
         Token token = tokenFactory.newSoftwareToken(this.tokenDir);
@@ -140,6 +179,26 @@ public class TestSoftwareToken extends TestCase {
             (PKCS15X509Certificate)certificates.get(0);
         
         log.info("certificate="+certificate.getX509CertificateAttributes().getValue().getX509Certificate());
+        
+        PathHelper.selectDF(token,app.getApplicationTemplate().getPath());
+        
+        token.selectEF(0x5031);
+        
+        objs.writeInstance(token.writeEFData());
+        
+        if (objs.getAuthObjects() instanceof ReferenceProxy)
+            ((ReferenceProxy<PKCS15AuthenticationObject>)objs.getAuthObjects()).updateEntity();
+        
+        if (objs.getPrivateKeys() instanceof ReferenceProxy)
+            ((ReferenceProxy<PKCS15PrivateKey>)objs.getPrivateKeys()).updateEntity();
+        
+        if (objs.getPublicKeys() instanceof ReferenceProxy)
+            ((ReferenceProxy<PKCS15PublicKey>)objs.getPublicKeys()).updateEntity();
+        
+        if (objs.getCertificates() instanceof ReferenceProxy)
+            ((ReferenceProxy<PKCS15Certificate>)objs.getCertificates()).updateEntity();
+        
+        this.checkEquality(this.tokenDir);
     }
     
     public void testApplicationCreation() throws IOException

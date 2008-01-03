@@ -112,6 +112,7 @@ public class ReferenceProxyFactory<ReferenceType extends DEREncodable,EntityType
             if (method.getParameterTypes().length == 0 &&
                     method.getName().equals("updateEntity")) {
                 this.directory.updateEntity(this.reference,this.resolvedEntity);
+                return null;
             }
                 
             return method.invoke(this.resolvedEntity,args);

@@ -51,7 +51,8 @@ import org.opensc.pkcs15.asn1.sequence.SequenceOfStreamResolverDirectory;
  */
 public class PathOrObjectsFactory<EntityType extends DEREncodable> {
     
-    private final SequenceOfFactory<EntityType> sequenceOfFactory;
+    @SuppressWarnings("unchecked")
+    private final SequenceOfFactory sequenceOfFactory;
     @SuppressWarnings("unchecked")
     private final ReferenceProxyFactory<Path,SequenceOf> pathProxyFactory;
     private final String entityName;
@@ -65,7 +66,7 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
     @SuppressWarnings("unchecked")
     public PathOrObjectsFactory(Class<EntityType> clazz)
     {
-        this.sequenceOfFactory = new SequenceOfFactory<EntityType>(clazz);
+        this.sequenceOfFactory = new SequenceOfFactory(clazz);
         this.pathProxyFactory = new ReferenceProxyFactory<Path,SequenceOf>(SequenceOf.class);
         this.entityName = this.pathProxyFactory.getEntityInterface().getSimpleName();
     }
@@ -87,9 +88,7 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
         // Choice 1: indirect / Path 
         if (obj instanceof ASN1Sequence) {
             return this.pathProxyFactory.getProxy(Path.getInstance(obj),
-            (Directory<Path, SequenceOf>)
-            new SequenceOfStreamResolverDirectory<Path,EntityType>(pathResolver,this.sequenceOfFactory));
-            
+            (Directory<Path, SequenceOf>)new SequenceOfStreamResolverDirectory(pathResolver,this.sequenceOfFactory));
         }
         
         if (obj instanceof ASN1TaggedObject) {

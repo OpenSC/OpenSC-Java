@@ -172,7 +172,13 @@ public class PKCS15Objects {
         
         ASN1OutputStream aos = new ASN1OutputStream(os);
         
-        if (this.privateKeys != null)
+        // write authentication objects first, in order to be compliant
+        // with opensc tokens.
+        // (This eases the conception of Unit Tests against opensc
+        if (this.authObjects != null)
+            aos.writeObject(new DERTaggedObject(8,this.authObjects));
+        
+         if (this.privateKeys != null)
             aos.writeObject(new DERTaggedObject(0,this.privateKeys));
         
         if (this.publicKeys != null)
@@ -193,9 +199,6 @@ public class PKCS15Objects {
             aos.writeObject(new DERTaggedObject(6,this.usefulCertificates));
         
         // data objects to come...
-        
-        if (this.authObjects != null)
-            aos.writeObject(new DERTaggedObject(8,this.authObjects));
         
         // write END_OF_STREAM
         aos.write(0);
