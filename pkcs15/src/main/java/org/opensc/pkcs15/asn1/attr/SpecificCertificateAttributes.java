@@ -16,19 +16,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 30.12.2007
+ * Created: 06.01.2008
  * 
  ***********************************************************/
 
 package org.opensc.pkcs15.asn1.attr;
 
-import java.security.interfaces.RSAPublicKey;
+import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
 
 /**
- * This interface is implemented by all public key objects stored on the token
- * and proxies. 
+ * All <code>*CertificateAttributes</code> objects fulfill this interface.
  * 
  * @author wglas
  */
-public interface RSAPublicKeyObject extends RSAPublicKey, PublicKeyObject {
+public interface SpecificCertificateAttributes extends DEREncodable {
+
+    /**
+     * @return The stored public key object on the token. Please note,
+     *         that it is likely, that the returned object is an instance
+     *         of {@link ReferenceProxy}, if it originated from a
+     *         <code>ReferencedValue{CertificateObject}</code>, which
+     *         points to a <code>Path</code> or an <code>URL</code>.
+     */
+    public CertificateObject getCertificateObject();
+
 }

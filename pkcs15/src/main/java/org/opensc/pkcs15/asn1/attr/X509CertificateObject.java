@@ -26,7 +26,6 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -40,7 +39,7 @@ import org.bouncycastle.asn1.x509.X509Name;
  * 
  * @author wglas
  */
-public interface X509CertificateObject extends DEREncodable {
+public interface X509CertificateObject extends CertificateObject {
 
     public X509Certificate getX509Certificate() throws CertificateParsingException;
     

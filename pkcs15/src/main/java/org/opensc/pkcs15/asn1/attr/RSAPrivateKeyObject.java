@@ -24,13 +24,11 @@ package org.opensc.pkcs15.asn1.attr;
 
 import java.security.interfaces.RSAPrivateCrtKey;
 
-import org.bouncycastle.asn1.DEREncodable;
-
 /**
  * This interface is implemented by RSAPrivateKeyObject instances
  * and proxies. 
  * 
  * @author wglas
  */
-public interface RSAPrivateKeyObject extends RSAPrivateCrtKey, DEREncodable {
+public interface RSAPrivateKeyObject extends RSAPrivateCrtKey, PrivateKeyObject {
 }

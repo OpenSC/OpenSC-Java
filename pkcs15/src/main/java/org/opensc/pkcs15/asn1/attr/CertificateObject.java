@@ -22,13 +22,26 @@
 
 package org.opensc.pkcs15.asn1.attr;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateParsingException;
+
+import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
 
 /**
- * This interface is implemented by all public key objects stored on the token
- * and proxies. 
+ * This interface is extended by all interfaces, which represent
+ * a certificate stored on a token. Please note, that most of the
+ * time a <code>ReferencedValue{CertificateObject}</code> is stored on the
+ * card, so instances of this interface implement
+ * {@link ReferenceProxy} too in this case.
  * 
  * @author wglas
  */
-public interface RSAPublicKeyObject extends RSAPublicKey, PublicKeyObject {
+public interface CertificateObject extends DEREncodable {
+    
+    /**
+     * @return The certificate as interpreted by most
+     *         JAV security providers.
+     */
+    Certificate getCertificate() throws CertificateParsingException;
 }

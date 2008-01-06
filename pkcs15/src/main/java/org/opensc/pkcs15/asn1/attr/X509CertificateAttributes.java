@@ -52,7 +52,7 @@ import org.opensc.pkcs15.asn1.ref.Path;
  * 
  * @author wglas
  */
-public class X509CertificateAttributes extends ASN1Encodable {
+public class X509CertificateAttributes extends ASN1Encodable implements SpecificCertificateAttributes {
 
     private X509CertificateObject value;
     private X509Name subject;
@@ -217,6 +217,15 @@ public class X509CertificateAttributes extends ASN1Encodable {
      */
     public void setSerialNumber(BigInteger serialNumber) {
         this.serialNumber = serialNumber;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.attr.SpecificCertificateAttributes#getCertificateObject()
+     */
+    @Override
+    public CertificateObject getCertificateObject() {
+        
+        return this.value;
     }
 
 

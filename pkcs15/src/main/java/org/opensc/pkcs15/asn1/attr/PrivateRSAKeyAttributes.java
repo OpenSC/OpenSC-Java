@@ -28,11 +28,14 @@ import java.util.Enumeration;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.opensc.pkcs15.asn1.Context;
 import org.opensc.pkcs15.asn1.ContextHolder;
+import org.opensc.pkcs15.asn1.basic.KeyInfo;
+import org.opensc.pkcs15.asn1.basic.Operations;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -49,7 +52,7 @@ import org.opensc.pkcs15.asn1.ref.Path;
  * 
  * @author wglas
  */
-public class PrivateRSAKeyAttributes extends ASN1Encodable {
+public class PrivateRSAKeyAttributes extends ASN1Encodable implements SpecificPrivateKeyAttributes {
 
     private RSAPrivateKeyObject value;
     private BigInteger modulusLength;
@@ -69,7 +72,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
      * @param obj ASN.1 object to be decoded.
      * @return A KeyInfo object suitable for RSA Private keys.
      */
-    static public PrivateRSAKeyAttributes getInstance(Object obj)
+    static public SpecificPrivateKeyAttributes getInstance(Object obj)
     {
         Context context = ContextHolder.getContext();
         
@@ -157,7 +160,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
     public void setValue(RSAPrivateKeyObject value) {
         this.value = value;
     }
-
+    
     /**
      * @return the modulusLength
      */
@@ -186,4 +189,18 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable {
         this.keyInfo = keyInfo;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.attr.SpecificPrivateKeyAttributes#getPrivateKeyObject()
+     */
+    public PrivateKeyObject getPrivateKeyObject() {
+        return this.value;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.attr.SpecificPrivateKeyAttributes#getGenericKeyInfo()
+     */
+    public KeyInfo<? extends DEREncodable,Operations> getGenericKeyInfo() {
+        return this.keyInfo;
+    }
 }

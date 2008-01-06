@@ -28,6 +28,7 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.opensc.pkcs15.asn1.attr.CommonKeyAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonPublicKeyAttributes;
+import org.opensc.pkcs15.asn1.attr.SpecificPublicKeyAttributes;
 
 /**
  * <PRE>
@@ -52,6 +53,16 @@ public abstract class PKCS15PublicKey extends ASN1Encodable implements PKCS15Key
     protected PKCS15PublicKey() {
     }
 
+    /**
+     * @return The public key attributes, which are specific to the
+     *         cryptographic algorithm performed by the actual subclass.        
+     */
+    abstract public SpecificPublicKeyAttributes getSpecificPublicKeyAttributes();
+
+    /**
+     * @param obj The ASN.1 object to be deserialized.
+     * @return A supported subclass instance of PKCS15PublicKey.
+     */
     public static PKCS15PublicKey getInstance(Object obj) {
         
         if (obj instanceof PKCS15PublicKey)

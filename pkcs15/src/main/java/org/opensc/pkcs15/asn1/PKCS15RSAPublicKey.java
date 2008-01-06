@@ -36,6 +36,7 @@ import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonPublicKeyAttributes;
 import org.opensc.pkcs15.asn1.attr.PublicRSAKeyAttributes;
 import org.opensc.pkcs15.asn1.attr.RSAPublicKeyObject;
+import org.opensc.pkcs15.asn1.attr.SpecificPublicKeyAttributes;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -180,12 +181,19 @@ public class PKCS15RSAPublicKey extends PKCS15PublicKey {
         return this.publicRSAKeyAttributes;
     }
 
-
     /**
      * @param publicRSAKeyAttributes the publicRSAKeyAttributes to set
      */
     public void setPublicRSAKeyAttributes(
             PublicRSAKeyAttributes publicRSAKeyAttributes) {
         this.publicRSAKeyAttributes = publicRSAKeyAttributes;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.PKCS15PublicKey#getSpecificPublicKeyAttributes()
+     */
+    @Override
+    public SpecificPublicKeyAttributes getSpecificPublicKeyAttributes() {
+        return this.publicRSAKeyAttributes;
     }
 }

@@ -25,7 +25,8 @@ import org.opensc.pkcs15.asn1.PKCS15Objects;
 import org.opensc.pkcs15.asn1.PKCS15PrivateKey;
 import org.opensc.pkcs15.asn1.PKCS15PublicKey;
 import org.opensc.pkcs15.asn1.PKCS15RSAPublicKey;
-import org.opensc.pkcs15.asn1.PKCS15X509Certificate;
+import org.opensc.pkcs15.asn1.attr.CertificateObject;
+import org.opensc.pkcs15.asn1.attr.PublicKeyObject;
 import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
 import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
@@ -175,10 +176,10 @@ public class TestSoftwareToken extends TestCase {
         List<PKCS15Certificate> certificates = objs.getCertificates().getSequence();
         assertEquals(1,certificates.size());
         
-        PKCS15X509Certificate certificate =
-            (PKCS15X509Certificate)certificates.get(0);
+        PKCS15Certificate certificate =
+            certificates.get(0);
         
-        log.info("certificate="+certificate.getX509CertificateAttributes().getValue().getX509Certificate());
+        log.info("certificate="+certificate.getSpecificCertificateAttributes().getCertificateObject().getCertificate());
         
         PathHelper.selectDF(token,app.getApplicationTemplate().getPath());
         
@@ -186,18 +187,24 @@ public class TestSoftwareToken extends TestCase {
         
         objs.writeInstance(token.writeEFData());
         
-        if (objs.getAuthObjects() instanceof ReferenceProxy)
-            ((ReferenceProxy<PKCS15AuthenticationObject>)objs.getAuthObjects()).updateEntity();
+        assertTrue(objs.getAuthObjects() instanceof ReferenceProxy);
+        ((ReferenceProxy<PKCS15AuthenticationObject>)objs.getAuthObjects()).updateEntity();
         
-        if (objs.getPrivateKeys() instanceof ReferenceProxy)
-            ((ReferenceProxy<PKCS15PrivateKey>)objs.getPrivateKeys()).updateEntity();
+        assertTrue(objs.getPrivateKeys() instanceof ReferenceProxy);
+        ((ReferenceProxy<PKCS15PrivateKey>)objs.getPrivateKeys()).updateEntity();
         
-        if (objs.getPublicKeys() instanceof ReferenceProxy)
-            ((ReferenceProxy<PKCS15PublicKey>)objs.getPublicKeys()).updateEntity();
+        assertTrue(pubKey.getSpecificPublicKeyAttributes().getPublicKeyObject() instanceof ReferenceProxy);
+        ((ReferenceProxy<PublicKeyObject>)pubKey.getSpecificPublicKeyAttributes().getPublicKeyObject()).updateEntity();
+            
+        assertTrue(objs.getPublicKeys() instanceof ReferenceProxy);
+        ((ReferenceProxy<PKCS15PublicKey>)objs.getPublicKeys()).updateEntity();
         
-        if (objs.getCertificates() instanceof ReferenceProxy)
-            ((ReferenceProxy<PKCS15Certificate>)objs.getCertificates()).updateEntity();
+        assertTrue(objs.getCertificates() instanceof ReferenceProxy);
+        ((ReferenceProxy<PKCS15Certificate>)objs.getCertificates()).updateEntity();
         
+        assertTrue(certificate.getSpecificCertificateAttributes().getCertificateObject() instanceof ReferenceProxy);
+        ((ReferenceProxy<CertificateObject>)certificate.getSpecificCertificateAttributes().getCertificateObject()).updateEntity();
+
         this.checkEquality(this.tokenDir);
     }
     

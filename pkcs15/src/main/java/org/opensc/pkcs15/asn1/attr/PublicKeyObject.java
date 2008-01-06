@@ -24,11 +24,17 @@ package org.opensc.pkcs15.asn1.attr;
 
 import java.security.interfaces.RSAPublicKey;
 
+import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
+
 /**
- * This interface is implemented by all public key objects stored on the token
- * and proxies. 
+ * This interface is extended by all interfaces, which represent
+ * a public key stored on a token. Please note, that most of the
+ * time a <code>ReferencedValue{PublicKeyObject}</code> is stored on the
+ * card, so instances of this interface implement
+ * {@link ReferenceProxy} too in this case.
  * 
  * @author wglas
  */
-public interface RSAPublicKeyObject extends RSAPublicKey, PublicKeyObject {
+public interface PublicKeyObject extends RSAPublicKey, DEREncodable {
 }

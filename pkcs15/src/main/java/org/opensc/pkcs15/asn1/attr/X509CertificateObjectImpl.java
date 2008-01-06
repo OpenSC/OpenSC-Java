@@ -22,6 +22,7 @@
 
 package org.opensc.pkcs15.asn1.attr;
 
+import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 
@@ -159,6 +160,15 @@ public class X509CertificateObjectImpl implements X509CertificateObject {
     @Override
     public X509Certificate getX509Certificate() throws CertificateParsingException {
         return new org.bouncycastle.jce.provider.X509CertificateObject(this.delegate);
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.attr.CertificateObject#getCertificate()
+     */
+    @Override
+    public Certificate getCertificate() throws CertificateParsingException {
+        
+        return this.getX509Certificate();
     }
 
 }

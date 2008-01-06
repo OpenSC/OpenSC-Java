@@ -28,11 +28,14 @@ import java.util.Enumeration;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.opensc.pkcs15.asn1.Context;
 import org.opensc.pkcs15.asn1.ContextHolder;
+import org.opensc.pkcs15.asn1.basic.KeyInfo;
+import org.opensc.pkcs15.asn1.basic.Operations;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -49,7 +52,7 @@ import org.opensc.pkcs15.asn1.ref.Path;
  * 
  * @author wglas
  */
-public class PublicRSAKeyAttributes extends ASN1Encodable {
+public class PublicRSAKeyAttributes extends ASN1Encodable implements SpecificPublicKeyAttributes {
 
     private RSAPublicKeyObject value;
     private BigInteger modulusLength;
@@ -184,6 +187,22 @@ public class PublicRSAKeyAttributes extends ASN1Encodable {
      */
     public void setKeyInfo(RSAKeyInfo keyInfo) {
         this.keyInfo = keyInfo;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.attr.SpecificPublicKeyAttributes#getGenericKeyInfo()
+     */
+    @Override
+    public KeyInfo<? extends DEREncodable, Operations> getGenericKeyInfo() {
+        return this.keyInfo;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.attr.SpecificPublicKeyAttributes#getPublicKeyObject()
+     */
+    @Override
+    public PublicKeyObject getPublicKeyObject() {
+        return this.value;
     }
 
 }

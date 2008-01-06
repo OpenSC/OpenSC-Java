@@ -27,6 +27,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.opensc.pkcs15.asn1.attr.CommonCertificateAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
+import org.opensc.pkcs15.asn1.attr.SpecificCertificateAttributes;
 
 /**
  * This is the base class of all certificate objects.
@@ -54,6 +55,16 @@ public abstract class PKCS15Certificate extends ASN1Encodable implements PKCS15O
     protected PKCS15Certificate() {
     }
     
+    /**
+     * @return The certificate attributes, which are specific to the
+     *         type of certificate represented by the actual subclass.        
+     */
+    abstract public SpecificCertificateAttributes getSpecificCertificateAttributes();
+
+    /**
+     * @param obj The ASN.1 object to be deserialized.
+     * @return A supported subclass instance of PKCS15Certificate.
+     */
     public static PKCS15Certificate getInstance(Object obj) {
         
         if (obj instanceof PKCS15Certificate)

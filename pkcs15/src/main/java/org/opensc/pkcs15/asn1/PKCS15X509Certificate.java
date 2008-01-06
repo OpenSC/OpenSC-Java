@@ -32,6 +32,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.opensc.pkcs15.asn1.attr.CommonCertificateAttributes;
 import org.opensc.pkcs15.asn1.attr.CommonObjectAttributes;
+import org.opensc.pkcs15.asn1.attr.SpecificCertificateAttributes;
 import org.opensc.pkcs15.asn1.attr.X509CertificateAttributes;
 import org.opensc.pkcs15.asn1.attr.X509CertificateObject;
 import org.opensc.pkcs15.asn1.proxy.Directory;
@@ -167,6 +168,14 @@ public class PKCS15X509Certificate extends PKCS15Certificate {
     public void setX509CertificateAttributes(
             X509CertificateAttributes x509CertificateAttributes) {
         this.x509CertificateAttributes = x509CertificateAttributes;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.asn1.PKCS15Certificate#getSpecificCertificateAttributes()
+     */
+    @Override
+    public SpecificCertificateAttributes getSpecificCertificateAttributes() {
+        return this.x509CertificateAttributes;
     }
 
 }

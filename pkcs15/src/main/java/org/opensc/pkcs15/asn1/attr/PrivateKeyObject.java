@@ -16,19 +16,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 30.12.2007
+ * Created: 06.01.2008
  * 
  ***********************************************************/
 
 package org.opensc.pkcs15.asn1.attr;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.PrivateKey;
+
+import org.bouncycastle.asn1.DEREncodable;
+import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
 
 /**
- * This interface is implemented by all public key objects stored on the token
- * and proxies. 
+ * This interface is extended by all interfaces, which represent
+ * a private key stored on a token. Please note, that most of the
+ * time a <code>ReferencedValue{PrivateKeyObject}</code> is stored on the
+ * card, so instances of this interface implement
+ * {@link ReferenceProxy} too in this case.
  * 
  * @author wglas
  */
-public interface RSAPublicKeyObject extends RSAPublicKey, PublicKeyObject {
+public interface PrivateKeyObject extends DEREncodable, PrivateKey {
 }
