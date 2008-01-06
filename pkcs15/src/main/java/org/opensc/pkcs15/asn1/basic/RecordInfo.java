@@ -30,7 +30,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.opensc.pkcs15.asn1.helper.IntegerHelper;
@@ -220,7 +219,7 @@ public class RecordInfo extends ASN1Encodable {
      * @return the cDFRecordLength
      */
     public Integer getCDFRecordLength() {
-        this.return cDFRecordLength;
+        return this.cDFRecordLength;
     }
 
     /**
