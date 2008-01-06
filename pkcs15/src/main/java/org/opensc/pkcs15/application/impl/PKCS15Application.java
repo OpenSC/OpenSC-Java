@@ -22,10 +22,15 @@
 
 package org.opensc.pkcs15.application.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import org.bouncycastle.asn1.ASN1InputStream;
 import org.clazzes.util.lang.Util;
 import org.opensc.pkcs15.AIDs;
 import org.opensc.pkcs15.application.Application;
 import org.opensc.pkcs15.asn1.ISO7816ApplicationTemplate;
+import org.opensc.pkcs15.asn1.ref.DDO;
 import org.opensc.pkcs15.token.Token;
 
 /**
@@ -36,6 +41,7 @@ public class PKCS15Application implements Application {
     
     private ISO7816ApplicationTemplate template;
     private Token token;
+    private DDO ddo;
     
     private static final byte[] DEFAULT_PATH = new byte[] { 0x3F, 0x00, 0x50, 0x15 };
     
@@ -53,8 +59,9 @@ public class PKCS15Application implements Application {
     
     /**
      * default constructor.
+     * @throws IOException Upon errors reading additional token information.
      */
-    PKCS15Application(Token token, ISO7816ApplicationTemplate template)
+    PKCS15Application(Token token, ISO7816ApplicationTemplate template) throws IOException
     {
         if (template == null)
             throw new IllegalArgumentException("PKCS15Application instantiated with template == null.");
@@ -67,6 +74,15 @@ public class PKCS15Application implements Application {
             
         this.template = template;
         this.token = token;
+        
+        if (this.template.getDiscretionaryData() != null)
+        {
+            ByteArrayInputStream is = new ByteArrayInputStream(this.template.getDiscretionaryData());
+            ASN1InputStream ais = new ASN1InputStream(is);
+            
+            this.ddo = DDO.getInstance(ais.readObject());
+            ais.close();
+        }
     }
     
     /* (non-Javadoc)
@@ -96,5 +112,12 @@ public class PKCS15Application implements Application {
         return this.token;
     }
 
- 
+    /**
+     * @return The PKCS#15 specific DDO information contained in
+     *         {@link ISO7816ApplicationTemplate#getDiscretionaryData()}.
+     */
+    public DDO getDdo() {
+        return this.ddo;
+    }
+
 }

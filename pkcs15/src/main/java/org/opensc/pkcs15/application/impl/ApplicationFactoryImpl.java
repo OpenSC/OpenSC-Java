@@ -57,8 +57,9 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
      * @param token The token on which the application has been found.
      * @param template The application template found in the DIR file.
      * @return The application object, if the AID of the template is recognized or null.
+     * @throws IOException 
      */
-    protected Application constructApplication(Token token, ISO7816ApplicationTemplate template)
+    protected Application constructApplication(Token token, ISO7816ApplicationTemplate template) throws IOException
     {
         if (Util.equals(AIDs.PKCS15_AID,template.getAid()))
             return new PKCS15Application(token,template);
