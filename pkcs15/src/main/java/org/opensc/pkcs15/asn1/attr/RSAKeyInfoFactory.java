@@ -22,13 +22,9 @@
 
 package org.opensc.pkcs15.asn1.attr;
 
-import java.util.Enumeration;
-
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInteger;
 import org.opensc.pkcs15.asn1.Context;
 import org.opensc.pkcs15.asn1.ContextHolder;
-import org.opensc.pkcs15.asn1.basic.Operations;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
 import org.opensc.pkcs15.asn1.basic.RSAKeyInfoImpl;
 import org.opensc.pkcs15.asn1.proxy.Directory;
@@ -94,28 +90,6 @@ public abstract class RSAKeyInfoFactory {
             return proxyFactory.getProxy((DERInteger)obj,directory);
         }
         
-        ASN1Sequence seq = ASN1Sequence.getInstance(obj);
-        
-        Enumeration<Object> objs = seq.getObjects();
-        
-        if (!objs.hasMoreElements())
-            throw new IllegalArgumentException("KeyInfo consists of at least one sequence member.");
-        
-        Object o = objs.nextElement();
-        Operations ops;
-        
-        if (o instanceof ASN1Sequence || o instanceof Operations) {
-            ops = Operations.getInstance(o);
-        } else {
-            // ignore null before operations.
-            if (!objs.hasMoreElements())
-                throw new IllegalArgumentException("KeyInfo consists of at least two sequence members.");
-            
-            o = objs.nextElement();
-            ops = Operations.getInstance(o);
-        }
-        
-        return new RSAKeyInfoImpl(ops);
+        return RSAKeyInfoImpl.getInstance(obj);
     }
-    
 }

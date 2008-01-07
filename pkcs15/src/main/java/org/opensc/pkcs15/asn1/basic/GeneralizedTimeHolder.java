@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.DERGeneralizedTime;
 
 /**
  * This interface is needed as a facade for bouncycastle's
- * {@link DERGeneralizedTime} class in order to build generate
+ * {@link DERGeneralizedTime} class in order to generate
  * <code>ReferencedValue{GeneralizedTime}</code> proxies.
  * 
  * @author wglas

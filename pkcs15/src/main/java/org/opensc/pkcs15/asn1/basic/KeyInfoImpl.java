@@ -92,6 +92,9 @@ implements KeyInfo<ParameterType,OperationsType> {
         this.supportedOperations = supportedOperations;
     }
 
+    /* (non-Javadoc)
+     * @see org.bouncycastle.asn1.ASN1Encodable#toASN1Object()
+     */
     @Override
     public DERObject toASN1Object() {
         
