@@ -29,25 +29,25 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 
 /**
- * An implementation of RSAKeyInfo.
+ * An implementation of NullKeyInfo.
  * 
  * @author wglas
  */
-public class RSAKeyInfoImpl extends KeyInfoImpl<DERNull, Operations> implements RSAKeyInfo {
+public class NullKeyInfoImpl extends KeyInfoImpl<DERNull, Operations> implements NullKeyInfo {
 
     /**
      * Default constructor.
      */
-    public RSAKeyInfoImpl() {
-        super(DERNull.INSTANCE,null);
+    public NullKeyInfoImpl() {
+        super(null,null);
     }
 
     /**
      * @param parameters
      * @param supportedOperations
      */
-    public RSAKeyInfoImpl(Operations supportedOperations) {
-        super(DERNull.INSTANCE, supportedOperations);
+    public NullKeyInfoImpl(Operations supportedOperations) {
+        super(null, supportedOperations);
     }
 
     /**
@@ -56,7 +56,7 @@ public class RSAKeyInfoImpl extends KeyInfoImpl<DERNull, Operations> implements 
      * @param obj ASN.1 object to be decoded.
      * @return A KeyInfoImpl object suitable for RSA Private keys.
      */
-    static public RSAKeyInfoImpl getInstance(Object obj)
+    static public NullKeyInfoImpl getInstance(Object obj)
     {
         ASN1Sequence seq = ASN1Sequence.getInstance(obj);
         
@@ -69,13 +69,13 @@ public class RSAKeyInfoImpl extends KeyInfoImpl<DERNull, Operations> implements 
      * an <code>AlgorithmInfo</code> for the RSA algorithm.
      * 
      * @param objs The members of an ASN.1 sequence positioned at the element before
-     *             the <code>RSAKeyInfo</code> member.
+     *             the <code>NullKeyInfo</code> member.
      * @return A KeyInfo object suitable for RSA Private keys.
      */
-    static public RSAKeyInfoImpl getInstanceFromSequence(Enumeration<Object> objs)
+    static public NullKeyInfoImpl getInstanceFromSequence(Enumeration<Object> objs)
     {
         if (!objs.hasMoreElements())
-            throw new IllegalArgumentException("RSAKeyInfo consists of at least one sequence member.");
+            throw new IllegalArgumentException("NullKeyInfo consists of at least one sequence member.");
         
         Object o = objs.nextElement();
         Operations ops;
@@ -84,16 +84,16 @@ public class RSAKeyInfoImpl extends KeyInfoImpl<DERNull, Operations> implements 
             ops = Operations.getInstance(o);
         } else {
             if (!(o instanceof ASN1Null))
-                throw new IllegalArgumentException("RSAKeyInfo does neither start with Operations nor with NULL.");
+                throw new IllegalArgumentException("NullKeyInfo does neither start with Operations nor with NULL.");
             
             // ignore null before operations.
             if (!objs.hasMoreElements())
-                throw new IllegalArgumentException("RSAKeyInfo consists of at least two sequence members.");
+                throw new IllegalArgumentException("NullKeyInfo consists of at least two sequence members.");
             
             o = objs.nextElement();
             ops = Operations.getInstance(o);
         }
         
-        return new RSAKeyInfoImpl(ops);
+        return new NullKeyInfoImpl(ops);
     }
 }

@@ -35,7 +35,7 @@ import org.opensc.pkcs15.asn1.attr.RSAPublicKeyChoice;
 import org.opensc.pkcs15.asn1.attr.RSAPublicKeyObject;
 import org.opensc.pkcs15.asn1.attr.X509CertificateObject;
 import org.opensc.pkcs15.asn1.attr.X509CertificateObjectImpl;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
+import org.opensc.pkcs15.asn1.basic.NullKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.proxy.StreamResolver;
 import org.opensc.pkcs15.asn1.proxy.StreamResolverDirectory;
@@ -104,7 +104,7 @@ public class TokenContext implements Context {
      * @see org.opensc.pkcs15.asn1.Context#getRSAKeyInfoDirectory()
      */
     @Override
-    public Directory<DERInteger, RSAKeyInfo> getRSAKeyInfoDirectory() {
+    public Directory<DERInteger, NullKeyInfo> getNullKeyInfoDirectory() {
         
         return null;
     }

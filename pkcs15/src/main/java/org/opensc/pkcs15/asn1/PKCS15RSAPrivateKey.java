@@ -37,7 +37,7 @@ import org.opensc.pkcs15.asn1.attr.CommonPrivateKeyAttributes;
 import org.opensc.pkcs15.asn1.attr.PrivateRSAKeyAttributes;
 import org.opensc.pkcs15.asn1.attr.RSAPrivateKeyObject;
 import org.opensc.pkcs15.asn1.attr.SpecificPrivateKeyAttributes;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
+import org.opensc.pkcs15.asn1.basic.NullKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.Path;
 
@@ -84,8 +84,8 @@ public class PKCS15RSAPrivateKey extends PKCS15PrivateKey {
     {
         Context context = ContextHolder.getContext();
         
-        Directory<DERInteger,RSAKeyInfo> infoDirectory =
-            context == null ? null : context.getRSAKeyInfoDirectory();
+        Directory<DERInteger,NullKeyInfo> infoDirectory =
+            context == null ? null : context.getNullKeyInfoDirectory();
         
         Directory<Path, RSAPrivateKeyObject> keyKirectory =
             context == null ? null : context.getRSAPrivateKeyDirectory();
@@ -101,7 +101,7 @@ public class PKCS15RSAPrivateKey extends PKCS15PrivateKey {
      */
     public static PKCS15PrivateKey getInstance (Object obj,
             Directory<Path, RSAPrivateKeyObject> keyKirectory,
-            Directory<DERInteger, RSAKeyInfo> infoDirectory)
+            Directory<DERInteger, NullKeyInfo> infoDirectory)
     {
         if (obj instanceof PKCS15RSAPrivateKey)
             return (PKCS15PrivateKey)obj;

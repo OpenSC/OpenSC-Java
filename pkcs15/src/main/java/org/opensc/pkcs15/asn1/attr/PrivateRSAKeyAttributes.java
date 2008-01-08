@@ -36,7 +36,7 @@ import org.opensc.pkcs15.asn1.Context;
 import org.opensc.pkcs15.asn1.ContextHolder;
 import org.opensc.pkcs15.asn1.basic.KeyInfo;
 import org.opensc.pkcs15.asn1.basic.Operations;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
+import org.opensc.pkcs15.asn1.basic.NullKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.ref.Path;
 
@@ -56,7 +56,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable implements SpecificPr
 
     private RSAPrivateKeyObject value;
     private BigInteger modulusLength;
-    private RSAKeyInfo keyInfo;
+    private NullKeyInfo keyInfo;
     
     /**
      * Default constructor.
@@ -76,8 +76,8 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable implements SpecificPr
     {
         Context context = ContextHolder.getContext();
         
-        Directory<DERInteger,RSAKeyInfo> infoDirectory =
-            context == null ? null : context.getRSAKeyInfoDirectory();
+        Directory<DERInteger,NullKeyInfo> infoDirectory =
+            context == null ? null : context.getNullKeyInfoDirectory();
         
         Directory<Path, RSAPrivateKeyObject> keyKirectory =
             context == null ? null : context.getRSAPrivateKeyDirectory();
@@ -93,7 +93,7 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable implements SpecificPr
      */
     public static PrivateRSAKeyAttributes getInstance (Object obj,
             Directory<Path, RSAPrivateKeyObject> keyKirectory,
-            Directory<DERInteger, RSAKeyInfo> infoDirectory)
+            Directory<DERInteger, NullKeyInfo> infoDirectory)
     {
         if (obj instanceof PrivateRSAKeyAttributes)
             return (PrivateRSAKeyAttributes)obj;
@@ -178,14 +178,14 @@ public class PrivateRSAKeyAttributes extends ASN1Encodable implements SpecificPr
     /**
      * @return the keyInfo
      */
-    public RSAKeyInfo getKeyInfo() {
+    public NullKeyInfo getKeyInfo() {
         return this.keyInfo;
     }
 
     /**
      * @param keyInfo the keyInfo to set
      */
-    public void setKeyInfo(RSAKeyInfo keyInfo) {
+    public void setKeyInfo(NullKeyInfo keyInfo) {
         this.keyInfo = keyInfo;
     }
 

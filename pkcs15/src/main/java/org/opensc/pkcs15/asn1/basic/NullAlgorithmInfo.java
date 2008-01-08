@@ -16,52 +16,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created: 30.12.2007
+ * Created: 08.01.2008
  * 
  ***********************************************************/
 
 package org.opensc.pkcs15.asn1.basic;
 
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEREncodable;
 
 /**
- * A KeyIdentifier with an OCTET STRING as value.
+ * An AlgorithmInfo with a NULL <code>parameters</code> member. 
  * 
  * @author wglas
  */
-public class OctetStringKeyIdentifier extends KeyIdentifier {
+public class NullAlgorithmInfo extends AlgorithmInfo {
+
+    private NullKeyInfoImpl nullKeyInfo;
     
-    private ASN1OctetString octets;
-    
-    public OctetStringKeyIdentifier(int id, ASN1OctetString octets) {        
-        super(id);
-        if (id == issuerAndSerialNumber)
-            throw new IllegalArgumentException("nullAlgotihmId is incompatible with OctetStringKeyIdentifier.");
-        this.octets = octets;
+    protected NullAlgorithmInfo(int reference, int algorithm, NullKeyInfoImpl nullKeyInfo) {
+        super(reference, algorithm);
+        this.nullKeyInfo = nullKeyInfo;
     }
 
     /* (non-Javadoc)
-     * @see org.opensc.pkcs15.asn1.KeyIdentifier#getValue()
+     * @see org.opensc.pkcs15.asn1.basic.AlgorithmInfo#getKeyInfo()
      */
     @Override
-    public DEREncodable getValue() {
+    public KeyInfoImpl<? extends DEREncodable, Operations> getKeyInfo() {
         
-        return this.octets;
+        return this.nullKeyInfo;
     }
 
     /**
-     * @return the octets
+     * @return the nullKeyInfo
      */
-    public ASN1OctetString getOctets() {
-        return this.octets;
+    public NullKeyInfoImpl getNullKeyInfo() {
+        return this.nullKeyInfo;
     }
 
     /**
-     * @param octets the octets to set
+     * @param nullKeyInfo the nullKeyInfo to set
      */
-    public void setOctets(ASN1OctetString octets) {
-        this.octets = octets;
+    public void setNullKeyInfo(NullKeyInfoImpl nullKeyInfo) {
+        this.nullKeyInfo = nullKeyInfo;
     }
 
 }

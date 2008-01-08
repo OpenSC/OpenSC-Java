@@ -26,7 +26,7 @@ import org.bouncycastle.asn1.DERInteger;
 import org.opensc.pkcs15.asn1.attr.RSAPrivateKeyObject;
 import org.opensc.pkcs15.asn1.attr.RSAPublicKeyObject;
 import org.opensc.pkcs15.asn1.attr.X509CertificateObject;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
+import org.opensc.pkcs15.asn1.basic.NullKeyInfo;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.proxy.StreamResolver;
 import org.opensc.pkcs15.asn1.ref.Path;
@@ -42,7 +42,7 @@ public interface Context {
 
     public Directory<Path, RSAPublicKeyObject> getRSAPublicKeyDirectory();
     
-    public Directory<DERInteger,RSAKeyInfo> getRSAKeyInfoDirectory();
+    public Directory<DERInteger,NullKeyInfo> getNullKeyInfoDirectory();
     
     public Directory<Path, X509CertificateObject> getX509CertificateDirectory();
     

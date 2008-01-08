@@ -30,5 +30,5 @@ import org.bouncycastle.asn1.DERNull;
  * 
  * @author wglas
  */
-public interface RSAKeyInfo extends KeyInfo<DERNull, Operations> {
+public interface NullKeyInfo extends KeyInfo<DERNull, Operations> {
 }

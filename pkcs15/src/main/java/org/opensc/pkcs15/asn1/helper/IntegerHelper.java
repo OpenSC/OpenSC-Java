@@ -35,6 +35,24 @@ public abstract class IntegerHelper {
     private static BigInteger MAX_INT_BIG_INTEGER = BigInteger.valueOf(Integer.MAX_VALUE);
     
     /**
+     * Checks, whether a BigInteger my be converted to an integer,
+     * i.e. {@link BigInteger#intValue()} does neither overflow nor underflow.
+     * 
+     * @param bi The BigInteger to convert.
+     * @return  If <code>bi</code> is in the correct range return <code>true</code>,
+     *          otherwise return <code>false</code>.
+     */
+    public static boolean isIntValue(BigInteger bi) 
+    {
+        if (bi.compareTo(MIN_INT_BIG_INTEGER) < 0)
+            return false;
+        if (bi.compareTo(MAX_INT_BIG_INTEGER) > 0)
+            return false;
+        
+        return true;
+    }
+    
+    /**
      * Converts a BigInteger to an integer, if the BigInteger is
      * in the correct range. Otherwise, an IllegalArgumentException is thrown.
      * 

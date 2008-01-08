@@ -35,7 +35,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 
 /**
- * The ASN.1 representation of the polymorpic KeyIdentifier.
+ * The ASN.1 representation of the polymorphic KeyIdentifier.
  * 
  * @author wglas
  */

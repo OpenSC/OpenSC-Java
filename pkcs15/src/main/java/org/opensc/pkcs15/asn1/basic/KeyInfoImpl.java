@@ -100,7 +100,8 @@ implements KeyInfo<ParameterType,OperationsType> {
         
         ASN1EncodableVector v = new ASN1EncodableVector();
 
-        v.add(this.parameters);
+        if (this.parameters != null)
+            v.add(this.parameters);
         v.add(this.supportedOperations);
 
         return new DERSequence(v);

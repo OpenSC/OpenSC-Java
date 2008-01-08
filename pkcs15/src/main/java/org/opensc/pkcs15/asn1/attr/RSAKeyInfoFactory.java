@@ -25,8 +25,8 @@ package org.opensc.pkcs15.asn1.attr;
 import org.bouncycastle.asn1.DERInteger;
 import org.opensc.pkcs15.asn1.Context;
 import org.opensc.pkcs15.asn1.ContextHolder;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfo;
-import org.opensc.pkcs15.asn1.basic.RSAKeyInfoImpl;
+import org.opensc.pkcs15.asn1.basic.NullKeyInfo;
+import org.opensc.pkcs15.asn1.basic.NullKeyInfoImpl;
 import org.opensc.pkcs15.asn1.proxy.Directory;
 import org.opensc.pkcs15.asn1.proxy.ReferenceProxyFactory;
 
@@ -53,9 +53,9 @@ import org.opensc.pkcs15.asn1.proxy.ReferenceProxyFactory;
  */
 public abstract class RSAKeyInfoFactory {
 
-    private static ReferenceProxyFactory<DERInteger,RSAKeyInfo>
+    private static ReferenceProxyFactory<DERInteger,NullKeyInfo>
     proxyFactory =
-        new ReferenceProxyFactory<DERInteger,RSAKeyInfo>(RSAKeyInfo.class);
+        new ReferenceProxyFactory<DERInteger,NullKeyInfo>(NullKeyInfo.class);
     
     /**
      * This method implements the static getInstance factory pattern by
@@ -64,12 +64,12 @@ public abstract class RSAKeyInfoFactory {
      * @param obj ASN.1 object to be decoded.
      * @return A KeyInfo object suitable for RSA Private keys.
      */
-    static public RSAKeyInfo getInstance(Object obj)
+    static public NullKeyInfo getInstance(Object obj)
     {
         Context context = ContextHolder.getContext();
         
-        Directory<DERInteger,RSAKeyInfo> directory =
-            context == null ? null : context.getRSAKeyInfoDirectory();
+        Directory<DERInteger,NullKeyInfo> directory =
+            context == null ? null : context.getNullKeyInfoDirectory();
         
         return getInstance(obj,directory);
     }
@@ -79,17 +79,17 @@ public abstract class RSAKeyInfoFactory {
      * @param directory A directory for resolving integer references.
      * @return A KeyInfo object suitable for RSA Private keys.
      */
-    static public RSAKeyInfo getInstance(Object obj,
-            Directory<DERInteger,RSAKeyInfo> directory)
+    static public NullKeyInfo getInstance(Object obj,
+            Directory<DERInteger,NullKeyInfo> directory)
     {
-        if (obj instanceof RSAKeyInfo) {
-            return (RSAKeyInfo) obj;
+        if (obj instanceof NullKeyInfo) {
+            return (NullKeyInfo) obj;
         }
         
         if (obj instanceof DERInteger) {
             return proxyFactory.getProxy((DERInteger)obj,directory);
         }
         
-        return RSAKeyInfoImpl.getInstance(obj);
+        return NullKeyInfoImpl.getInstance(obj);
     }
 }
