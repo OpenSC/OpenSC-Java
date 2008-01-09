@@ -45,7 +45,7 @@ public class GeneralizedTimeHolderImpl implements GeneralizedTimeHolder {
      * @param obj The ASN.1 object to parse.
      * @return A GeneralizedTimeHoledr instance.
      */
-    public GeneralizedTimeHolder getInstance(Object obj) {
+    public static GeneralizedTimeHolder getInstance(Object obj) {
         
         if (obj instanceof GeneralizedTimeHolder)
             return (GeneralizedTimeHolder) obj;

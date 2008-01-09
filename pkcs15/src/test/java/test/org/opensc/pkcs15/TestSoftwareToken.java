@@ -15,6 +15,8 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.clazzes.util.io.IOUtil;
 import org.opensc.pkcs15.AIDs;
 import org.opensc.pkcs15.application.Application;
@@ -27,6 +29,7 @@ import org.opensc.pkcs15.asn1.PKCS15PublicKey;
 import org.opensc.pkcs15.asn1.PKCS15RSAPublicKey;
 import org.opensc.pkcs15.asn1.attr.CertificateObject;
 import org.opensc.pkcs15.asn1.attr.PublicKeyObject;
+import org.opensc.pkcs15.asn1.basic.TokenInfo;
 import org.opensc.pkcs15.asn1.proxy.ReferenceProxy;
 import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
@@ -205,6 +208,17 @@ public class TestSoftwareToken extends TestCase {
         assertTrue(certificate.getSpecificCertificateAttributes().getCertificateObject() instanceof ReferenceProxy);
         ((ReferenceProxy<CertificateObject>)certificate.getSpecificCertificateAttributes().getCertificateObject()).updateEntity();
 
+        PathHelper.selectDF(token,app.getApplicationTemplate().getPath());
+        
+        token.selectEF(0x5032);
+        
+        ASN1InputStream ais = new ASN1InputStream(token.readEFData());
+        TokenInfo tokenInfo = TokenInfo.getInstance(ais.readObject());
+        
+        ASN1OutputStream aos = new ASN1OutputStream(token.writeEFData());
+        aos.writeObject(tokenInfo);
+        aos.close();
+        
         this.checkEquality(this.tokenDir);
     }
     
