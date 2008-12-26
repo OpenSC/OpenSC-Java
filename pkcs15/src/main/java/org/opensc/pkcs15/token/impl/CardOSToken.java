@@ -36,7 +36,6 @@ import javax.smartcardio.ResponseAPDU;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.clazzes.util.lang.Util;
 import org.opensc.pkcs15.PKCS15Exception;
 import org.opensc.pkcs15.token.DF;
 import org.opensc.pkcs15.token.DFAcl;
@@ -47,6 +46,7 @@ import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFile;
 import org.opensc.pkcs15.token.TokenFileAcl;
+import org.opensc.pkcs15.util.Util;
 
 /**
  * A token  implementation for Siemens CardOS 4.3b tokens.
@@ -240,7 +240,7 @@ public class CardOSToken implements Token {
                 default:
                     byte [] tmp = new byte[n];
                     dis.readFully(tmp);
-                    log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp,":")+"].");
+                    log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp)+"].");
                 }
             }
             
@@ -322,7 +322,7 @@ public class CardOSToken implements Token {
                  default:
                      byte [] tmp = new byte[n];
                      dis.readFully(tmp);
-                     log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp,":")+"].");
+                     log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp)+"].");
                  }
              }
              
@@ -425,7 +425,7 @@ public class CardOSToken implements Token {
                 default:
                     byte [] tmp = new byte[n];
                     dis.readFully(tmp);
-                    log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp,":")+"].");
+                    log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp)+"].");
                 }
             }
             
@@ -512,7 +512,7 @@ public class CardOSToken implements Token {
                 default:
                     byte [] tmp = new byte[n];
                     dis.readFully(tmp);
-                    log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp,":")+"].");
+                    log.warn("skipping FCI tag [0x"+Integer.toHexString(tag)+"], data ["+Util.asHex(tmp)+"].");
                 }
             }
             

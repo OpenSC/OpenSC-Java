@@ -28,9 +28,9 @@ import java.io.IOException;
 import javax.smartcardio.ATR;
 import javax.smartcardio.Card;
 
-import org.clazzes.util.lang.Util;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFactory;
+import org.opensc.pkcs15.util.Util;
 
 /**
  * @author wglas
@@ -49,7 +49,7 @@ public class TokenFactoryImpl extends TokenFactory {
         if (CardOSToken.CARDOS_4_3_b_ATR.equals(atr))
             return new CardOSToken(card.getBasicChannel());
             
-        throw new IOException("Card has an unrecognized ATR ["+Util.asHex(atr.getBytes(),":")+"].");
+        throw new IOException("Card has an unrecognized ATR ["+Util.asHex(atr.getBytes())+"].");
     }
 
     /* (non-Javadoc)

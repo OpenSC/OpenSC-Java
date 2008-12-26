@@ -40,24 +40,20 @@
   </build>
   <dependencies>
      <dependency>
-      <groupId>org.clazzes</groupId>
-      <artifactId>util</artifactId>
-        <version>0.4.1</version>
-     </dependency>
-     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-        <version>1.2.13</version>
-     </dependency>
-     <dependency>
       <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
+      <artifactId>commons-logging-api</artifactId>
         <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov</artifactId>
       <version>jdk15-138</version>
+    </dependency>
+     <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

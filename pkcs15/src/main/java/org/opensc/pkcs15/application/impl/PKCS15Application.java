@@ -24,9 +24,9 @@ package org.opensc.pkcs15.application.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.clazzes.util.lang.Util;
 import org.opensc.pkcs15.AIDs;
 import org.opensc.pkcs15.application.Application;
 import org.opensc.pkcs15.asn1.ISO7816ApplicationTemplate;
@@ -69,7 +69,7 @@ public class PKCS15Application implements Application {
         if (template.getAid() == null)
             throw new IllegalArgumentException("PKCS15Application instantiated with template.aid == null.");
             
-        if (!Util.equals(AIDs.PKCS15_AID,template.getAid()))
+        if (!Arrays.equals(AIDs.PKCS15_AID,template.getAid()))
             throw new IllegalArgumentException("PKCS15Application instantiated with invalid AID in template.");
             
         this.template = template;

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CommandAPDU;
@@ -30,7 +31,7 @@ import javax.smartcardio.ResponseAPDU;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.clazzes.util.lang.Util;
+import org.opensc.pkcs15.util.Util;
 
 /**
  * A class, which encpsulates the contents of a Siemens APDU script
@@ -336,10 +337,10 @@ public class CSFFile
                     
                     CSFFile.this.records.add(r);
                     
-                    log.debug("apdu = " + Util.asHex(r.getRequest().getBytes(),":"));
+                    log.debug("apdu = " + Util.asHex(r.getRequest().getBytes()));
                     
                     if (resp != null)
-                        log.debug("resp = " + Util.asHex(resp,":"));
+                        log.debug("resp = " + Util.asHex(resp));
                     
                     section = line;
                 }
@@ -443,16 +444,16 @@ public class CSFFile
             
             ResponseAPDU resp = channel.transmit(record.getRequest());
             
-            log.debug("Got response ["+Util.asHex(resp.getBytes(),":")+"].");
+            log.debug("Got response ["+Util.asHex(resp.getBytes())+"].");
             
             if (!checkResponse(resp.getBytes(),record.getResponse()))
             {
                 if (record.getResponse() != null)
-                    log.warn("Response ["+Util.asHex(resp.getBytes(),":")+
+                    log.warn("Response ["+Util.asHex(resp.getBytes())+
                             "] from card differs from expexted response ["+
-                            Util.asHex(record.getResponse(),":") + "].");
+                            Util.asHex(record.getResponse()) + "].");
                 else
-                    log.warn("Response ["+Util.asHex(resp.getBytes(),":")+
+                    log.warn("Response ["+Util.asHex(resp.getBytes())+
                             "] from card does not signify success.");
             }
         }

@@ -26,11 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OutputStream;
-import org.clazzes.util.lang.Util;
 import org.opensc.pkcs15.AIDs;
 import org.opensc.pkcs15.application.Application;
 import org.opensc.pkcs15.application.ApplicationFactory;
@@ -39,6 +39,7 @@ import org.opensc.pkcs15.asn1.ISO7816Applications;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFileAcl;
 import org.opensc.pkcs15.token.impl.EFAclImpl;
+import org.opensc.pkcs15.util.Util;
 
 /**
  * @author wglas
@@ -61,7 +62,7 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
      */
     protected Application constructApplication(Token token, ISO7816ApplicationTemplate template) throws IOException
     {
-        if (Util.equals(AIDs.PKCS15_AID,template.getAid()))
+        if (Arrays.equals(AIDs.PKCS15_AID,template.getAid()))
             return new PKCS15Application(token,template);
       
         return null;
@@ -79,7 +80,7 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
      */
     protected Application constructApplication(Token token, byte[] aid)
     {
-        if (Util.equals(AIDs.PKCS15_AID,aid))
+        if (Arrays.equals(AIDs.PKCS15_AID,aid))
             return new PKCS15Application(token);
       
         return null;
@@ -196,13 +197,13 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
             
         for (ISO7816ApplicationTemplate template : applications.getApplications())
         {
-            if (Util.equals(aid,template.getAid()))
+            if (Arrays.equals(aid,template.getAid()))
             {
                 Application app = this.constructApplication(token,template);
                 
                 if (app == null)
                     throw new IllegalArgumentException("Application with an unsupported application ID ["+
-                            Util.asHex(aid,":")+"] has been requested from the token.");
+                            Util.asHex(aid)+"] has been requested from the token.");
                     
                 return app;
             }
@@ -222,7 +223,7 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
         
         if (app == null)
             throw new IllegalArgumentException("An unsupported application ID ["+
-                    Util.asHex(aid,":")+"] has been requested for creation.");
+                    Util.asHex(aid)+"] has been requested for creation.");
         
         ISO7816Applications applications = this.readApplications(token);
         

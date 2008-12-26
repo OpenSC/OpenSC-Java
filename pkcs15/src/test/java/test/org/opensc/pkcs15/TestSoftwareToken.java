@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OutputStream;
-import org.clazzes.util.io.IOUtil;
 import org.opensc.pkcs15.AIDs;
 import org.opensc.pkcs15.application.Application;
 import org.opensc.pkcs15.application.ApplicationFactory;
@@ -96,7 +95,19 @@ public class TestSoftwareToken extends TestCase {
             else
             {
                 FileOutputStream fos = new FileOutputStream(file);
-                IOUtil.copyStreams(zis,fos);
+                
+                try {
+                    byte[] buf = new byte[4096]; 
+                    int n;
+                
+                    while ((n=zis.read(buf))>0) {
+                        
+                        fos.write(buf,0,n);
+                    }
+                }
+                finally {
+                    fos.close();
+                }
             }
         }
         
