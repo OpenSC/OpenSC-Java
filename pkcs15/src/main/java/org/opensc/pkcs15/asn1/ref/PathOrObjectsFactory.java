@@ -124,7 +124,6 @@ public class PathOrObjectsFactory<EntityType extends DEREncodable> {
      * @param obj An ASN.1 object to resolve.
      * @return An instance or a proxy depending on the type of the ReferencedValue. 
      */
-    @SuppressWarnings("unchecked")
     public SequenceOf<EntityType> getInstance(Object obj) {
 
         Context context = ContextHolder.getContext();
