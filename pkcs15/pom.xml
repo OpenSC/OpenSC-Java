@@ -33,6 +33,7 @@
         <configuration>
           <excludes>
             <exclude>**/TestHardwareToken.java</exclude>
+            <exclude>**/TestCSFScripts.java</exclude>
           </excludes>
         </configuration>
       </plugin>
