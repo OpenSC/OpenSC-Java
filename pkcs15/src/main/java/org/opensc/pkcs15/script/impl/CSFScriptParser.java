@@ -307,7 +307,7 @@ public class CSFScriptParser implements ScriptParser {
                         else
                             cmd = new CommandAPDU(cla,ins,p1,p2);
                        
-                    SimpleCommand r = new SimpleCommand(cmd,resp,false);
+                    SimpleCommand r = new SimpleCommand(cmd,resp,true);
                     
                     if (log.isDebugEnabled()) {
                         log.debug("apdu = " + Util.asHex(r.getRequest().getBytes()));
@@ -358,10 +358,13 @@ public class CSFScriptParser implements ScriptParser {
                    
                     if (ret == null)
                         ret = r;
-                    
+                     
                     if (simpleCommand != null)
                         simpleCommand.setNext(r);
                     
+                    while (r.getNext() != null)
+                        r = (SimpleCommand)r.getNext();
+                            
                     simpleCommand = r;
                     
                     section = this.readLine(reader);

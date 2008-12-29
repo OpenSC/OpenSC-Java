@@ -44,12 +44,25 @@ public class TestCSFScripts extends HardwareCardSupport {
     
     private String getResourceBase() {
         
+        String s = System.getProperty("org.opensc.pkcs15.test.resourceBase");
+        
+        if (s != null) return s;
+
         return "file:/home/ev-i/Siemens/SmartCard/Unterlagen/CardOS_V4.3B/Packages_and_Release_Notes/V43B_CSF_Files_2005_05/Run_CSF";
+    }
+    
+    private String getScript() {
+        
+        String s = System.getProperty("org.opensc.pkcs15.test.script");
+        
+        if (s != null) return s;
+        
+        return "Run_V43B_Erase_Profile_Default.csf";
     }
     
     public void testInitScripts() throws IOException, CardException {
         
-        String resPath= this.getResourceBase() + "/Run_V43B_Erase_Profile_Default.csf";
+        String resPath= this.getResourceBase() + "/" + this.getScript();
         
         ScriptResource res = scriptResourceFactory.getScriptResource(resPath);
         
@@ -57,7 +70,8 @@ public class TestCSFScripts extends HardwareCardSupport {
         
         Command cmd = csfParser.parseScript(res);
         
-        cmd.execute(this.card.getBasicChannel());
+        while (cmd != null)
+            cmd = cmd.execute(this.card.getBasicChannel());
     }
     
     
