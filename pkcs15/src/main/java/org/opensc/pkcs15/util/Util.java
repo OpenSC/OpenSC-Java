@@ -22,6 +22,9 @@
 
 package org.opensc.pkcs15.util;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Static helper functions.
  * 
@@ -93,5 +96,31 @@ public abstract class Util {
         }
         
         return sb.toString();
+    }
+    
+    /**
+     * Recursively delete a directory.
+     * 
+     * @param dir The directory to delete. 
+     * @throws IOException If the directory could not be deleted.
+     */
+    public static void rmdirRecursive(File dir) throws IOException {
+
+        File[] children = dir.listFiles();
+        
+        for (File child : children) {
+         
+            if (child.isDirectory()) {
+                if (!child.getName().equals(".") && !child.getName().equals(".."))
+                    rmdirRecursive(child);
+            }
+            else {
+                if (!child.delete())
+                    throw new IOException("Cannot delete file ["+child+"].");
+            }
+        }
+        
+        if (!dir.delete())
+            throw new IOException("Cannot delete directory ["+dir+"].");
     }
 }

@@ -39,6 +39,7 @@ import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFile;
 import org.opensc.pkcs15.token.TokenFileAcl;
+import org.opensc.pkcs15.util.Util;
 
 /**
  * @author wglas
@@ -69,6 +70,21 @@ public class SoftwareToken implements Token {
         
         if (!this.mfFile.exists())
             this.mfFile.mkdir();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#reset()
+     */
+    @Override
+    public void reset() throws IOException {
+        
+        this.currentFile = this.mfFile;
+        this.currentPath = PathHelper.MF_PATH;
+        
+        if (this.mfFile.exists())
+           Util.rmdirRecursive(this.mfFile);
+        
+        this.mfFile.mkdir();
     }
 
     /* (non-Javadoc)

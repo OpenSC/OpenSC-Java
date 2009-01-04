@@ -32,10 +32,12 @@ import java.util.List;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OutputStream;
 import org.opensc.pkcs15.AIDs;
+import org.opensc.pkcs15.PKCS15Exception;
 import org.opensc.pkcs15.application.Application;
 import org.opensc.pkcs15.application.ApplicationFactory;
 import org.opensc.pkcs15.asn1.ISO7816ApplicationTemplate;
 import org.opensc.pkcs15.asn1.ISO7816Applications;
+import org.opensc.pkcs15.token.EF;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFileAcl;
 import org.opensc.pkcs15.token.impl.EFAclImpl;
@@ -97,7 +99,16 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
     protected ISO7816Applications readApplications(Token token) throws IOException
     {
         token.selectMF();
-        if (token.selectEF(DIR_PATH) == null) return null;
+        
+        try {
+            if (token.selectEF(DIR_PATH) == null) return null;
+        } catch (PKCS15Exception e) {
+            
+            if (e.getErrorCode() == PKCS15Exception.ERROR_FILE_NOT_FOUND)
+                return null;
+            else
+                throw e;
+        }
         
         InputStream is = token.readEFData();
         
@@ -128,9 +139,18 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
     {
         token.selectMF();
         
-        if (token.selectEF(DIR_PATH) == null) {
+        EF ef = null;
+        
+        try {
+            ef = token.selectEF(DIR_PATH);
+        } catch (PKCS15Exception e) {
+            if (e.getErrorCode() != PKCS15Exception.ERROR_FILE_NOT_FOUND)
+                throw e;
+        }
+        
+        if (ef == null) {
             token.createEF(DIR_PATH,
-                    0L, new EFAclImpl(TokenFileAcl.AC_ALWAYS,
+                    512L, new EFAclImpl(TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,
@@ -141,7 +161,7 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
                             TokenFileAcl.AC_ALWAYS
                             ));
            
-            token.selectEF(DIR_PATH);
+            ef = token.selectEF(DIR_PATH);
         }
         
         OutputStream os = token.writeEFData();

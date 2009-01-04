@@ -35,6 +35,15 @@ import java.io.OutputStream;
  */
 public interface Token extends Closeable {
 
+    /**
+     * Reset the token to the state, where only the master file (MF) exists.
+     * 
+     * Hardware token implementations should take care to execute a script,
+     * which undertakes the necessary steps on the card depending on the state
+     * of the card.
+     */
+    void reset() throws IOException;
+    
     TokenFile getCurrentFile() throws IOException;
     
     TokenFile select(int path) throws IOException;

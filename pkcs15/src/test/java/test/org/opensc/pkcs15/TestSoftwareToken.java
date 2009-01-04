@@ -34,6 +34,7 @@ import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenContext;
 import org.opensc.pkcs15.token.TokenFactory;
+import org.opensc.pkcs15.util.Util;
 
 public class TestSoftwareToken extends TestCase {
     
@@ -45,23 +46,6 @@ public class TestSoftwareToken extends TestCase {
     private File tokenDir;
     private File tokenDir2;
     
-    static void rmDirForce(File dir)
-    {
-        File [] entries = dir.listFiles();
-        
-        for (File entry:entries)
-        {
-            if (entry.isDirectory()) {
-                if (!entry.getName().equals(".") && !entry.getName().equals(".."))
-                    rmDirForce(entry);
-            }
-            else {
-                entry.delete();
-            }
-        }
-        dir.delete();
-    }
-
     private ZipInputStream getTestZip() {
         return new ZipInputStream(TestSoftwareToken.class.getClassLoader().
                 getResourceAsStream("test/org/opensc/pkcs15/test-ca.zip"));
@@ -73,12 +57,12 @@ public class TestSoftwareToken extends TestCase {
 
         this.tokenDir2 = new File(targetDir,"test-create");
         if (this.tokenDir2.exists())
-            rmDirForce(this.tokenDir2);
+            Util.rmdirRecursive(this.tokenDir2);
         this.tokenDir2.mkdir();
         
         this.tokenDir = new File(targetDir,"test-ca");
         if (this.tokenDir.exists())
-            rmDirForce(this.tokenDir);
+            Util.rmdirRecursive(this.tokenDir);
         this.tokenDir.mkdir();
         
         ZipInputStream zis = this.getTestZip();           

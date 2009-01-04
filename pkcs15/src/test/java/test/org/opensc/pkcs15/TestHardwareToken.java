@@ -26,4 +26,22 @@ public class TestHardwareToken extends HardwareCardSupport {
         assertEquals(AIDs.PKCS15_AID,apps.get(0).getAID());
     }
     
+    public void testApplicationCreation() throws IOException
+    {
+        Token token = tokenFactory.newHardwareToken(this.card);
+        
+        token.reset();
+        
+        Application app = applicationFactory.createApplication(token,AIDs.PKCS15_AID);
+        
+        assertNotNull(app);
+        
+        List<Application> apps = applicationFactory.listApplications(token);
+        
+        assertNotNull(apps);
+        assertEquals(1,apps.size());
+        assertEquals(AIDs.PKCS15_AID,apps.get(0).getAID());
+        
+    }
+    
 }

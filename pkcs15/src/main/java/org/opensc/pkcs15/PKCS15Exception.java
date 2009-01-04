@@ -101,7 +101,7 @@ public class PKCS15Exception extends IOException {
      * @param errorCode The error code as returned by the token.
      */
     public PKCS15Exception(int errorCode) {
-        super();
+        super("card error [0x"+Integer.toHexString(errorCode)+"]");
         this.errorCode = errorCode;
     }
 
@@ -111,7 +111,7 @@ public class PKCS15Exception extends IOException {
      * @param errorCode The error code as returned by the token.
      */
     public PKCS15Exception(String msg, Throwable cause, int errorCode) {
-        super(msg, cause);
+        super(msg + " [0x"+Integer.toHexString(errorCode)+"]", cause);
         this.errorCode = errorCode;
     }
 
@@ -120,7 +120,7 @@ public class PKCS15Exception extends IOException {
      * @param errorCode The error code as returned by the token.
      */
     public PKCS15Exception(String msg, int errorCode) {
-        super(msg);
+        super(msg + " [0x"+Integer.toHexString(errorCode)+"]");
         this.errorCode = errorCode;
     }
 
@@ -129,7 +129,7 @@ public class PKCS15Exception extends IOException {
      * @param errorCode The error code as returned by the token.
      */
     public PKCS15Exception(Throwable cause, int errorCode) {
-        super(cause);
+        super("card error [0x"+Integer.toHexString(errorCode)+"]", cause);
         this.errorCode = errorCode;
     }
 

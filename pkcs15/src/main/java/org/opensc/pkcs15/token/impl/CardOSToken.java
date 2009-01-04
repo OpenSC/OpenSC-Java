@@ -40,6 +40,11 @@ import javax.smartcardio.ResponseAPDU;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensc.pkcs15.PKCS15Exception;
+import org.opensc.pkcs15.script.Command;
+import org.opensc.pkcs15.script.ScriptParser;
+import org.opensc.pkcs15.script.ScriptParserFactory;
+import org.opensc.pkcs15.script.ScriptResource;
+import org.opensc.pkcs15.script.ScriptResourceFactory;
 import org.opensc.pkcs15.token.DF;
 import org.opensc.pkcs15.token.DFAcl;
 import org.opensc.pkcs15.token.EF;
@@ -70,6 +75,9 @@ public class CardOSToken implements Token {
     private static final int DEFAULT_LE = 252;
     private static final int DEFAULT_EXTENDED_LE = 65532;
     
+    private static final String DEFAULT_RESET_RESOURCE = "classpath:org/opensc/pkcs15/scripts/cardos/v43b_reset.ser";
+    private static final String RESET_SCRIPT_PROPERTY = "org.opensc.pkcs15.scripts.cardos.v43b_reset"; 
+    
     private CardChannel channel;
     private TokenFile currentFile;
     
@@ -79,6 +87,34 @@ public class CardOSToken implements Token {
     public CardOSToken(CardChannel channel) {
         super();
         this.channel = channel;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#reset()
+     */
+    @Override
+    public void reset() throws IOException {
+        
+        String res = System.getProperty(RESET_SCRIPT_PROPERTY);
+        
+        if (res == null)
+            res = DEFAULT_RESET_RESOURCE;
+            
+        ScriptResourceFactory scriptResourceFactory = ScriptResourceFactory.getInstance();
+        ScriptResource r = scriptResourceFactory.getScriptResource(res);
+        
+        ScriptParserFactory scriptParserFactory = ScriptParserFactory.getInstance();
+        ScriptParser parser = scriptParserFactory.getScriptParser(res.substring(res.lastIndexOf('.')+1));
+        
+        Command cmd = parser.parseScript(r);
+ 
+        try {
+            while (cmd != null) {
+                cmd = cmd.execute(this.channel);
+            }
+        } catch (CardException e) {
+            throw new PKCS15Exception("Error executing reset script ["+res+"].",e);
+        }
     }
 
     /* (non-Javadoc)
@@ -150,7 +186,7 @@ public class CardOSToken implements Token {
         data[1] = (byte)(data.length - 2);
         
         // CREATE FILE, P1=0x00, P2=0x00, ID -> read current EF from position 0.
-        CommandAPDU cmd = new CommandAPDU(0x00,0xE4,0x00,0x00,data,DEFAULT_LE);
+        CommandAPDU cmd = new CommandAPDU(0x00,0xE0,0x00,0x00,data,DEFAULT_LE);
         
         try {
             ResponseAPDU resp = this.channel.transmit(cmd);
@@ -223,7 +259,7 @@ public class CardOSToken implements Token {
         data[1] = (byte)(data.length - 2);
         
         // CREATE FILE, P1=0x00, P2=0x00, ID -> read current EF from position 0.
-        CommandAPDU cmd = new CommandAPDU(0x00,0xE4,0x00,0x00,data,DEFAULT_LE);
+        CommandAPDU cmd = new CommandAPDU(0x00,0xE0,0x00,0x00,data,DEFAULT_LE);
         
         try {
             ResponseAPDU resp = this.channel.transmit(cmd);
