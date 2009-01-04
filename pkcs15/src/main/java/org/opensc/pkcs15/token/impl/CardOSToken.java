@@ -23,10 +23,13 @@
 package org.opensc.pkcs15.token.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import javax.smartcardio.ATR;
 import javax.smartcardio.CardChannel;
@@ -94,18 +97,185 @@ public class CardOSToken implements Token {
      * @see org.opensc.pkcs15.token.Token#createDF(int, org.opensc.pkcs15.token.DFAcl)
      */
     @Override
-    public DF createDF(int path, DFAcl acl) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+    public DF createDF(int path, long size, DFAcl acl) throws IOException {
+        
+        if (size < 0 || size > 65535L)
+            throw new PKCS15Exception("Illegal size ["+size+"] for DF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"].",PKCS15Exception.ERROR_INVALID_PARAMETER);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
+        DataOutputStream dos = new DataOutputStream(bos);
+        
+        dos.write(0x62);
+        // length of subsequent FCP data field, to be filled at end.
+        dos.write(0x00);
+        
+        // fill in FCP data
+        //  DF body size
+        dos.write(0x81);
+        dos.write(0x02);
+        dos.writeShort((int)size);
+        
+        // File descriptor: 38h DF
+        dos.write(0x82);
+        dos.write(0x01);
+        dos.write(0x38);
+        
+        // File ID
+        dos.write(0x83);
+        dos.write(0x02);
+        dos.writeShort(path);
+        
+        // Default file status.
+        dos.write(0x85);
+        dos.write(0x01);
+        dos.write(0x00);
+        
+        // ACL definitions
+        dos.write(0x86);
+        dos.write(0x08);
+        dos.write(acl.getAcLifeCycle());
+        dos.write(acl.getAcUpdate());
+        dos.write(acl.getAcAppend());
+        dos.write(acl.getAcDeactivate());
+        dos.write(acl.getAcActivate());
+        dos.write(acl.getAcDelete());
+        dos.write(acl.getAcAdmin());
+        dos.write(acl.getAcCreate());
+          
+        // get command data.
+        dos.flush();
+        byte [] data = bos.toByteArray();
+        
+        // fill in length of subsequent FCP data field, to be filled at end.
+        data[1] = (byte)(data.length - 2);
+        
+        // CREATE FILE, P1=0x00, P2=0x00, ID -> read current EF from position 0.
+        CommandAPDU cmd = new CommandAPDU(0x00,0xE4,0x00,0x00,data,DEFAULT_LE);
+        
+        try {
+            ResponseAPDU resp = this.channel.transmit(cmd);
+            
+            if (resp.getSW() != PKCS15Exception.ERROR_OK)
+                throw new PKCS15Exception("CREATE FILE for DF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"] returned error",resp.getSW());
+            
+        } catch (CardException e) {
+            throw new PKCS15Exception("Error sending CREATE FILE for DF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"]",e);
+        }
+
+        return new DF(PathHelper.appendToPath(this.currentFile.getPath(),path),size,acl);
     }
 
     /* (non-Javadoc)
      * @see org.opensc.pkcs15.token.Token#createEF(int, org.opensc.pkcs15.token.EFAcl)
      */
     @Override
-    public EF createEF(int path, EFAcl acl) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+    public EF createEF(int path, long size, EFAcl acl) throws IOException {
+        
+        if (size < 0 || size > 65535L)
+            throw new PKCS15Exception("Illegal size ["+size+"] for EF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"].",PKCS15Exception.ERROR_INVALID_PARAMETER);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
+        DataOutputStream dos = new DataOutputStream(bos);
+        
+        dos.write(0x62);
+        // length of subsequent FCP data field, to be filled at end.
+        dos.write(0x00);
+        
+        // *** fill in FCP data
+        //   Only EF:      Net size in bytes
+        dos.write(0x80);
+        dos.write(0x02);
+        dos.writeShort((int)size);
+        
+        // File descriptor: 01h BINARY
+        dos.write(0x82);
+        dos.write(0x01);
+        dos.write(0x01);
+        
+        // File ID
+        dos.write(0x83);
+        dos.write(0x02);
+        dos.writeShort(path);
+        
+        // Default file status.
+        dos.write(0x85);
+        dos.write(0x01);
+        dos.write(0x00);
+        
+        // ACL definitions
+        dos.write(0x86);
+        dos.write(0x09);
+        dos.write(acl.getAcRead());
+        dos.write(acl.getAcUpdate());
+        dos.write(acl.getAcAppend());
+        dos.write(acl.getAcDeactivate());
+        dos.write(acl.getAcActivate());
+        dos.write(acl.getAcDelete());
+        dos.write(acl.getAcAdmin());
+        dos.write(acl.getAcIncrease());
+        dos.write(acl.getAcDecrease());
+  
+        // *** get command data.
+        dos.flush();
+        byte [] data = bos.toByteArray();
+        
+        // fill in length of subsequent FCP data field, to be filled at end.
+        data[1] = (byte)(data.length - 2);
+        
+        // CREATE FILE, P1=0x00, P2=0x00, ID -> read current EF from position 0.
+        CommandAPDU cmd = new CommandAPDU(0x00,0xE4,0x00,0x00,data,DEFAULT_LE);
+        
+        try {
+            ResponseAPDU resp = this.channel.transmit(cmd);
+            
+            if (resp.getSW() != PKCS15Exception.ERROR_OK)
+                throw new PKCS15Exception("CREATE FILE for EF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"] returned error",resp.getSW());
+            
+        } catch (CardException e) {
+            throw new PKCS15Exception("Error sending CREATE FILE for EF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"]",e);
+        }
+
+        return new EF(PathHelper.appendToPath(this.currentFile.getPath(),path),size,acl);
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#deleteDF(int)
+     */
+    @Override
+    public void deleteDF(int path) throws IOException {
+        
+        // DELETE FILE, P1=0x00, P2=0x00, ID -> read current EF from position 0.
+        CommandAPDU cmd = new CommandAPDU(0x00,0xE4,0x00,0x00,PathHelper.idToPath(path),DEFAULT_LE);
+        
+        try {
+            ResponseAPDU resp = this.channel.transmit(cmd);
+            
+            if (resp.getSW() != PKCS15Exception.ERROR_OK)
+                throw new PKCS15Exception("DELETE FILE for DF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"] returned error",resp.getSW());
+            
+        } catch (CardException e) {
+            throw new PKCS15Exception("Error sending DELETE FILE for DF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"]",e);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#deleteEF(int)
+     */
+    @Override
+    public void deleteEF(int path) throws IOException {
+        
+        // DELETE FILE, P1=0x00, P2=0x00, ID -> read current EF from position 0.
+        CommandAPDU cmd = new CommandAPDU(0x00,0xE4,0x00,0x00,PathHelper.idToPath(path),DEFAULT_LE);
+        
+        try {
+            ResponseAPDU resp = this.channel.transmit(cmd);
+            
+            if (resp.getSW() != PKCS15Exception.ERROR_OK)
+                throw new PKCS15Exception("DELETE FILE for EF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"] returned error",resp.getSW());
+            
+        } catch (CardException e) {
+            throw new PKCS15Exception("Error sending DELETE FILE for EF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"]",e);
+        }
     }
 
     /* (non-Javadoc)
@@ -540,13 +710,65 @@ public class CardOSToken implements Token {
         return this.selectDFInternal(cmd,PathHelper.truncatePath(this.currentFile.getPath()));
     }
 
+    private class EFOutputStream extends ByteArrayOutputStream {
+
+        private final byte[] pathToWrite;
+        private int lastFlushPos;
+        
+        EFOutputStream(final byte[] pathToWrite) {
+            this.pathToWrite = Arrays.copyOf(pathToWrite,pathToWrite.length);
+        }
+        
+        /* (non-Javadoc)
+         * @see java.io.ByteArrayOutputStream#close()
+         */
+        @Override
+        public void flush() throws IOException {
+            
+            if (this.size() == this.lastFlushPos) return;
+            
+            if (!Arrays.equals(this.pathToWrite,CardOSToken.this.currentFile.getPath()))
+                throw new PKCS15Exception("Path changed before writing content to EF ["+PathHelper.formatPath(this.pathToWrite)+"].",PKCS15Exception.ERROR_TECHNICAL_ERROR);
+            
+            super.close();
+            
+            // UPDATE BINARY, P1=0x00, P2=0x00, ID -> read current EF from position 0.
+            CommandAPDU cmd = new CommandAPDU(0x00,0xD6,0x00,0x00,this.toByteArray(),DEFAULT_LE);
+            
+            try {
+                ResponseAPDU resp = CardOSToken.this.channel.transmit(cmd);
+                
+                if (resp.getSW() != PKCS15Exception.ERROR_OK)
+                    throw new PKCS15Exception("UPDATE BINARY for EF ["+PathHelper.formatPath(this.pathToWrite)+"] returned error",resp.getSW());
+                
+                this.lastFlushPos = this.size();
+                
+            } catch (CardException e) {
+                throw new PKCS15Exception("Error sending UPDATE BINARY for EF ["+PathHelper.formatPath(this.pathToWrite)+"]",e);
+            }
+        }
+
+        /* (non-Javadoc)
+         * @see java.io.ByteArrayOutputStream#close()
+         */
+        @Override
+        public void close() throws IOException {
+            
+            this.flush();
+            super.close();
+        }
+    };
+    
     /* (non-Javadoc)
      * @see org.opensc.pkcs15.token.Token#writeEFData()
      */
     @Override
     public OutputStream writeEFData() throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        
+        if (this.currentFile == null)
+            throw new IOException("No current EF selected."); 
+        
+        return new EFOutputStream(this.currentFile.getPath());
     }
 
 }

@@ -22,6 +22,7 @@
 
 package org.opensc.pkcs15.token;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,7 +33,7 @@ import java.io.OutputStream;
  * 
  * @author wglas
  */
-public interface Token {
+public interface Token extends Closeable {
 
     TokenFile getCurrentFile() throws IOException;
     
@@ -50,9 +51,41 @@ public interface Token {
     
     OutputStream writeEFData() throws IOException;
     
-    EF createEF(int path, EFAcl acl) throws IOException;
+    /**
+     * Create an elementary file as child of the current DF.
+     * 
+     * @param path The relative path of the EF to create.
+     * @param size The reserved size of the EF to be created.
+     * @param acl The access control list to set.
+     * @return The description of the created elementary file.
+     * @throws IOException
+     */
+    EF createEF(int path, long size, EFAcl acl) throws IOException;
     
-    DF createDF(int path, DFAcl acl) throws IOException;
+    /**
+     * Create a dedicated file as child of the current DF.
+     * 
+     * @param path The relative path of the DF to create.
+     * @param size The reserved size of the DF to be created.
+     * @param acl The access control list to set.
+     * @return The description of the created dedicated file.
+     * @throws IOException
+     */
+    DF createDF(int path, long size, DFAcl acl) throws IOException;
     
-    void close() throws IOException;
+    /**
+     * Delete a dedicated file as child of the current DF.
+     * 
+     * @param path The relative path of the DF to delete.
+     * @throws IOException
+     */
+    void deleteDF(int path) throws IOException;
+    
+    /**
+     * Delete an elementary file as child of the current DF.
+     * 
+     * @param path The relative path of the EF to delete.
+     * @throws IOException
+     */
+    void deleteEF(int path) throws IOException;
 }

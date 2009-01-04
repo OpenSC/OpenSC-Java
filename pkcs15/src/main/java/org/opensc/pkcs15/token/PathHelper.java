@@ -80,6 +80,31 @@ public abstract class PathHelper {
     }
     
     /**
+     * @param path A path consisting of pairs of bytes.
+     * @param id A relative path of a DF or EF.
+     * @return A string with slash-separated IDs.
+     */
+    public static String formatPathAppend(final byte [] path, int id)
+    {
+        StringBuffer sb = new StringBuffer();
+        
+        int l = 0;
+        
+        while (l<path.length)
+        {
+            appendHexByte(sb,path[l]); 
+            appendHexByte(sb,path[l+1]); 
+            sb.append('/');
+            l+=2;
+        }
+     
+        appendHexByte(sb,(byte)(id >> 8));
+        appendHexByte(sb,(byte)id);
+        
+        return sb.toString();
+    }
+    
+   /**
      * @param id A file ID consisting of 2 unsigned bytes.
      * @return A byte array containing two bytes. 
      */

@@ -43,7 +43,7 @@ public class SimpleCommand implements Command {
     private static final Log log = LogFactory.getLog(SimpleCommand.class);
     
     private final CommandAPDU request;
-    private final byte[] response;
+    private final int[] response;
     private final boolean checkResponse;
     private Command next;
     
@@ -53,7 +53,7 @@ public class SimpleCommand implements Command {
      * @param checkResponse Whether to throw a {@link CardException} in {@link #execute(CardChannel)}
      *           when the card returns an unexpected response.
      */
-    public SimpleCommand(CommandAPDU request, byte[] response, boolean checkResponse) {
+    public SimpleCommand(CommandAPDU request, int[] response, boolean checkResponse) {
         super();
         this.request = request;
         this.response = response;
@@ -97,7 +97,7 @@ public class SimpleCommand implements Command {
     /**
      * @return the expected data portion of the expected response from the card.
      */
-    public byte[] getResponse() {
+    public int[] getResponse() {
         return this.response;
     }
 
@@ -117,9 +117,9 @@ public class SimpleCommand implements Command {
      *         {@link #getResponse()} and the last two bytes of <code>a</code>
      *         are equal to <code>0x90</code> and <code>0x00</code>.
      */
-    protected boolean doCheckResponse(byte[] a)
+    protected static boolean doCheckResponse(byte[] a, int[] expected)
     {
-        if (this.response==null)
+        if (expected==null)
         {
             if (a.length != 2) return false;
             
@@ -127,29 +127,23 @@ public class SimpleCommand implements Command {
             return true;
         }
         
-        if (a.length != this.response.length + 2) return false;
+        if (a.length != expected.length + 2) return false;
         
-        if (a[this.response.length] != (byte)0x90 || a[this.response.length+1] != 0x00) return false;
+        if (a[expected.length] != (byte)0x90 || a[expected.length+1] != 0x00) return false;
         
-        for (int i=0;i<this.response.length;++i)
-            if (a[i] != this.response[i]) return false;
+        for (int i=0;i<expected.length;++i) {
+
+            int mask = (expected[i] & 0xff00) >> 8; 
             
+            if ((a[i]&mask) != (expected[i]&mask)) return false;
+        }
+        
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.opensc.pkcs15.script.Command#execute(javax.smartcardio.CardChannel)
-     */
-    @Override
-    public Command execute(CardChannel channel) throws CardException {
-       
-        log.debug("Tranmitting APDU ["+this.getRequest()+"].");
+    protected Command checkResponse(ResponseAPDU resp) throws CardException {
         
-        ResponseAPDU resp = channel.transmit(this.getRequest());
-        
-        log.debug("Got response ["+Util.asHex(resp.getBytes())+"].");
-        
-        if (!this.doCheckResponse(resp.getBytes()))
+        if (!doCheckResponse(resp.getBytes(),this.response))
         {
             String msg;
             
@@ -158,7 +152,7 @@ public class SimpleCommand implements Command {
                 msg =
                     "Response ["+Util.asHex(resp.getBytes())+
                     "] from card differs from expected response ["+
-                    Util.asHex(this.getResponse()) + "].";
+                    Util.asHexMask(this.getResponse()) + "].";
                 
             }
             else {
@@ -174,6 +168,21 @@ public class SimpleCommand implements Command {
         }
        
         return this.next;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.script.Command#execute(javax.smartcardio.CardChannel)
+     */
+    @Override
+    public Command execute(CardChannel channel) throws CardException {
+       
+        log.debug("Tranmitting APDU ["+Util.asHex(this.getRequest().getBytes())+"].");
+        
+        ResponseAPDU resp = channel.transmit(this.getRequest());
+        
+        log.debug("Got response ["+Util.asHex(resp.getBytes())+"].");
+        
+        return this.checkResponse(resp);
     }
 
 }

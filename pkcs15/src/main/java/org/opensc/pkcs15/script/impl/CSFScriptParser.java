@@ -22,10 +22,13 @@
 
 package org.opensc.pkcs15.script.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +40,7 @@ import org.opensc.pkcs15.script.Command;
 import org.opensc.pkcs15.script.ScriptParser;
 import org.opensc.pkcs15.script.ScriptResource;
 import org.opensc.pkcs15.script.SimpleCommand;
+import org.opensc.pkcs15.script.SwitchCommand;
 import org.opensc.pkcs15.util.Util;
 
 /**
@@ -196,7 +200,8 @@ public class CSFScriptParser implements ScriptParser {
         {
             int i=0;
             
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buf = new byte[v.length()/4];
+            int n=0;
             
             while (i<v.length())
             {
@@ -219,15 +224,132 @@ public class CSFScriptParser implements ScriptParser {
 
                 if (v.charAt(i) != 'h')
                     throw new IOException("No trailing h found in byte value ["+v+"].");
-            
+
+                buf[n] = (byte)r;
                 ++i;
-                
-                bos.write(r);
+                ++n;
             }
             
-            return bos.toByteArray();
+            return Arrays.copyOf(buf,n);
         }
         
+        private int[] parseByteArrayMask(String v) throws IOException
+        {
+            int i=0;
+            
+            int[] buf = new int[v.length()/2];
+            int n= 0;
+            
+            while (i<v.length())
+            {
+                while (i<v.length() && Character.isWhitespace(v.charAt(i))) ++i;
+                
+                if (i>=v.length()) break;
+                
+                if (v.charAt(i) == '*') {
+                    
+                    buf[n] = 0;
+                    ++i;
+                    
+                } else {
+                
+                    if (v.charAt(i) != '0')
+                        throw new IOException("No leading zero found in byte value ["+v+"].");
+            
+                    if (++i>=v.length()) throw new IOException("Invalid EOF parsing hex byte.");
+            
+                    int r = hexDigit(v.charAt(i)) << 4;
+            
+                    if (++i>=v.length()) throw new IOException("Invalid EOF parsing hex byte.");
+            
+                    r |= hexDigit(v.charAt(i));
+            
+                    if (++i>=v.length()) throw new IOException("Invalid EOF parsing hex byte.");
+
+                    if (v.charAt(i) != 'h')
+                        throw new IOException("No trailing h found in byte value ["+v+"].");
+                    
+                    ++i;
+                    
+                    if (i < v.length() && v.charAt(i) == '/') {
+                        
+                        if (v.charAt(i) != '0')
+                            throw new IOException("No leading zero found in byte value ["+v+"].");
+                
+                        if (++i>=v.length()) throw new IOException("Invalid EOF parsing hex byte.");
+                
+                        r |= hexDigit(v.charAt(i)) << 12;
+                
+                        if (++i>=v.length()) throw new IOException("Invalid EOF parsing hex byte.");
+                
+                        r |= hexDigit(v.charAt(i)) << 8;
+                
+                        if (++i>=v.length()) throw new IOException("Invalid EOF parsing hex byte.");
+
+                        if (v.charAt(i) != 'h')
+                            throw new IOException("No trailing h found in byte value ["+v+"].");
+                        
+                        ++i;
+
+                    } else {
+                        r |= 0xff00;
+                    }
+                    
+                        
+                    buf[n] = r | 0xff00;
+                }
+               
+                ++n;
+            }
+            
+            return Arrays.copyOf(buf,n);
+        }
+        
+   
+        private Map<int[],String> parseByteArrayCase(Map<int[],String> cases, String v) throws IOException
+        {
+            if (cases == null)
+                cases = new HashMap<int[],String>();
+            
+            int i = v.length();
+            
+            while (--i >= 0) {
+                
+                if (Character.isWhitespace(v.charAt(i))) break;
+            }
+            
+            int[] resp = null;
+            
+            if (i > 0)
+                resp = parseByteArrayMask(v.substring(0,i));
+            
+            cases.put(resp,v.substring(i+1));
+            
+            return cases;
+        }
+            
+        
+        private SimpleCommand parseInclude(String relPath) throws IOException {
+            
+            relPath = relPath.replace('\\','/');
+            
+            ScriptResource includeFile = this.resource.openInclude(relPath);
+            
+            if (!includeFile.exists() && relPath.endsWith(".CSF")) {
+            
+                // Fix uppercase extensions, which actually represent lowercase
+                // extensions on a UNIX filesystem.
+                String fixedRelPath = relPath.substring(0,relPath.length()-4) + ".csf";
+                
+                includeFile = this.resource.openInclude(fixedRelPath);
+            }
+            
+            log.info("Reading include file ["+includeFile+"].");
+            
+            Parser includeParser = new Parser(includeFile);
+                
+            return includeParser.parse();
+        }
         
         private SimpleCommand parse() throws IOException
         {
@@ -265,8 +387,10 @@ public class CSFScriptParser implements ScriptParser {
                     byte[] data = null;
                     int le = -1;
 
-                    byte[] resp = null;
+                    int[] resp = null;
                   
+                    Map<int[],String> cases = null;
+                    
                     while (line != null && line.charAt(0) != '[')
                     {
                         String kv[] = parseAssignment(line);
@@ -284,7 +408,12 @@ public class CSFScriptParser implements ScriptParser {
                         else if ("data".equals(kv[0]))
                             data = this.parseByteArray(kv[1]);
                         else if ("resp".equals(kv[0]))
-                            resp = this.parseByteArray(kv[1]);
+                            resp = this.parseByteArrayMask(kv[1]);
+                        else if ("file_case_resp".equals(kv[0]))
+                            cases = this.parseByteArrayCase(cases,kv[1]);
+                        else if ("sw1".equals(kv[0]) || "sw2".equals(kv[0]) || "rlen".equals(kv[0])) {
+                            log.warn("Ignoring ["+kv[0]+"="+kv[1]+"]");
+                        }
                         else
                             throw new IOException("Invalid key ["+kv[0]+"] found in section [transmit].");
                         
@@ -307,13 +436,27 @@ public class CSFScriptParser implements ScriptParser {
                         else
                             cmd = new CommandAPDU(cla,ins,p1,p2);
                        
-                    SimpleCommand r = new SimpleCommand(cmd,resp,true);
+                    SimpleCommand r;
+                    
+                    if (cases == null) {
+                        r = new SimpleCommand(cmd,resp,true);
+                    } else {
+                    
+                        SwitchCommand sc = new SwitchCommand(cmd,resp,true);
+                        
+                        for (Entry<int[],String> entry : cases.entrySet())  {
+                            
+                            sc.addCase(entry.getKey(),this.parseInclude(entry.getValue()));
+                        }
+                        
+                        r = sc;
+                    }
                     
                     if (log.isDebugEnabled()) {
                         log.debug("apdu = " + Util.asHex(r.getRequest().getBytes()));
                     
                         if (resp != null)
-                            log.debug("resp = " + Util.asHex(resp));
+                            log.debug("resp = " + Util.asHexMask(resp));
                     }
                     
                     if (ret == null)
@@ -336,25 +479,8 @@ public class CSFScriptParser implements ScriptParser {
                         throw new IOException("Invalid key ["+kv[0]+"] in section [include]");
                     
                     String relPath = kv[1].trim();
-                    
-                    relPath = relPath.replace('\\','/');
-                    
-                    ScriptResource includeFile = this.resource.openInclude(relPath);
-                    
-                    if (!includeFile.exists() && relPath.endsWith(".CSF")) {
-                    
-                        // Fix uppercase extensions, which actually represent lowercase
-                        // extensions on a UNIX filesystem.
-                        String fixedRelPath = relPath.substring(0,relPath.length()-4) + ".csf";
                         
-                        includeFile = this.resource.openInclude(fixedRelPath);
-                    }
-                    
-                    log.info("Reading include file ["+includeFile+"].");
-                    
-                    Parser includeParser = new Parser(includeFile);
-                        
-                    SimpleCommand r = includeParser.parse();
+                    SimpleCommand r = this.parseInclude(relPath);
                    
                     if (ret == null)
                         ret = r;

@@ -130,7 +130,7 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
         
         if (token.selectEF(DIR_PATH) == null) {
             token.createEF(DIR_PATH,
-                    new EFAclImpl(TokenFileAcl.AC_ALWAYS,
+                    0L, new EFAclImpl(TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,
                             TokenFileAcl.AC_ALWAYS,

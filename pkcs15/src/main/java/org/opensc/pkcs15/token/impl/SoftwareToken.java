@@ -83,7 +83,7 @@ public class SoftwareToken implements Token {
      * @see org.opensc.pkcs15.token.Token#createEF(int, org.opensc.pkcs15.token.EFAcl)
      */
     @Override
-    public EF createEF(int path, EFAcl acl) throws IOException {
+    public EF createEF(int path, long size, EFAcl acl) throws IOException {
         
         File file = appendToFile(this.currentFile,path);
         
@@ -99,7 +99,7 @@ public class SoftwareToken implements Token {
      * @see org.opensc.pkcs15.token.Token#createDF(int, org.opensc.pkcs15.token.DFAcl)
      */
     @Override
-    public DF createDF(int path, DFAcl acl) throws IOException {
+    public DF createDF(int path, long size, DFAcl acl) throws IOException {
         
        File file = appendToFile(this.currentFile,path);
         
@@ -109,6 +109,38 @@ public class SoftwareToken implements Token {
         byte[] dfPath = PathHelper.appendToPath(this.currentPath,path);
         
         return new DF(dfPath,file.length(),acl);
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#deleteDF(int)
+     */
+    @Override
+    public void deleteDF(int path) throws IOException {
+        
+        File file = appendToFile(this.currentFile,path);
+        
+        if (!file.isDirectory())
+            throw new IOException("File ["+file.getCanonicalPath()+"] is not a directory.");
+        
+        if (!file.delete())
+            throw new IOException("Cannot delete directory ["+file.getCanonicalPath()+"].");
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.opensc.pkcs15.token.Token#deleteEF(int)
+     */
+    @Override
+    public void deleteEF(int path) throws IOException {
+        
+        File file = appendToFile(this.currentFile,path);
+        
+        if (!file.isFile())
+            throw new IOException("File ["+file.getCanonicalPath()+"] is not an oridnary file.");
+        
+        if (!file.delete())
+            throw new IOException("Cannot delete file ["+file.getCanonicalPath()+"].");
+        
     }
 
     /* (non-Javadoc)

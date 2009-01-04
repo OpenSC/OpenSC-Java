@@ -54,4 +54,44 @@ public abstract class Util {
         
         return sb.toString();
     }
+    
+    /**
+     * @param b A byte array to be formatted.
+     * @return A string of length <code>b.length*2+b.length-1</code> consisting of
+     *         hexadecimal representations of each byte in <code>b</code>
+     *         separated by ':'.
+     */
+    static public String asHexMask(int[] b) {
+        
+        if (b==null) return null;
+        
+        StringBuffer sb = new StringBuffer(b.length*6);
+        
+        for (int i=0;i<b.length;++i) {
+            
+            if (i>0) sb.append(':');
+               
+            int mask = (b[i]&0xff00) >> 8;
+            
+            if (mask == 0) {
+
+                sb.append('*');
+            }
+            else {
+                
+                int iv = ((int)b[i]) & mask;
+                if (iv < 0x10) sb.append('0');   
+                sb.append(Integer.toHexString(iv));
+
+                if (mask != 0xff) {
+                    
+                    sb.append('/');
+                    if (mask < 0x10) sb.append('0');   
+                    sb.append(Integer.toHexString(mask));
+                }
+            }
+        }
+        
+        return sb.toString();
+    }
 }
