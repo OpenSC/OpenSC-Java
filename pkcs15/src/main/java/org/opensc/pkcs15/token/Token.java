@@ -44,20 +44,69 @@ public interface Token extends Closeable {
      */
     void reset() throws IOException;
     
+    /**
+     * @return The current file on the token.
+     * @throws IOException Upon errors.
+     */
     TokenFile getCurrentFile() throws IOException;
     
+    /**
+     * Select a file (DF or EF), which is a child of the current DF.
+     * 
+     * @param path The relative path of the child to open.
+     * @return The new current file on the token.
+     * @throws IOException Upon errors.
+     */
     TokenFile select(int path) throws IOException;
     
+    /**
+     * Select the parent DF of the current DF.
+     * 
+     * @return The parent DF, which is now the current file.
+     * @throws IOException Upon errors.
+     */
     DF selectParentDF() throws IOException;
     
+    /**
+     * Select a DF, which is a child of the current DF.
+     * 
+     * @param path The relative path of the DF to open.
+     * @return The new current file on the token.
+     * @throws IOException Upon card errors or when the selected file is not a DF.
+     */
     DF selectDF(int path) throws IOException;
     
+    /**
+     * Select an EF, which is a child of the current DF.
+     * 
+     * @param path The relative path of the EF to open.
+     * @return The new current file on the token.
+     * @throws IOException Upon card errors or when the selected file is not an EF.
+     */
     EF selectEF(int path) throws IOException;
     
+    /**
+     * Select the master file on the token.
+     * 
+     * @return The master file, which is now the current file.
+     * @throws IOException Upon card errors.
+     */
     MF selectMF() throws IOException;
     
+    /**
+     * Read the content of the current EF-
+     * 
+     * @return An input stream with the content of the current EF.
+     * @throws IOException Upon card errors or when the current file is not an EF.
+     */
     InputStream readEFData() throws IOException;
     
+    /**
+     * Write to the content of the current EF.
+     * 
+     * @return An output stream, which writes to the content of the current EF
+     * @throws IOException Upon card errors or when the current file is not an EF.
+     */
     OutputStream writeEFData() throws IOException;
     
     /**

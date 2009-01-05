@@ -26,16 +26,30 @@ import org.opensc.pkcs15.asn1.ISO7816ApplicationTemplate;
 import org.opensc.pkcs15.token.Token;
 
 /**
- * This interface describes a PKCS#15 application.
+ * This interface describes a smart card application cf. to ISO7816.
+ * 
+ * The functionality in this interface is very terse, because the scope of
+ * applications may range from PKI application to specialized applications for
+ * public health care.
  * 
  * @author wglas
  */
 public interface Application {
 
+    /**
+     * @return The application ID.
+     */
     byte[] getAID();
     
+    /**
+     * @return The application template as stored inside the EF(DIR) object
+     *         in the root path of a token.
+     */
     public ISO7816ApplicationTemplate getApplicationTemplate();
     
+    /**
+     * @return The token on which this application resides.
+     */
     public Token getToken();
     
 }

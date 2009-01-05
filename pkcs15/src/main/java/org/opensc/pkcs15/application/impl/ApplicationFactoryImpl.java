@@ -79,8 +79,9 @@ public class ApplicationFactoryImpl extends ApplicationFactory {
      * @param token The token to which the new application will be bound.
      * @param aid The application ID.
      * @return The application object, if the application ID is recognized or null.
+     * @throws IOException 
      */
-    protected Application constructApplication(Token token, byte[] aid)
+    protected Application constructApplication(Token token, byte[] aid) throws IOException
     {
         if (Arrays.equals(AIDs.PKCS15_AID,aid))
             return new PKCS15Application(token);

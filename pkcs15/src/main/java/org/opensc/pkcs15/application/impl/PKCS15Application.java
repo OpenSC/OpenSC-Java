@@ -34,8 +34,12 @@ import org.opensc.pkcs15.asn1.ref.DDO;
 import org.opensc.pkcs15.token.Token;
 
 /**
+ * A PKCS#15 application with PKI functionality.
+ * 
+ * This class is the foundation for implementing a KeyStore and various key
+ * classes of the JCE provider. 
+ * 
  * @author wglas
- *
  */
 public class PKCS15Application implements Application {
     
@@ -46,9 +50,12 @@ public class PKCS15Application implements Application {
     private static final byte[] DEFAULT_PATH = new byte[] { 0x3F, 0x00, 0x50, 0x15 };
     
     /**
-     * default constructor.
+     * default constructor called during instantiation of a new application on the card.
+     * 
+     * This constructor creates the basic DFs and EFs for the application for lateron
+     * adding PKCS#15 objects to the directory. 
      */
-    PKCS15Application(Token token)
+    PKCS15Application(Token token) throws IOException
     {
         this.token = token;
         this.template = new ISO7816ApplicationTemplate();
@@ -58,7 +65,8 @@ public class PKCS15Application implements Application {
     }
     
     /**
-     * default constructor.
+     * default constructor called during instantiation of an application already
+     * existing on the card.
      * @throws IOException Upon errors reading additional token information.
      */
     PKCS15Application(Token token, ISO7816ApplicationTemplate template) throws IOException
