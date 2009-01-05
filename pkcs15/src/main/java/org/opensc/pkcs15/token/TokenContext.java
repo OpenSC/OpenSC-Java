@@ -57,7 +57,7 @@ public class TokenContext implements Context {
         @Override
         public InputStream readReference(Path ref) throws IOException {
           
-            PathHelper.selectEF(TokenContext.this.token,ref.getPath());
+            PathHelper.selectEF(TokenContext.this.token,new TokenPath(ref.getPath()));
             
             InputStream is = TokenContext.this.token.readEFData();
             
@@ -75,7 +75,7 @@ public class TokenContext implements Context {
         @Override
         public OutputStream writeReference(Path ref) throws IOException {
             
-            PathHelper.selectEF(TokenContext.this.token,ref.getPath());
+            PathHelper.selectEF(TokenContext.this.token,new TokenPath(ref.getPath()));
             
             OutputStream os = TokenContext.this.token.writeEFData();
             

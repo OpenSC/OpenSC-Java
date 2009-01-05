@@ -28,7 +28,7 @@ package org.opensc.pkcs15.token;
  */
 public abstract class TokenFile implements TokenFileAcl {
 
-    private final byte[] path;
+    private final TokenPath path;
     private final long size;
     private final int acUpdate;
     private final int acAppend;
@@ -46,7 +46,7 @@ public abstract class TokenFile implements TokenFileAcl {
      * @param acDelete
      * @param acAdmin
      */
-    public TokenFile(byte[] path, long size,
+    public TokenFile(TokenPath path, long size,
             int acUpdate, int acAppend, int acDeactivate,
             int acActivate, int acDelete, int acAdmin) {
         super();
@@ -60,7 +60,7 @@ public abstract class TokenFile implements TokenFileAcl {
         this.acAdmin = acAdmin;
     }
 
-    public TokenFile(byte[] path, long size, TokenFileAcl acl)
+    public TokenFile(TokenPath path, long size, TokenFileAcl acl)
     {
         this.path = path;
         this.size = size;
@@ -80,7 +80,7 @@ public abstract class TokenFile implements TokenFileAcl {
     /**
      * @return the path
      */
-    public byte[] getPath() {
+    public TokenPath getPath() {
         return this.path;
     }
 

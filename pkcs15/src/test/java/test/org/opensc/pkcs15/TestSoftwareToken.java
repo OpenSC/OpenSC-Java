@@ -34,6 +34,7 @@ import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenContext;
 import org.opensc.pkcs15.token.TokenFactory;
+import org.opensc.pkcs15.token.TokenPath;
 import org.opensc.pkcs15.util.Util;
 
 public class TestSoftwareToken extends TestCase {
@@ -145,7 +146,7 @@ public class TestSoftwareToken extends TestCase {
         Token token = tokenFactory.newSoftwareToken(this.tokenDir);
         Application app = applicationFactory.newApplication(token,AIDs.PKCS15_AID);
   
-        PathHelper.selectDF(token,app.getApplicationTemplate().getPath());
+        PathHelper.selectDF(token,new TokenPath(app.getApplicationTemplate().getPath()));
         
         token.selectEF(0x5031);
         
@@ -179,7 +180,7 @@ public class TestSoftwareToken extends TestCase {
         
         log.info("certificate="+certificate.getSpecificCertificateAttributes().getCertificateObject().getCertificate());
         
-        PathHelper.selectDF(token,app.getApplicationTemplate().getPath());
+        PathHelper.selectDF(token,new TokenPath(app.getApplicationTemplate().getPath()));
         
         token.selectEF(0x5031);
         
@@ -203,7 +204,7 @@ public class TestSoftwareToken extends TestCase {
         assertTrue(certificate.getSpecificCertificateAttributes().getCertificateObject() instanceof ReferenceProxy);
         ((ReferenceProxy<CertificateObject>)certificate.getSpecificCertificateAttributes().getCertificateObject()).updateEntity();
 
-        PathHelper.selectDF(token,app.getApplicationTemplate().getPath());
+        PathHelper.selectDF(token,new TokenPath(app.getApplicationTemplate().getPath()));
         
         token.selectEF(0x5032);
         

@@ -45,7 +45,7 @@ public class MF extends DF implements MFAcl {
      * @param acExecute
      * @param acAllocate
      */
-    public MF(byte[] path, long size, int acLifeCycle, int acUpdate, int acAppend,
+    public MF(TokenPath path, long size, int acLifeCycle, int acUpdate, int acAppend,
             int acDeactivate, int acActivate, int acDelete, int acAdmin,
             int acCreate, int acExecute, int acAllocate) {
         super(path, size,
@@ -55,7 +55,7 @@ public class MF extends DF implements MFAcl {
         this.acAllocate = acAllocate;
     }
     
-    public MF(byte[] path, long size, MFAcl acl)
+    public MF(TokenPath path, long size, MFAcl acl)
     {
         super(path,size,acl);
         this.acExecute = acl.getAcExecute();

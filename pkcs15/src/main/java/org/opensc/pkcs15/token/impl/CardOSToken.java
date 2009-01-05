@@ -29,7 +29,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import javax.smartcardio.ATR;
 import javax.smartcardio.CardChannel;
@@ -54,6 +53,7 @@ import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFile;
 import org.opensc.pkcs15.token.TokenFileAcl;
+import org.opensc.pkcs15.token.TokenPath;
 import org.opensc.pkcs15.util.Util;
 
 /**
@@ -198,7 +198,7 @@ public class CardOSToken implements Token {
             throw new PKCS15Exception("Error sending CREATE FILE for DF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"]",e);
         }
 
-        return new DF(PathHelper.appendToPath(this.currentFile.getPath(),path),size,acl);
+        return new DF(new TokenPath(this.currentFile.getPath(),path),size,acl);
     }
 
     /* (non-Javadoc)
@@ -271,7 +271,7 @@ public class CardOSToken implements Token {
             throw new PKCS15Exception("Error sending CREATE FILE for EF ["+PathHelper.formatPathAppend(this.currentFile.getPath(),path)+"]",e);
         }
 
-        return new EF(PathHelper.appendToPath(this.currentFile.getPath(),path),size,acl);
+        return new EF(new TokenPath(this.currentFile.getPath(),path),size,acl);
     }
 
     /* (non-Javadoc)
@@ -451,11 +451,11 @@ public class CardOSToken implements Token {
             }
             
             if (fileSize >= 0)
-                this.currentFile = new EF(PathHelper.appendToPath(this.currentFile.getPath(),path),fileSize,
+                this.currentFile = new EF(new TokenPath(this.currentFile.getPath(),path),fileSize,
                         acRead,acUpdate,acAppend,acDeactivate,acActivate,
                         acDelete,acAdmin,acIncrease,acDecrease);
             else if (bodySize >= 0)
-                this.currentFile = new DF(PathHelper.appendToPath(this.currentFile.getPath(),path),bodySize,
+                this.currentFile = new DF(new TokenPath(this.currentFile.getPath(),path),bodySize,
                         acRead,acUpdate,acAppend,acDeactivate,acActivate,
                         acDelete,acAdmin,acIncrease);
             else
@@ -468,7 +468,7 @@ public class CardOSToken implements Token {
         }
     }
 
-    private DF selectDFInternal(CommandAPDU cmd, byte[] targetPath) throws IOException {
+    private DF selectDFInternal(CommandAPDU cmd, TokenPath targetPath) throws IOException {
         
         try {
              ResponseAPDU resp = this.channel.transmit(cmd);
@@ -504,8 +504,8 @@ public class CardOSToken implements Token {
                      if (n!=2)
                          throw new IOException("Invalid length ["+n+"] of FCI tag 0x83.");
                      int tpath = dis.readUnsignedShort();
-                     if (tpath != PathHelper.tailID(targetPath))
-                         throw new IOException("File ID ["+PathHelper.formatID(tpath)+"] reported by SELECT FILE differs from requested ID ["+PathHelper.formatID(PathHelper.tailID(targetPath))+"].");
+                     if (tpath != targetPath.getTailID())
+                         throw new IOException("File ID ["+PathHelper.formatID(tpath)+"] reported by SELECT FILE differs from requested ID ["+PathHelper.formatID(targetPath.getTailID())+"].");
                      break;
 
                  case 0x86:    
@@ -556,7 +556,7 @@ public class CardOSToken implements Token {
         // SELECT FILE, P1=0x01, P2=0x00, no data -> select DF
         CommandAPDU cmd = new CommandAPDU(0x00,0xA4,0x01,0x00,PathHelper.idToPath(path),DEFAULT_LE);
         
-        return this.selectDFInternal(cmd,PathHelper.appendToPath(this.currentFile.getPath(),path));
+        return this.selectDFInternal(cmd,new TokenPath(this.currentFile.getPath(),path));
     }
     
     /* (non-Javadoc)
@@ -635,7 +635,7 @@ public class CardOSToken implements Token {
                 }
             }
             
-            EF ef = new EF(PathHelper.appendToPath(this.currentFile.getPath(),path),fileSize,
+            EF ef = new EF(new TokenPath(this.currentFile.getPath(),path),fileSize,
                     acRead,acUpdate,acAppend,acDeactivate,acActivate,
                     acDelete,acAdmin,acIncrease,acDecrease);
 
@@ -743,16 +743,16 @@ public class CardOSToken implements Token {
         // SELECT FILE, P1=0x03, P2=0x00, no data -> select parent DF
         CommandAPDU cmd = new CommandAPDU(0x00,0xA4,0x03,0x00,DEFAULT_LE);
         
-        return this.selectDFInternal(cmd,PathHelper.truncatePath(this.currentFile.getPath()));
+        return this.selectDFInternal(cmd,this.currentFile.getPath().getParent());
     }
 
     private class EFOutputStream extends ByteArrayOutputStream {
 
-        private final byte[] pathToWrite;
+        private final TokenPath pathToWrite;
         private int lastFlushPos;
         
-        EFOutputStream(final byte[] pathToWrite) {
-            this.pathToWrite = Arrays.copyOf(pathToWrite,pathToWrite.length);
+        EFOutputStream(final TokenPath pathToWrite) {
+            this.pathToWrite = pathToWrite;
         }
         
         /* (non-Javadoc)
@@ -763,8 +763,8 @@ public class CardOSToken implements Token {
             
             if (this.size() == this.lastFlushPos) return;
             
-            if (!Arrays.equals(this.pathToWrite,CardOSToken.this.currentFile.getPath()))
-                throw new PKCS15Exception("Path changed before writing content to EF ["+PathHelper.formatPath(this.pathToWrite)+"].",PKCS15Exception.ERROR_TECHNICAL_ERROR);
+            if (!this.pathToWrite.equals(CardOSToken.this.currentFile.getPath()))
+                throw new PKCS15Exception("Path changed before writing content to EF ["+this.pathToWrite+"].",PKCS15Exception.ERROR_TECHNICAL_ERROR);
             
             super.close();
             
@@ -775,12 +775,12 @@ public class CardOSToken implements Token {
                 ResponseAPDU resp = CardOSToken.this.channel.transmit(cmd);
                 
                 if (resp.getSW() != PKCS15Exception.ERROR_OK)
-                    throw new PKCS15Exception("UPDATE BINARY for EF ["+PathHelper.formatPath(this.pathToWrite)+"] returned error",resp.getSW());
+                    throw new PKCS15Exception("UPDATE BINARY for EF ["+this.pathToWrite+"] returned error",resp.getSW());
                 
                 this.lastFlushPos = this.size();
                 
             } catch (CardException e) {
-                throw new PKCS15Exception("Error sending UPDATE BINARY for EF ["+PathHelper.formatPath(this.pathToWrite)+"]",e);
+                throw new PKCS15Exception("Error sending UPDATE BINARY for EF ["+this.pathToWrite+"]",e);
             }
         }
 

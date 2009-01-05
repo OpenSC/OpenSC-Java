@@ -35,7 +35,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.opensc.pkcs15.asn1.helper.IntegerHelper;
-import org.opensc.pkcs15.token.PathHelper;
+import org.opensc.pkcs15.util.Util;
 
 /**
  * <PRE>
@@ -163,9 +163,32 @@ public class Path extends ASN1Encodable {
 
     public String toString() {
         
-        if (this.index != null && this.length !=null)
-            return "Path["+PathHelper.formatPath(this.path)+"("+this.index+","+this.length+")]";
+        StringBuffer sb = new StringBuffer();
+        
+        sb.append("Path[");
+        
+        int i=0;
+        
+        while (i < this.path.length) {
+            
+            if (i>0) sb.append('/');
+            Util.appendHexByte(sb,this.path[i]);
+            ++i;
+            if (i >= this.path.length) break;
+            Util.appendHexByte(sb,this.path[i]);
+            ++i;
+        }
+        
+        if (this.index != null && this.length !=null) {
+            sb.append("(");
+            sb.append(this.index);
+            sb.append(",");
+            sb.append(this.length);
+            sb.append(")]");
+        }
         else     
-            return "Path["+PathHelper.formatPath(this.path)+"]";
+            sb.append("]");
+        
+        return sb.toString();
     }
 }

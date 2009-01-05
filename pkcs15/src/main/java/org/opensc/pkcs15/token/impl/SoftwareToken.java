@@ -39,6 +39,7 @@ import org.opensc.pkcs15.token.PathHelper;
 import org.opensc.pkcs15.token.Token;
 import org.opensc.pkcs15.token.TokenFile;
 import org.opensc.pkcs15.token.TokenFileAcl;
+import org.opensc.pkcs15.token.TokenPath;
 import org.opensc.pkcs15.util.Util;
 
 /**
@@ -51,7 +52,7 @@ public class SoftwareToken implements Token {
     private File directory;
     private File currentFile;
     private File mfFile;
-    private byte[] currentPath;
+    private TokenPath currentPath;
     
     private static File appendToFile(final File file, final int relPath)
     {
@@ -106,7 +107,7 @@ public class SoftwareToken implements Token {
         if (!file.createNewFile())
             throw new IOException("Cannot create file ["+file.getCanonicalPath()+"].");
         
-        byte[] efPath = PathHelper.appendToPath(this.currentPath,path);
+        TokenPath efPath = new TokenPath(this.currentPath,path);
         
         return new EF(efPath,file.length(),acl);
     }
@@ -122,7 +123,7 @@ public class SoftwareToken implements Token {
         if (!file.mkdir())
             throw new IOException("Cannot create directory ["+file.getCanonicalPath()+"].");
         
-        byte[] dfPath = PathHelper.appendToPath(this.currentPath,path);
+        TokenPath dfPath = new TokenPath(this.currentPath,path);
         
         return new DF(dfPath,file.length(),acl);
     }
@@ -229,7 +230,7 @@ public class SoftwareToken implements Token {
         if (!file.exists()) return null;
         
         this.currentFile = file;
-        this.currentPath = PathHelper.appendToPath(this.currentPath,path);
+        this.currentPath = new TokenPath(this.currentPath,path);
         
         return this.getCurrentFile();
     }
@@ -249,7 +250,7 @@ public class SoftwareToken implements Token {
             throw new IOException("File ["+file.getCanonicalPath()+"] is not a directory.");
         
         this.currentFile = file;
-        this.currentPath = PathHelper.appendToPath(this.currentPath,path);
+        this.currentPath = new TokenPath(this.currentPath,path);
         
         return (DF)this.getCurrentFile();
     }
@@ -266,7 +267,7 @@ public class SoftwareToken implements Token {
             throw new IOException("File ["+file.getCanonicalPath()+"] is not a directory.");
         
         this.currentFile = file;
-        this.currentPath = PathHelper.truncatePath(this.currentPath);
+        this.currentPath = this.currentPath.getParent();
         
         return (DF)this.getCurrentFile();
     }
@@ -286,7 +287,7 @@ public class SoftwareToken implements Token {
             throw new IOException("File ["+file.getCanonicalPath()+"] is not an oridinary file.");
         
         this.currentFile = file;
-        this.currentPath = PathHelper.appendToPath(this.currentPath,path);
+        this.currentPath = new TokenPath(this.currentPath,path);
         
         return (EF)this.getCurrentFile();
     }

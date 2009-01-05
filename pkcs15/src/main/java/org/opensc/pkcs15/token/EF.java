@@ -43,7 +43,7 @@ public class EF extends TokenFile implements EFAcl {
      * @param acDelete
      * @param acAdmin
      */
-    public EF(byte[] path, long size,
+    public EF(TokenPath path, long size,
             int acRead, int acUpdate, int acAppend,
             int acDeactivate, int acActivate, int acDelete, int acAdmin,
             int acIncrease, int acDecrease) {
@@ -54,7 +54,7 @@ public class EF extends TokenFile implements EFAcl {
         this.acDecrease = acDecrease;
     }
     
-    public EF(byte[] path, long size, EFAcl acl)
+    public EF(TokenPath path, long size, EFAcl acl)
     {
         super(path,size,acl);
         this.acRead = acl.getAcRead();

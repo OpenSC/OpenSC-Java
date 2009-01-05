@@ -43,7 +43,7 @@ public class DF extends TokenFile implements DFAcl {
      * @param acAdmin
      * @param acCreate
      */
-    public DF(byte[] path, long size,
+    public DF(TokenPath path, long size,
             int acLifeCycle, int acUpdate, int acAppend,
             int acDeactivate, int acActivate, int acDelete, int acAdmin, int acCreate) {
         super(path, size,
@@ -53,7 +53,7 @@ public class DF extends TokenFile implements DFAcl {
         this.acCreate = acCreate;
     }
     
-    public DF(byte[] path, long size, DFAcl acl)
+    public DF(TokenPath path, long size, DFAcl acl)
     {
         super(path,size,acl);
         this.acLifeCycle = acl.getAcLifeCycle();

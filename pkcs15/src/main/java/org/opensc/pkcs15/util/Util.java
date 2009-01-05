@@ -25,6 +25,7 @@ package org.opensc.pkcs15.util;
 import java.io.File;
 import java.io.IOException;
 
+
 /**
  * Static helper functions.
  * 
@@ -50,9 +51,7 @@ public abstract class Util {
             
             int iv = ((int)b[i]) & 0xff;
             
-            if (iv < 0x10) sb.append('0');
-            
-            sb.append(Integer.toHexString(iv));
+            appendHexByte(sb,iv);
         }
         
         return sb.toString();
@@ -83,14 +82,12 @@ public abstract class Util {
             else {
                 
                 int iv = ((int)b[i]) & mask;
-                if (iv < 0x10) sb.append('0');   
-                sb.append(Integer.toHexString(iv));
-
+                appendHexByte(sb,iv);
+                
                 if (mask != 0xff) {
                     
                     sb.append('/');
-                    if (mask < 0x10) sb.append('0');   
-                    sb.append(Integer.toHexString(mask));
+                    appendHexByte(sb,mask);
                 }
             }
         }
@@ -123,4 +120,19 @@ public abstract class Util {
         if (!dir.delete())
             throw new IOException("Cannot delete directory ["+dir+"].");
     }
+
+    /**
+     * Append two hexadecimal digits to the given string buffer. 
+     * 
+     * @param sb The string buffer to append to.
+     * @param b The byte value to append, stored in an integer.
+     */
+    public static void appendHexByte(StringBuffer sb, int b)
+    {
+        sb.append(Util.HEX_DIGITS[(b>>4)&0x0f]);
+        sb.append(Util.HEX_DIGITS[b&0x0f]);
+    }
+
+    private static final char[] HEX_DIGITS =
+    new char[] {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 }
