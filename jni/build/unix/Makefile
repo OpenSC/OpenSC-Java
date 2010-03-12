@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-O2 -fPIC -I../../src/jniP11 -I/usr/lib/jvm/java-6-openjdk/include
 LD=gcc
 LDFLAGS=-shared -s
-LIBS=-ljnix -ltdl
+LIBS=-ljnix -lltdl
 
 srcdir=../../src/jniP11
 

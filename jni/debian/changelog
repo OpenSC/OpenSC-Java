@@ -1,0 +1,5 @@
+jni-opensc-pkcs11 (0.2.3-0) any; urgency=medium
+
+  * Initial debianization.
+
+ -- Wolfgang Glas (ev-i Informationstechnologie GmbH) <wolfgang.glas@ev-i.at>  Fri, 12 Mar 2010 22:47:53 +0100
