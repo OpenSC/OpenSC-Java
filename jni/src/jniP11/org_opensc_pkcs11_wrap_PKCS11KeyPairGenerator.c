@@ -20,9 +20,9 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
+#include <jniP11private.h>
 #include <org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.h>
 
-#include <jniP11private.h>
 #include <stdlib.h>
 
 /*
@@ -30,7 +30,7 @@
  * Method:    generateKeyPairNative
  * Signature: (JJJI[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;)[J
  */
-JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator_generateKeyPairNative)
+JNIEXPORT jlongArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator_generateKeyPairNative
   (JNIEnv *env, jobject jp11kpg, jlong mh, jlong shandle, jlong hsession,
    jint algo, jobjectArray pubAttrs, jobjectArray privAttrs)
 {

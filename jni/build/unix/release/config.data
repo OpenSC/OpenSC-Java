@@ -1,9 +1,0 @@
-#
-# $Id: config.data,v 1.1 2005/12/09 09:37:50 wglas Exp $
-#
-# Default makefile variable settings.
-#
-ac CFLAGS=-O2 -Wall
-ac CXXFLAGS=-O2 -Wall
-test { `gcc --version` =~ /4\.[1-9]\.[0-9]/ } then {ac CFLAGS=-O2 -fno-stack-protector -Wall}
-test { `gcc --version` =~ /4\.[1-9]\.[0-9]/ } then {ac CXXFLAGS=-O2 -fno-stack-protector -Wall}

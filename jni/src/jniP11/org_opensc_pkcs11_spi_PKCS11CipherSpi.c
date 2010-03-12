@@ -21,16 +21,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
-#include <org_opensc_pkcs11_spi_PKCS11CipherSpi.h>
-
 #include <jniP11private.h>
+#include <org_opensc_pkcs11_spi_PKCS11CipherSpi.h>
 
 /*
  * Class:     org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    initEncryptNative
  * Signature: (JJJJI)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_initEncryptNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_initEncryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
   int rv;
@@ -62,7 +61,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    initDecryptNative
  * Signature: (JJJJI)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_initDecryptNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_initDecryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
   int rv;
@@ -94,7 +93,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    updateDecryptNative
  * Signature: (JJJJ[BII)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateDecryptNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateDecryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
   int rv;
@@ -167,7 +166,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
  * Method:    updateEncryptNative
  * Signature: (JJJJ[BII)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateEncryptNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateEncryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
   int rv;
@@ -240,7 +239,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
  * Method:    updateDecryptNativeOff
  * Signature: (JJJJ[BII[BI)I
  */
-JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateDecryptNativeOff)
+JNIEXPORT jint JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateDecryptNativeOff
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
   int rv;
@@ -315,7 +314,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    updateEncryptNativeOff
  * Signature: (JJJJ[BII[BI)I
  */
-JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateEncryptNativeOff)
+JNIEXPORT jint JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_updateEncryptNativeOff
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
   int rv;
@@ -390,7 +389,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    doFinalDecryptNative
  * Signature: (JJJJ[BII)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalDecryptNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalDecryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
   int rv;
@@ -498,7 +497,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
  * Method:    doFinalEncryptNative
  * Signature: (JJJJ[BII)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalEncryptNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalEncryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
   int rv;
@@ -606,7 +605,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
  * Method:    doFinalDecryptNativeOff
  * Signature: (JJJJ[BII[BI)I
  */
-JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalDecryptNativeOff)
+JNIEXPORT jint JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalDecryptNativeOff
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
   int rv;
@@ -691,7 +690,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    doFinalEncryptNativeOff
  * Signature: (JJJJ[BII[BI)I
  */
-JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalEncryptNativeOff)
+JNIEXPORT jint JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doFinalEncryptNativeOff
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
   int rv;
@@ -778,7 +777,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    updateDecryptNative
  * Signature: (JJJJ[BII)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doDecryptNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doDecryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
   int rv;
@@ -854,7 +853,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
  * Method:    updateEncryptNative
  * Signature: (JJJJ[BII)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doEncryptNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doEncryptNative
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len)
 {
   int rv;
@@ -930,7 +929,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Cip
  * Method:    updateDecryptNativeOff
  * Signature: (JJJJ[BII[BI)I
  */
-JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doDecryptNativeOff)
+JNIEXPORT jint JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doDecryptNativeOff
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
   int rv;
@@ -1005,7 +1004,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi
  * Method:    updateEncryptNativeOff
  * Signature: (JJJJ[BII[BI)I
  */
-JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doEncryptNativeOff)
+JNIEXPORT jint JNICALL Java_org_opensc_pkcs11_spi_PKCS11CipherSpi_doEncryptNativeOff
   (JNIEnv *env, jobject jciph, jlong mh, jlong shandle, jlong hsession, jlong hkey, jbyteArray input, jint off, jint len, jbyteArray output, jint output_off)
 {
   int rv;

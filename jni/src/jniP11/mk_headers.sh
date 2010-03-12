@@ -22,9 +22,6 @@ do
 
   file=`echo $class | sed 's/\./_/g'`
 
-  $JAVA_HOME/bin/javah -classpath ../../../java/bin -d . $class
+  $JAVA_HOME/bin/javah -classpath ../../../target/classes -d . $class
   rm -f ${file}_*.h
-
-  mv $file.h $file.h~
-  sed  -e 's/JNICALL Java_\([a-zA-Z0-9_]*\)/JNICALL JNIX_FUNC_NAME(Java_\1)/' -e 's/#include <jni.h>/#include <jnix.h>/' < $file.h~ > $file.h
 done

@@ -13,11 +13,10 @@
     <jni.libPrefix>lib</jni.libPrefix>
     <jni.libExtension>so</jni.libExtension>
     <jni.targetDir>target</jni.targetDir>
-    <jni.build.dir>jni/build/unix/release</jni.build.dir>
     <org.opensc.pkcs11.distRepoId>clazzes-repository</org.opensc.pkcs11.distRepoId>
     <org.opensc.pkcs11.distRepoURL>scpexe://maven.clazzes.org/var/www/htdocs/maven.clazzes.org</org.opensc.pkcs11.distRepoURL>
    </properties>
-  <version>0.2.2</version>
+  <version>0.2.3</version>
   
   <distributionManagement>
     <repository>
@@ -56,47 +55,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <!-- Version 1.0.2 refuses to search in the OS' PATH, so we use version 1.0.1 -->
-        <version>1.0.1</version>
-        <executions>
-          <execution>
-           <id>exec-jniconfig</id>
-           <goals><goal>exec</goal></goals>
-           <phase>compile</phase>
-           <configuration>
-              <executable>perl</executable>
-              <workingDirectory>${jni.build.dir}</workingDirectory>
-              <arguments>
-               <argument>../../../src/scripts/config.pl</argument>
-              </arguments>
-           </configuration>
-          </execution>
-          <execution>
-           <id>exec-jnibuild</id>
-           <goals><goal>exec</goal></goals>
-           <phase>compile</phase>
-           <configuration>
-              <executable>make</executable>
-              <workingDirectory>${jni.build.dir}</workingDirectory>
-           </configuration>
-          </execution>
-          <execution>
-           <id>exec-jniclean</id>
-           <goals><goal>exec</goal></goals>
-           <phase>clean</phase>
-           <configuration>
-              <executable>make</executable>
-              <workingDirectory>${jni.build.dir}</workingDirectory>
-              <arguments>
-               <argument>distclean</argument>
-              </arguments>
-           </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -106,15 +64,19 @@
            <phase>package</phase>
            <configuration>
             <tasks>
-              <mkdir dir="${jni.targetDir}/lib"/>
-              <copy todir="${jni.targetDir}/lib">
-                <fileset dir="${jni.build.dir}/jniP11">
+              <zip zipfile="${jni.targetDir}/${project.artifactId}-${project.version}-${jni.classifier}.zip">
+                <fileset dir="/usr/lib/jni">
                   <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
                 </fileset>
-              </copy>
-              <zip zipfile="${jni.targetDir}/${project.artifactId}-${project.version}-${jni.classifier}.zip">
-                <fileset dir="${jni.targetDir}/lib">
-                  <include name="${jni.libPrefix}${project.artifactId}-${project.majorVersion}.${jni.libExtension}" />
+              </zip>
+              <zip zipfile="${jni.targetDir}/${project.artifactId}-${project.version}-Windows-x86.zip">
+                <fileset dir="/usr/i686-pc-mingw32/bin">
+                  <include name="${project.artifactId}-${project.majorVersion}.dll" />
+                </fileset>
+              </zip>
+              <zip zipfile="${jni.targetDir}/${project.artifactId}-${project.version}-Windows-x64.zip">
+                <fileset dir="/usr/x86_64-pc-mingw32/bin">
+                  <include name="${project.artifactId}-${project.majorVersion}.dll" />
                 </fileset>
               </zip>
              </tasks>
@@ -138,6 +100,16 @@
                   <file>${project.build.directory}/${project.artifactId}-${project.version}-${jni.classifier}.zip</file>
                   <type>zip</type>
                   <classifier>${jni.classifier}</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}-Windows-x86.zip</file>
+                  <type>zip</type>
+                  <classifier>Windows-x86</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}-Windows-x64.zip</file>
+                  <type>zip</type>
+                  <classifier>Windows-x64</classifier>
                 </artifact>
               </artifacts>
             </configuration>
@@ -184,104 +156,19 @@
        </plugins>
       </build>
     </profile>
-    <profile>
-      <id>jni-win32-env</id>
-      <activation>
-       <os><family>Windows</family><arch>x86</arch></os>
-      </activation>
-      <properties>
-       <jni.classifier>Windows-${os.arch}</jni.classifier>
-       <jni.libPrefix></jni.libPrefix>
-       <jni.libExtension>dll</jni.libExtension>
-	     <jni.build.dir>jni/build/mingw/release</jni.build.dir>
-      </properties>
-    </profile>
-    <profile>
-      <id>jni-i386-env</id>
-      <activation>
-       <os><arch>i386</arch></os>
-      </activation>
-      <properties>
-        <jni.classifier>${os.name}-x86</jni.classifier>
-      </properties>
-    </profile>
-    <profile>
-      <id>jni-amd64-env</id>
-      <activation>
-       <os><arch>amd64</arch></os>
-      </activation>
-      <properties>
-        <jni.classifier>${os.name}-x86_64</jni.classifier>
-      </properties>
-    </profile>
-    <profile>
-      <id>post-deploy-dependencies</id>
-      <activation>
-        <file><missing>java/src/org/opensc/pkcs11/PKCS11Provider.java</missing></file>
-      </activation>
-      <dependencies>
-        <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>${project.artifactId}</artifactId>
-        <version>${project.version}</version>
-        <type>zip</type>
-        <classifier>${jni.classifier}</classifier>
-       </dependency>
-     </dependencies>
-    </profile>
-    
-    <profile>
-      <id>deploy-extra-arch</id>
-      <activation>
-        <property>
-          <name>deploy.extra.arch</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-      <plugins>
-       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-${extra.arch}.zip</file>
-                  <type>zip</type>
-                  <classifier>${extra.arch}</classifier>
-                </artifact>
-                <artifact>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-${jni.classifier}.zip</file>
-                  <type>zip</type>
-                  <classifier>${jni.classifier}</classifier>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-     </plugins>
-    </build>
-   </profile>
   </profiles>
 
   <dependencies>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.13</version>
+      <version>1.2.15</version>
+      <scope>test</scope>
     </dependency>
      <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.1</version>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

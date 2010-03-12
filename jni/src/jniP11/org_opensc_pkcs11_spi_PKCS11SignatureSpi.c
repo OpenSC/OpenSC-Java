@@ -21,16 +21,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
-#include <org_opensc_pkcs11_spi_PKCS11SignatureSpi.h>
-
 #include <jniP11private.h>
+#include <org_opensc_pkcs11_spi_PKCS11SignatureSpi.h>
 
 /*
  * Class:     org_opensc_pkcs11_spi_PKCS11SignatureSpi
  * Method:    initSignNative
  * Signature: (JJJJI)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_initSignNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_initSignNative
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
   int rv;
@@ -62,7 +61,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  * Method:    updateSignNative
  * Signature: (JJJ[BII)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateSignNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateSignNative
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyteArray ba, jint off, jint len)
 {
   int rv;
@@ -114,7 +113,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  * Method:    updateSignNative1
  * Signature: (JJJB)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateSignNative1)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateSignNative1
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyte b)
 {
   int rv;
@@ -144,7 +143,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  * Method:    signNative
  * Signature: (JJJ)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_signNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_signNative
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession)
 {
   int rv;
@@ -192,7 +191,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Sig
  * Method:    initVerifyNative
  * Signature: (JJJJI)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_initVerifyNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_initVerifyNative
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jlong hkey, jint alg)
 {
   int rv;
@@ -223,7 +222,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  * Method:    updateVerifyNative
  * Signature: (JJJ[BII)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyteArray data, jint off, jint len)
 {
   int rv;
@@ -275,7 +274,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  * Method:    updateVerifyNative1
  * Signature: (JJJB)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative1)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative1
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyte b)
 { 
   int rv;
@@ -303,7 +302,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  * Method:    verifyNative
  * Signature: (JJJ[B)Z
  */
-JNIEXPORT jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_verifyNative)
+JNIEXPORT jboolean JNICALL Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_verifyNative
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyteArray data)
 {
   int rv;

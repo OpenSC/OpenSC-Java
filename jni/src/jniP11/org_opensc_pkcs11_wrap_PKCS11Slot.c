@@ -21,16 +21,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
-#include <org_opensc_pkcs11_wrap_PKCS11Slot.h>
-
 #include <jniP11private.h>
+#include <org_opensc_pkcs11_wrap_PKCS11Slot.h>
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Slot
  * Method:    initSlotNative
  * Signature: (J)J
  */
-jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_initSlotNative)
+jlong JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_initSlotNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong id)
 {
   pkcs11_slot_t *slot;
@@ -48,7 +47,7 @@ jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_initSlotNati
  * Method:    destroySlotNative
  * Signature: (J)
  */
-void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_destroySlotNative)
+void JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_destroySlotNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -67,7 +66,7 @@ void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_destroySlotNa
  * Method:    enumerateSlotsNative
  * Signature: (J)[J
  */
-jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumerateSlotsNative)
+jlongArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumerateSlotsNative
   (JNIEnv *env, jclass clazz, jlong mh)
 {
   CK_ULONG nslots=0;
@@ -117,7 +116,7 @@ jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_enumera
  * Method:    waitForSlotNative
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_waitForSlotNative)
+JNIEXPORT jlong JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_waitForSlotNative
   (JNIEnv *env, jclass jslot, jlong mh)
 {
   CK_ULONG slotId;
@@ -144,7 +143,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_wa
  * Method:    isTokenPresentNative
  * Signature: (J)Z
  */
-jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isTokenPresentNative)
+jboolean JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_isTokenPresentNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -163,7 +162,7 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isTokenPr
  * Method:    isRemovableDeviceNative
  * Signature: (J)Z
  */
-jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isRemovableDeviceNative)
+jboolean JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_isRemovableDeviceNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -182,7 +181,7 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isRemovab
  * Method:    isHardwareDeviceNative
  * Signature: (J)Z
  */
-jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isHardwareDeviceNative)
+jboolean JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_isHardwareDeviceNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -200,7 +199,7 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_isHardwar
  * Method:    getManufacturerNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufacturerNative)
+jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManufacturerNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
@@ -229,7 +228,7 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getManu
  * Method:    getDescriptionNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getDescriptionNative)
+jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getDescriptionNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
@@ -258,7 +257,7 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getDesc
  * Method:    getHardwareVersionNative
  * Signature: (JJ)D
  */
-jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getHardwareVersionNative)
+jdouble JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getHardwareVersionNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -277,7 +276,7 @@ jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getHardwar
  * Method:    getFirmwareVersionNative
  * Signature: (JJ)D
  */
-jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getFirmwareVersionNative)
+jdouble JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getFirmwareVersionNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -296,7 +295,7 @@ jdouble JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getFirmwar
  * Method:    getMechanismsNative
  * Signature: (JJ)[Lorg/opensc/pkcs11/wrap/PKCS11Mechanism;
  */
-jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMechanismsNative)
+jobjectArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMechanismsNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int rv;
@@ -341,7 +340,7 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getMe
  * Method:    getTokenlabelNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenLabelNative)
+jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenLabelNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
@@ -375,7 +374,7 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
  * Method:    getTokenManufacturerNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenManufacturerNative)
+jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenManufacturerNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
@@ -408,7 +407,7 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
  * Method:    getTokenModelNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenModelNative)
+jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenModelNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
@@ -442,7 +441,7 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
  * Method:    getTokenSerialNumberNative
  * Signature: (JJ)[B
  */
-jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenSerialNumberNative)
+jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenSerialNumberNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   int l;
@@ -475,7 +474,7 @@ jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getToke
  * Method:    getTokenMinPinLenNative
  * Signature: (JJ)I
  */
-jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPinLenNative)
+jint JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPinLenNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -504,7 +503,7 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMinPi
  * Method:    getTokenMaxPinLenNative
  * Signature: (JJ)I
  */
-jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPinLenNative)
+jint JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPinLenNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;
@@ -533,7 +532,7 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_getTokenMaxPi
  * Method:    hasTokenProtectedAuthPathNative
  * Signature: (JJ)Z
  */
-jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Slot_hasTokenProtectedAuthPathNative)
+jboolean JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Slot_hasTokenProtectedAuthPathNative
   (JNIEnv *env, jobject jslot, jlong mh, jlong handle)
 {
   pkcs11_slot_t *slot;

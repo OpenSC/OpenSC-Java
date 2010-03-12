@@ -21,16 +21,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
-#include <org_opensc_pkcs11_wrap_PKCS11Session.h>
-
 #include <jniP11private.h>
+#include <org_opensc_pkcs11_wrap_PKCS11Session.h>
 
 /*
  * Class:     org_opensc_pkcs11_wrap_PKCS11Session
  * Method:    openNative
  * Signature: (JJI)J
  */
-JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_openNative)
+JNIEXPORT jlong JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Session_openNative
   (JNIEnv *env, jclass jsession, jlong mh, jlong shandle, jint rw)
 {
   int rv;
@@ -63,7 +62,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session
  * Method:    closeNative
  * Signature: (JJJ)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_closeNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Session_closeNative
   (JNIEnv *env, jclass jsession, jlong mh, jlong shandle, jlong hsession)
 {
   int rv;
@@ -87,7 +86,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
  * Method:    loginNative
  * Signature: (JJJI[B)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_loginNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Session_loginNative
   (JNIEnv *env, jobject jsession, jlong mh, jlong shandle, jlong hsession, jint type, jbyteArray jpin)
 {
   int rv;
@@ -120,7 +119,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
  * Method:    logoutNative
  * Signature: (JJJ)V
  */
-JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_logoutNative)
+JNIEXPORT void JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Session_logoutNative
   (JNIEnv *env, jobject jsession, jlong mh, jlong shandle, jlong hsession)
 {
   int rv;

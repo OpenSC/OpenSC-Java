@@ -20,9 +20,9 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
+#include <jniP11private.h>
 #include <org_opensc_pkcs11_wrap_PKCS11Object.h>
 
-#include <jniP11private.h>
 #include <stdlib.h>
 
 #define ENUM_HANDLES_BLOCK_SZ 32
@@ -34,7 +34,7 @@
  * Method:    enumObjectsNative
  * Signature: (JJJ[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;)[J
  */
-JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_enumObjectsNative)
+JNIEXPORT jlongArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Object_enumObjectsNative
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jobjectArray attrs)
 {
   jclass clazz;
@@ -213,7 +213,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
  * Method:    getAttributeNative
  * Signature: (JJJI)[B
  */
-JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getAttributeNative)
+JNIEXPORT jbyteArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Object_getAttributeNative
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
 {
   int rv;
@@ -280,7 +280,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Ob
  * Method:    getMechanismsNative
  * Signature: (JJJJ)[Lorg/opensc/pkcs11/wrap/PKCS11Mechanism;
  */
-jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getAllowedMechanismsNative)
+jobjectArray JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Object_getAllowedMechanismsNative
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle)
 {
   int rv;
@@ -344,7 +344,7 @@ jobjectArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_get
  * Method:    getULongAttributeNative
  * Signature: (JJJJI)I
  */
-jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAttributeNative)
+jint JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAttributeNative
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
 {
   int rv;
@@ -389,7 +389,7 @@ jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getULongAtt
  * Method:    getBooleanAttributeNative
  * Signature: (JJJJI)Z
  */
-jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBooleanAttributeNative)
+jboolean JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Object_getBooleanAttributeNative
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jlong ohandle, jint att)
 {
   int rv;
@@ -433,7 +433,7 @@ jboolean JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_getBool
  * Method:    createObjectNative
  * Signature: (JJJ[Lorg/opensc/pkcs11/wrap/PKCS11Attribute;)J
  */
-JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_createObjectNative)
+JNIEXPORT jlong JNICALL Java_org_opensc_pkcs11_wrap_PKCS11Object_createObjectNative
   (JNIEnv *env, jclass jp11obj, jlong mh, jlong shandle, jlong hsession, jobjectArray attrs)
 {
   int rv;

@@ -21,16 +21,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
-#include <org_opensc_pkcs11_PKCS11Provider.h>
-
 #include <jniP11private.h>
+#include <org_opensc_pkcs11_PKCS11Provider.h>
 
 /*
  * Class:     org_opensc_pkcs11_PKCS11Provider
  * Method:    loadPKCS11Module
  * Signature: ([B)J
  */
-jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_loadNativePKCS11Module)
+jlong JNICALL Java_org_opensc_pkcs11_PKCS11Provider_loadNativePKCS11Module
   (JNIEnv *env, jobject provider, jstring filename)
 {
   pkcs11_module_t *mod =  new_pkcs11_module(env,filename);
@@ -45,7 +44,7 @@ jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_loadNativePKC
  * Method:    unloadPKCS11Module
  * Signature: (J)V
  */
-void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_PKCS11Provider_unloadPKCS11Module)
+void JNICALL Java_org_opensc_pkcs11_PKCS11Provider_unloadPKCS11Module
   (JNIEnv *env, jobject provider, jlong handle)
 {
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,handle);
