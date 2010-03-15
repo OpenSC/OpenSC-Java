@@ -1,3 +1,27 @@
+jni-opensc-pkcs11 (0.2.3-0clazzes2) any; urgency=medium
+
+  * Fix debian dependencies in order to fix PPA builds.
+
+ -- Wolfgang Glas (ev-i Informationstechnologie GmbH) <wolfgang.glas@ev-i.at>  Mon, 15 Mar 2010 13:35:56 +0100
+
+jni-opensc-pkcs11 (0.2.3-0clazzes1~karmic1) karmic; urgency=medium
+
+  * Upload to clazzes.org PPA for karmic.
+ 
+ -- Wolfgang Glas (ev-i Informationstechnologie GmbH) <wolfgang.glas@ev-i.at>  Mon, 15 Mar 2010 09:55:13 +0100
+
+jni-opensc-pkcs11 (0.2.3-0clazzes1~jaunty1) jaunty; urgency=medium
+
+  * Upload to clazzes.org PPA for jaunty.
+ 
+ -- Wolfgang Glas (ev-i Informationstechnologie GmbH) <wolfgang.glas@ev-i.at>  Mon, 15 Mar 2010 09:55:11 +0100
+
+jni-opensc-pkcs11 (0.2.3-0clazzes1~hardy1) hardy; urgency=medium
+
+  * Upload to clazzes.org PPA for hardy.
+ 
+ -- Wolfgang Glas (ev-i Informationstechnologie GmbH) <wolfgang.glas@ev-i.at>  Mon, 15 Mar 2010 09:55:10 +0100
+
 jni-opensc-pkcs11 (0.2.3-0) any; urgency=medium
 
   * Initial debianization.
