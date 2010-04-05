@@ -6,70 +6,27 @@ LIBS=-ljnix
 
 srcdir=../../src/jniP11
 
-OBJS=org_opensc_pkcs11_PKCS11Provider.o \
-     org_opensc_pkcs11_spi_PKCS11CipherSpi.o \
-     org_opensc_pkcs11_spi_PKCS11SignatureSpi.o \
-     org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.o \
-     org_opensc_pkcs11_wrap_PKCS11Object.o \
-     org_opensc_pkcs11_wrap_PKCS11Session.o \
-     org_opensc_pkcs11_wrap_PKCS11Slot.o \
-     pkcs11_error.o \
-     pkcs11_module.o \
-     pkcs11_slot.o
+SOURCES=org_opensc_pkcs11_PKCS11Provider.c \
+     org_opensc_pkcs11_spi_PKCS11CipherSpi.c \
+     org_opensc_pkcs11_spi_PKCS11SignatureSpi.c \
+     org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.c \
+     org_opensc_pkcs11_wrap_PKCS11Object.c \
+     org_opensc_pkcs11_wrap_PKCS11Session.c \
+     org_opensc_pkcs11_wrap_PKCS11Slot.c \
+     pkcs11_error.c \
+     pkcs11_module.c \
+     pkcs11_slot.c
 
+OBJS=$(addsuffix .o,$(basename $(SOURCES))) 
+DEPENDS=$(addsuffix .d,$(basename $(SOURCES))) 
 
-%.o: $(srcdir)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o %.d: $(srcdir)/%.c
+	$(CC) $(CFLAGS) -MMD -MT '$*.d $*.o' -c $< -o $*.o
 
 opensc-PKCS11-0.2.dll: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 
-org_opensc_pkcs11_PKCS11Provider.o: \
- $(srcdir)/org_opensc_pkcs11_PKCS11Provider.c \
- $(srcdir)/org_opensc_pkcs11_PKCS11Provider.h \
- $(srcdir)/jniP11private.h
-
-org_opensc_pkcs11_spi_PKCS11CipherSpi.o: \
- $(srcdir)/org_opensc_pkcs11_spi_PKCS11CipherSpi.c \
- $(srcdir)/org_opensc_pkcs11_spi_PKCS11CipherSpi.h \
- $(srcdir)/jniP11private.h
-
-org_opensc_pkcs11_spi_PKCS11SignatureSpi.o: \
- $(srcdir)/org_opensc_pkcs11_spi_PKCS11SignatureSpi.c \
- $(srcdir)/org_opensc_pkcs11_spi_PKCS11SignatureSpi.h \
- $(srcdir)/jniP11private.h
-
-org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.o: \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.c \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11KeyPairGenerator.h \
- $(srcdir)/jniP11private.h
-
-org_opensc_pkcs11_wrap_PKCS11Object.o: \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11Object.c \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11Object.h \
- $(srcdir)/jniP11private.h
-
-org_opensc_pkcs11_wrap_PKCS11Session.o: \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11Session.c \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11Session.h \
- $(srcdir)/jniP11private.h
-
-org_opensc_pkcs11_wrap_PKCS11Slot.o: \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11Slot.c \
- $(srcdir)/org_opensc_pkcs11_wrap_PKCS11Slot.h \
- $(srcdir)/jniP11private.h
-
-pkcs11_error.o: \
- $(srcdir)/pkcs11_error.c \
- $(srcdir)/jniP11private.h
-
-pkcs11_module.o: \
- $(srcdir)/pkcs11_module.c \
- $(srcdir)/jniP11private.h
-
-pkcs11_slot.o: \
- $(srcdir)/pkcs11_slot.c \
- $(srcdir)/jniP11private.h
-
 clean:
-	rm -f opensc-PKCS11-0.2.dll $(OBJS)
+	rm -f opensc-PKCS11-0.2.dll $(OBJS) $(DEPENDS)
+
+include $(DEPENDS)
