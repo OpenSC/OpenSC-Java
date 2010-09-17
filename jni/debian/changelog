@@ -1,3 +1,9 @@
+jni-opensc-pkcs11 (0.2.3-1) any; urgency=medium
+
+  * Upload to deb.clazzes.org using new PBA build engine.
+
+ -- Wolfgang Glas (ev-i Informationstechnologie GmbH) <wolfgang.glas@ev-i.at>  Fri, 17 Sep 2010 08:48:13 +0200
+
 jni-opensc-pkcs11 (0.2.3-0clazzes2~karmic1) karmic; urgency=medium
 
   * Upload to clazzes.org PPA for karmic.
