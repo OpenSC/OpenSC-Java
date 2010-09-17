@@ -3,6 +3,11 @@ Section: utils
 Priority: optional
 Maintainer: Wolfgang Glas <wolfgang.glas@ev-i.at>
 Build-Depends: cdbs, debhelper (>> 5), mingw-w32-jnix, mingw-w64-jnix
+XBCS-PBA-Category: fancylibs
+XBCS-PBA-Generation: 2
+XBCS-PBA-Distributions: lucid squeeze
+XBCS-PBA-Repositories: deb.clazzes.org
+XBCS-PBA-Build-Source-Mingw: deb http://deb.clazzes.org/$family $distribution-mingw-3 main
 
 Package: mingw-w32-jni-opensc-pkcs11
 Architecture: any
