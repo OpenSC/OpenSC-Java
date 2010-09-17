@@ -1,13 +1,8 @@
-Source: jni-opensc-pkcs11
+Source: jni-opensc-pkcs11-mingw
 Section: utils
 Priority: optional
 Maintainer: Wolfgang Glas <wolfgang.glas@ev-i.at>
-Build-Depends: cdbs, debhelper (>> 5), gcc, jnix, libltdl-dev|libltdl3-dev|libltdl7-dev, mingw-w32-jnix, mingw-w64-jnix
-
-Package: jni-opensc-pkcs11
-Architecture: any
-Depends: java-runtime, libltdl7|libltdl3
-Description: jni-opensc-pkcs11 is the java native plugin for the opensc-java pkcs11 library.
+Build-Depends: cdbs, debhelper (>> 5), mingw-w32-jnix, mingw-w64-jnix
 
 Package: mingw-w32-jni-opensc-pkcs11
 Architecture: any

@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-O2 -fPIC -I../../src/jniP11 -I/usr/lib/jvm/java-6-openjdk/include
+CFLAGS=-g -O2 -fPIC -I../../src/jniP11 -I/usr/lib/jvm/java-6-openjdk/include
 LD=gcc
-LDFLAGS=-shared -s
+LDFLAGS=-shared
 LIBS=-ljnix -lltdl
 
 srcdir=../../src/jniP11

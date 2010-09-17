@@ -1,4 +1,4 @@
-jni-opensc-pkcs11 (0.2.3-1) any; urgency=medium
+jni-opensc-pkcs11-mingw (0.2.3-1) any; urgency=medium
 
   * Upload to deb.clazzes.org using new PBA build engine.
 
