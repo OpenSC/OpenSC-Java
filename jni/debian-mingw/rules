@@ -1,0 +1,42 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+DEB_DH_ALWAYS_EXCLUDE := .svn
+
+package = jni-opensc-pkcs11
+docdir = debian/tmp/usr/share/doc/$(package)
+
+builddir = build/unix
+w32builddir = build/mingw32
+w64builddir = build/mingw64
+
+# do not strip anything.
+# call 'strip' on a mingw lib*.a file causes the ranlib information to
+# be discarded rendering the libraries useless.
+DEB_DH_STRIP_ARGS := -Xpc-mingw32
+
+INSTALL_PROGRAM = install
+
+common-build-arch::
+	cd $(builddir) && $(MAKE)
+	cd $(w32builddir) && $(MAKE)
+	cd $(w64builddir) && $(MAKE)
+	touch common-build-arch
+
+clean::
+	rm -f common-install-arch common-build-arch
+	rm -rf *~ debian/jni-opensc-pkcs11 debian/mingw-w32-jni-opensc-pkcs11 debian/mingw-w64-jni-opensc-pkcs11 debian/substvars debian/compat
+	-cd $(builddir) && make clean
+	-cd $(w32builddir) && make clean
+	-cd $(w64builddir) && make clean
+
+common-install-arch::
+	rm -rf debian/jni-opensc-pkcs11 debian/mingw-w32-jni-opensc-pkcs11 debian/mingw-w64-jni-opensc-pkcs11
+	mkdir -p debian/jni-opensc-pkcs11/usr/lib/jni
+	mkdir -p debian/mingw-w32-jni-opensc-pkcs11/usr/i686-pc-mingw32/bin
+	mkdir -p debian/mingw-w64-jni-opensc-pkcs11/usr/x86_64-pc-mingw32/bin
+	cp -p $(builddir)/libopensc-PKCS11-0.2.so debian/jni-opensc-pkcs11/usr/lib/jni
+	cp -p $(w32builddir)/opensc-PKCS11-0.2.dll debian/mingw-w32-jni-opensc-pkcs11/usr/i686-pc-mingw32/bin
+	cp -p $(w64builddir)/opensc-PKCS11-0.2.dll debian/mingw-w64-jni-opensc-pkcs11/usr/x86_64-pc-mingw32/bin
+	touch common-install-arch
